@@ -1,6 +1,6 @@
 # CT313H: WEB TECHNOLOGIES AND SERVICES
 
-## Project Name: Building a Web-Based Learning Management Platform "LitUp!"
+## Project Name: Building a Web-Based Learning Management Platform LitUp!"
 
 Semester 3, Academic year: 2024-2025
 
@@ -12,4 +12,4 @@ Semester 3, Academic year: 2024-2025
 
 **Student Name 2**: Huỳnh Tiểu Băng
 
-**Class Number**: CT313H/M01
+**Class Number**: CT313HM01
