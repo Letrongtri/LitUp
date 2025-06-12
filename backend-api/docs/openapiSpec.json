@@ -1,0 +1,185 @@
+{
+    "openapi": "3.1.1",
+    "info": {
+      "title": "LitUp API",
+      "version": "1.0.0",
+      "description": "A learning management system",
+      "contact": {
+        "name": "LitUp Team",
+        "email": "contact@litup.dev"
+      }
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000",
+        "description": "Development server"
+      }
+    ],
+    "paths": {
+      "/api/auth/register": {
+        "post": {
+          "summary": "User registration",
+          "description": "Register a new user account",
+          "operationId": "registerUser",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegistration"
+                }
+              }
+            }
+          },
+          "tags": ["auth"],
+          "responses": {
+            "201": {
+              "description": "User registered successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/responses/AuthSuccess"
+                  }
+                }
+              }
+            },
+            "400": {"$ref": "#/components/responses/400BadRequest"},
+            "500": {"$ref": "#/components/responses/500InternalServerError"}
+          }
+        }
+      },
+      "/api/auth/login": {
+        "post": {
+          "summary": "User login",
+          "description": "Login with email and password",
+          "operationId": "loginUser",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserLogin"
+                }
+              }
+            }
+          },
+          "tags": ["auth"],
+          "responses": {
+            "200": {
+              "description": "Login successful",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/responses/AuthSuccess"
+                  }
+                }
+              }
+            },
+            "401": {"$ref": "#/components/responses/401Unauthorized"},
+            "400": {"$ref": "#/components/responses/400BadRequest"},
+            "500": {"$ref": "#/components/responses/500InternalServerError"}
+          }
+        }
+      },
+      "/api/profile": {
+        "get": {
+          "summary": "Get user profile",
+          "description": "Get current user profile information (requires JWT)",
+          "operationId": "getUserProfile",
+          "security": [{"bearerAuth": []}],
+          "tags": ["profile"],
+          "responses": {
+            "200": {
+              "description": "User profile information",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {"type": "string", "enum": ["success"]},
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "user": {"$ref": "#/components/schemas/User"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {"$ref": "#/components/responses/401Unauthorized"},
+            "500": {"$ref": "#/components/responses/500InternalServerError"}
+          }
+        }
+      },
+      "/api/profile/{id}": {
+        "put": {
+          "summary": "Update user profile",
+          "description": "Update user profile information",
+          "operationId": "updateUserProfile",
+          "security": [{"bearerAuth": []}],
+          "parameters": [
+            {"$ref": "#/components/parameters/userIdParam"}
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserUpdate"
+                }
+              }
+            }
+          },
+          "tags": ["profile"],
+          "responses": {
+            "200": {
+              "description": "Profile updated successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {"type": "string", "enum": ["success"]},
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "user": {"$ref": "#/components/schemas/User"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {"$ref": "#/components/responses/401Unauthorized"},
+            "403": {"$ref": "#/components/responses/403Forbidden"},
+            "404": {"$ref": "#/components/responses/404NotFound"},
+            "400": {"$ref": "#/components/responses/400BadRequest"},
+            "500": {"$ref": "#/components/responses/500InternalServerError"}
+          }
+        },
+        "delete": {
+          "summary": "Delete user account",
+          "description": "Delete user account",
+          "operationId": "deleteUserAccount",
+          "security": [{"bearerAuth": []}],
+          "parameters": [
+            {"$ref": "#/components/parameters/userIdParam"}
+          ],
+          "tags": ["profile"],
+          "responses": {
+            "200": {
+              "description": "Account deleted successfully",
+              "$ref": "#/components/responses/200NoData"
+            },
+            "401": {"$ref": "#/components/responses/401Unauthorized"},
+            "403": {"$ref": "#/components/responses/403Forbidden"},
+            "404": {"$ref": "#/components/responses/404NotFound"},
+            "500": {"$ref": "#/components/responses/500InternalServerError"}
+          }
+        }
+    }
+}
+}
