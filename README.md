@@ -1,6 +1,6 @@
 # CT313H: WEB TECHNOLOGIES AND SERVICES
 
-## Project Name: ...
+## Project Name: Building a Web-Based Learning Management Platform "LitUp!"
 
 Semester 3, Academic year: 2024-2025
 
