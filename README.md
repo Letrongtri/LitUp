@@ -4,13 +4,12 @@
 
 Semester 3, Academic year: 2024-2025
 
-**Student ID 1**: ...
+**Student ID 1**: B2206019
 
-**Student Name 1**: ...
+**Student Name 1**: Lê Trọng Trí
 
-**Student ID 2**: ...
+**Student ID 2**: B2205973
 
-**Student Name 2**: ...
+**Student Name 2**: Huỳnh Tiểu Băng
 
-**Class Number**: ...
-
+**Class Number**: CT313H/M01
