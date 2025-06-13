@@ -1,31 +1,35 @@
+const JSend = require("../jsend");
+
 function overview(req, res) {
-  return res.json({
-    users: {},
-    classrooms: {},
-    assignments: {},
-    submissions: {},
-    assignment: {},
-  });
+  return res.status(201).json(
+    JSend.success({
+      users: {},
+      classrooms: {},
+      assignments: {},
+      submissions: {},
+      assignment: {},
+    })
+  );
 }
 
 function getUsers(req, res) {
-  return res.json({ users: [] });
+  return res.status(201).json(JSend.success({ users: [] }));
 }
 
 function updateUser(req, res) {
-  return res.json({ user: {} });
+  return res.status(201).json(JSend.success({ user: {} }));
 }
 
 function getClassrooms(req, res) {
-  return res.json({ classrooms: [] });
+  return res.status(201).json(JSend.success({ classrooms: [] }));
 }
 
 function updateClassroom(req, res) {
-  return res.json({ Classroom: {} });
+  return res.status(201).json(JSend.success({ classroom: {} }));
 }
 
 function updateAssignment(req, res) {
-  return res.json({ assignment: {} });
+  return res.status(201).json(JSend.success({ assignment: {} }));
 }
 
 module.exports = {

@@ -1,6 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 
+// standardize json responses
+const JSend = require("./jsend");
+
 // routes
 const adminRouter = require("./routes/admin.router");
 const assignmentsRouter = require("./routes/assignments.router");
@@ -16,9 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-  return res.json({
-    message: "ok",
-  });
+  return res.json(JSend.success());
 });
 
 adminRouter.setup(app);
