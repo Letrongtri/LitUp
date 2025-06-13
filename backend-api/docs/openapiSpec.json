@@ -308,7 +308,7 @@
                 }
             ],
             "responses": {
-                "200" {
+                "200": {
                     "description":"Classroom details",
                     "content": {
                         "application/json":{
@@ -411,5 +411,284 @@
                     "404": {"$ref": "#/components/responses/404NotFound"},
                     "500": {"$ref": "#/components/responses/500InternalServerError"}
                 }
+            }
+        },
+        "/api/classrooms/{id}/assignments": {
+            "post": {
+              "summary": "Create assignment",
+              "description": "Create a new assignment in classroom",
+              "operationId": "createAssignment",
+              "tags": ["assignments"],
+              "parameters": [
+                {
+                  "$ref": "#/components/parameters/classroomIdParam"
+                }
+              ],
+              "requestBody": {
+                "required": true,
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/AssignmentCreate"
+                    }
+                  }
+                }
+              },
+              "responses": {
+                "201": {
+                  "description": "Assignment created successfully",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/Assignment"
+                      }
+                    }
+                  }
+                },
+                "401": {"$ref": "#/components/responses/401Unauthorized"},
+                "403": {"$ref": "#/components/responses/403Forbidden"},
+                "404": {"$ref": "#/components/responses/404NotFound"},
+                "400": {"$ref": "#/components/responses/400BadRequest"},
+                "500": {"$ref": "#/components/responses/500InternalServerError"}
+              }
             },
+            "get": {
+              "summary": "Get classroom assignments",
+              "description": "Get list of assignments in a classroom",
+              "operationId": "getClassroomAssignments",
+              "tags": ["assignments"],
+              "parameters": [
+                {
+                  "$ref": "#/components/parameters/classroomIdParam"
+                },
+                {
+                  "$ref": "#/components/parameters/limitParam"
+                },
+                {
+                  "$ref": "#/components/parameters/pageParam"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "List of assignments in classroom",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "enum": ["success"]
+                          },
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "assignments": {
+                                "type": "array",
+                                "items": {
+                                  "$ref": "#/components/schemas/Assignment"
+                                }
+                              },
+                              "metadata": {
+                                "$ref": "#/components/schemas/PaginationMetadata"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "401": {"$ref": "#/components/responses/401Unauthorized"},
+                "403": {"$ref": "#/components/responses/403Forbidden"},
+                "404": {"$ref": "#/components/responses/404NotFound"},
+                "500": {"$ref": "#/components/responses/500InternalServerError"}
+              }
+            }
+          },
+        "/api/assignments/{id}": {
+            "get": {
+                "summary": "Get assignment details",
+                "description": "Get detailed information about an assignment",
+                "operationId": "getAssignmentDetails",
+                "tags": ["assignments"],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/assignmentIdParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description":"Assignment details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssignmentDetails"
+                                }
+                            }
+                        }
+                    },
+                    "401": {"$ref": "#/components/responses/401Unauthorized"},
+                    "403": {"$ref": "#/components/responses/403Forbidden"},
+                    "404": {"$ref": "#/components/responses/404NotFound"},
+                    "500": {"$ref": "#/components/responses/500InternalServerError"}
+                }
+            },
+            "put": {
+                "summary": "Update assignment",
+                "description": "Update assignment info",
+                "operationId": "updateAssignment",
+                "tags":["assignments"],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/assignmentIdParam"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssignmentUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Assignment updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Assignment"
+                                }
+                            }
+                        }
+                    },
+                    "401": {"$ref": "#/components/responses/401Unauthorized"},
+                    "403": {"$ref": "#/components/responses/403Forbidden"},
+                    "404": {"$ref": "#/components/responses/404NotFound"},
+                    "400": {"$ref": "#/components/responses/400BadRequest"},
+                    "500": {"$ref": "#/components/responses/500InternalServerError"}
+                }
+            },
+            "delete": {
+                "summary": "Delete assignment",
+                "description": "Delete an assignment",
+                "operationId": "deleteAssignment",
+                "tags": ["assignments"],
+                "parameters": [
+                  {
+                    "$ref": "#/components/parameters/assignmentIdParam"
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Assignment deleted successfully",
+                    "$ref": "#/components/responses/200NoData"
+                  },
+                  "401": {"$ref": "#/components/responses/401Unauthorized"},
+                  "403": {"$ref": "#/components/responses/403Forbidden"},
+                  "404": {"$ref": "#/components/responses/404NotFound"},
+                  "500": {"$ref": "#/components/responses/500InternalServerError"}
+                }
+              }
+            },
+        "/api/assignments/{id}/submit": {
+            "post": {
+                "summary": "Submit assignment",
+                "description": "Strudent submits assignment",
+                "operationId":"submitAssignment",
+                "tags": ["submissions"],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/assignmentIdParam"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssignmentSubmission"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Assignmrnt submitted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Submission"
+                                }
+                            }
+                        }
+                    },
+                    "401": {"$ref": "#/components/responses/401Unauthorized"},
+                    "403": {"$ref": "#/components/responses/403Forbidden"},
+                    "404": {"$ref": "#/components/responses/404NotFound"},
+                    "400": {"$ref": "#/components/responses/400BadRequest"},
+                    "500": {"$ref": "#/components/responses/500InternalServerError"}
+                }
+            }
+        },
+        "/api/assignments/{id}/submissions": {
+            "get": {
+                "summary": "Get assignment submissions",
+                "description": "View submission",
+                "operationId": "getAssignmentSubmissions",
+                "tags": ["submissions"],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/assignmentIdParam"
+                    },
+                    {
+                        "$ref": "#/components/parameters/limitParam"
+                    },
+                    {
+                        "$ref":"#/components/parameters/pageParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of submissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type":"object",
+                                    "properties": {
+                                        "status": {
+                                            "type":"string",
+                                            "enum":["success"]
+                                        },
+                                        "data": {
+                                            "type":"object",
+                                            "properties": {
+                                                "submissions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref":"#/components/schemas/Submission"
+                                                    }
+                                                },
+                                                "metadata": {
+                                                    "$ref": "#/components/schemas/PaginationMetadata"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "401": {"$ref": "#/components/responses/401Unauthorized"},
+                        "403": {"$ref": "#/components/responses/403Forbidden"},
+                        "404": {"$ref": "#/components/responses/404NotFound"},
+                        "500": {"$ref": "#/components/responses/500InternalServerError"}
+                    }
+                }
+            }
+        }
+
+
             
