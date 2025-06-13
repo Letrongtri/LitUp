@@ -12,7 +12,7 @@ function getUsers(req, res) {
   return res.json({ users: [] });
 }
 
-function getUser(req, res) {
+function updateUser(req, res) {
   return res.json({ user: {} });
 }
 
@@ -20,7 +20,7 @@ function getClassrooms(req, res) {
   return res.json({ classrooms: [] });
 }
 
-function getClassroom(req, res) {
+function updateClassroom(req, res) {
   return res.json({ Classroom: {} });
 }
 
@@ -31,8 +31,8 @@ function updateAssignment(req, res) {
 module.exports = {
   overview,
   getUsers,
-  getUser,
+  updateUser,
   getClassrooms,
-  getClassroom,
+  updateClassroom,
   updateAssignment,
 };

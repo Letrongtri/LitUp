@@ -2,7 +2,7 @@ function createClassroom(req, res) {
   return res.status(201).json({ classroom: {} });
 }
 
-function getClassroomsByFilter(req, res) {
+function getClassrooms(req, res) {
   //   const filters = [];
   //   const { favorite, name } = req.query;
 
@@ -42,7 +42,7 @@ function getMembersInClass(req, res) {
 
 module.exports = {
   createClassroom,
-  getClassroomsByFilter,
+  getClassrooms,
   getClassroom,
   updateClassroom,
   deleteClassroom,
