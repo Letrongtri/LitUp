@@ -81,7 +81,7 @@
           }
         }
       },
-      "/api/profile": {
+      "/api/user": {
         "get": {
           "summary": "Get user profile",
           "description": "Get current user profile information (requires JWT)",
@@ -113,7 +113,7 @@
           }
         }
       },
-      "/api/profile/{id}": {
+      "/api/user/{id}": {
         "put": {
           "summary": "Update user profile",
           "description": "Update user profile information",
