@@ -2,16 +2,27 @@ const express = require("express");
 
 const assignmentsController = require("../controllers/assignments.controller");
 const submissionsController = require("../controllers/submissions.controller");
+const allowedMethods = require("../middlewares/allowedMethods.middleware");
 
 const router = express.Router();
 
 module.exports.setup = (app) => {
   app.use("/api/assignments", router);
 
-  router.post("/:id/submit", submissionsController.createSubmission);
-  router.put("/:id/submissions", submissionsController.getSubmissions);
+  router
+    .route("/:id/submit")
+    .post(submissionsController.createSubmission)
+    .all(allowedMethods(["POST"]));
 
-  router.get("/:id", assignmentsController.getAssignment);
-  router.put("/:id", assignmentsController.updateAssignment);
-  router.delete("/:id", assignmentsController.deleteAssignment);
+  router
+    .route("/:id/submissions")
+    .put(submissionsController.getSubmissions)
+    .all(allowedMethods(["PUT"]));
+
+  router
+    .route("/:id")
+    .get(assignmentsController.getAssignment)
+    .put(assignmentsController.updateAssignment)
+    .delete(assignmentsController.deleteAssignment)
+    .all(allowedMethods(["GET", "PUT", "DELETE"]));
 };

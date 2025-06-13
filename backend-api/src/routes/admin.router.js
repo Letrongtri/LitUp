@@ -1,19 +1,40 @@
 const express = require("express");
 
 const adminController = require("../controllers/admin.controller");
+const allowedMethods = require("../middlewares/allowedMethods.middleware");
 
 const router = express.Router();
 
 module.exports.setup = (app) => {
   app.use("/api/admin", router);
 
-  router.get("/overview", adminController.overview);
+  router
+    .route("/overview")
+    .get(adminController.overview)
+    .all(allowedMethods(["GET"]));
 
-  router.get("/users", adminController.getUsers);
-  router.put("/users/:id", adminController.updateUser);
+  router
+    .route("/users")
+    .get(adminController.getUsers)
+    .all(allowedMethods(["GET"]));
 
-  router.get("/classrooms", adminController.getClassrooms);
-  router.put("/classrooms/:id", adminController.updateClassroom);
+  router
+    .route("/users/:id")
+    .put(adminController.updateUser)
+    .all(allowedMethods(["PUT"]));
 
-  router.put("/assignments/:id", adminController.updateAssignment);
+  router
+    .route("/classrooms")
+    .get(adminController.getClassrooms)
+    .all(allowedMethods(["GET"]));
+
+  router
+    .route("/classrooms/:id")
+    .put(adminController.updateClassroom)
+    .all(allowedMethods(["PUT"]));
+
+  router
+    .route("/assignments/:id")
+    .put(adminController.updateAssignment)
+    .all(allowedMethods(["PUT"]));
 };
