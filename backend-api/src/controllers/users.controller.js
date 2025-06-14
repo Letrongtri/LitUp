@@ -1,15 +1,15 @@
+const JSend = require("../jsend");
+
 function getUser(req, res) {
-  return res.json({ contact: {} });
+  return res.status(201).json(JSend.success({ user: {} }));
 }
 
 function updateUser(req, res) {
-  return res.json({ user: {} });
+  return res.status(201).json(JSend.success({ users: {} }));
 }
 
 function deleteUser(req, res) {
-  return res.json({
-    message: "User deleted",
-  });
+  return res.status(201).json(JSend.success());
 }
 
 module.exports = {
