@@ -28,6 +28,8 @@ app.get("/", (req, res) => {
   return res.json(JSend.success());
 });
 
+app.use("/public", express.static("public"));
+
 adminRouter.setup(app);
 assignmentsRouter.setup(app);
 authRouter.setup(app);
