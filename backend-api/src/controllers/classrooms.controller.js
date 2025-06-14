@@ -1,48 +1,36 @@
+const JSend = require("../jsend");
+
 function createClassroom(req, res) {
-  return res.status(201).json({ classroom: {} });
+  return res.status(201).json(JSend.success({ classroom: {} }));
 }
 
-function getClassroomsByFilter(req, res) {
-  //   const filters = [];
-  //   const { favorite, name } = req.query;
-
-  //   if (favorite !== undefined) {
-  //     filters.push(`favorite=${favorite}`);
-  //   }
-  //   if (name) {
-  //     filters.push(`name=${name}`);
-  //   }
-
-  //   console.log(filters.join("&"));
-
-  return res.json({ classrooms: [] });
+function getClassrooms(req, res) {
+  return res.status(201).json(JSend.success({ classrooms: [] }));
 }
 
 function getClassroom(req, res) {
-  return res.json({ classroom: {} });
+  return res.status(201).json(JSend.success({ classroom: {} }));
 }
 
 function updateClassroom(req, res) {
-  return res.json({ classroom: {} });
+  return res.status(201).json(JSend.success({ classroom: {} }));
 }
 
 function deleteClassroom(req, res) {
-  return res.json({
-    message: "Classroom deleted",
-  });
+  return res.status(201).json(JSend.success());
 }
 
 function joinClassroom(req, res) {
-  return res.status(201).json({ message: "Joined successfully" });
+  return res.status(201).json(JSend.success({ users: [] }));
 }
 
 function getMembersInClass(req, res) {
-  return res.json({ users: [] });
+  return res.status(201).json(JSend.success({ users: [] }));
 }
 
 module.exports = {
   createClassroom,
-  getClassroomsByFilter,
+  getClassrooms,
   getClassroom,
   updateClassroom,
   deleteClassroom,
