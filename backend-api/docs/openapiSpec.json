@@ -3,10 +3,10 @@
   "info": {
     "title": "LitUp API",
     "version": "1.0.0",
-    "description": "A learning management system API",
+    "description": "A learning management system",
     "contact": {
-      "name": "Lê Trọng Trí, Huỳnh Tiểu Băng",
-      "email": "trib2206019@student.ctu.edu.vn"
+      "name": "LitUp Team",
+      "email": "contact@litup.dev"
     }
   },
   "servers": [
@@ -20,13 +20,13 @@
       "post": {
         "summary": "User registration",
         "description": "Register a new user account",
-        "operationId": "register",
+        "operationId": "registerUser",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Users"
+                "$ref": "#/components/schemas/UserRegistration"
               }
             }
           }
@@ -43,8 +43,8 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
+          "400": {"$ref": "#/components/responses/400BadRequest"},
+          "500": {"$ref": "#/components/responses/500InternalServerError"}
         }
       }
     },
@@ -52,7 +52,7 @@
       "post": {
         "summary": "User login",
         "description": "Login with email and password",
-        "operationId": "login",
+        "operationId": "loginUser",
         "requestBody": {
           "required": true,
           "content": {
@@ -75,19 +75,19 @@
               }
             }
           },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
+          "401": {"$ref": "#/components/responses/401Unauthorized"},
+          "400": {"$ref": "#/components/responses/400BadRequest"},
+          "500": {"$ref": "#/components/responses/500InternalServerError"}
         }
       }
     },
-    "/api/users": {
+    "/api/user": {
       "get": {
         "summary": "Get user profile",
         "description": "Get current user profile information (requires JWT)",
-        "operationId": "getUser",
-        "security": [{ "bearerAuth": [] }],
-        "tags": ["users"],
+        "operationId": "getUserProfile",
+        "security": [{"bearerAuth": []}],
+        "tags": ["profile"],
         "responses": {
           "200": {
             "description": "User profile information",
@@ -96,11 +96,11 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": { "type": "string", "enum": ["success"] },
+                    "status": {"type": "string", "enum": ["success"]},
                     "data": {
                       "type": "object",
                       "properties": {
-                        "user": { "$ref": "#/components/schemas/Users" }
+                        "user": {"$ref": "#/components/schemas/User"}
                       }
                     }
                   }
@@ -108,18 +108,20 @@
               }
             }
           },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
+          "401": {"$ref": "#/components/responses/401Unauthorized"},
+          "500": {"$ref": "#/components/responses/500InternalServerError"}
         }
       }
     },
-    "/api/users/{id}": {
+    "/api/user/{id}": {
       "put": {
         "summary": "Update user profile",
         "description": "Update user profile information",
-        "operationId": "updateUser",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "$ref": "#/components/parameters/userIdParam" }],
+        "operationId": "updateUserProfile",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/userIdParam"}
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -130,7 +132,7 @@
             }
           }
         },
-        "tags": ["users"],
+        "tags": ["profile"],
         "responses": {
           "200": {
             "description": "Profile updated successfully",
@@ -139,1135 +141,552 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": { "type": "string", "enum": ["success"] },
+                    "status": {"type": "string", "enum": ["success"]},
                     "data": {
                       "type": "object",
                       "properties": {
-                        "user": { "$ref": "#/components/schemas/User" }
+                        "user": {"$ref": "#/components/schemas/User"}
                       }
                     }
                   }
                 }
               }
             }
-<<<<<<< HEAD
-        },
-        "/api/admin/classrooms": {
-            "get": {
-                "summary": "Get all classrooms",
-                "description": "Get list of all classrooms for admin management",
-                "operationId": "getAllClassrooms",
-                "tags": ["admin"],
-                "parameters": [
-                {
-                    "$ref": "#/components/parameters/limitParam"
-                },
-                {
-                    "$ref": "#/components/parameters/pageParam"
-                }
-                ],
-                "responses": {
-                "200": {
-                    "description": "List of all classrooms",
-                    "content": {
-                    "application/json": {
-                        "schema": {
-                        "type": "object",
-                        "properties": {
-                            "status": {
-                            "type": "string",
-                            "enum": ["success"]
-                            },
-                            "data": {
-                            "type": "object",
-                            "properties": {
-                                "classrooms": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/AdminClassroomView"
-                                }
-                                },
-                                "metadata": {
-                                "$ref": "#/components/schemas/PaginationMetadata"
-                                }
-                            }
-                            }
-                        }
-                        }
-                    }
-                    }
-                },
-                "401": {"$ref": "#/components/responses/401Unauthorized"},
-                "403": {"$ref": "#/components/responses/403Forbidden"},
-                "500": {"$ref": "#/components/responses/500InternalServerError"}
-                }
-            }
-            },
-            "/api/admin/classrooms/{id}": {
-            "put": {
-                "summary": "Lock/unlock classroom",
-                "description": "Admin can lock or unlock classrooms",
-                "operationId": "toggleClassroomStatus",
-                "tags": ["admin"],
-                "parameters": [
-                {
-                    "$ref": "#/components/parameters/classroomIdParam"
-                }
-                ],
-                "requestBody": {
-                "required": true,
-                "content": {
-                    "application/json": {
-                    "schema": {
-                        "$ref": "#/components/schemas/ClassroomStatusUpdate"
-                    }
-                    }
-                }
-                },
-                "responses": {
-                "200": {
-                    "description": "Classroom status updated",
-                    "content": {
-                    "application/json": {
-                        "schema": {
-                        "$ref": "#/components/schemas/AdminClassroomView"
-                        }
-                    }
-                    }
-                },
-                "401": {"$ref": "#/components/responses/401Unauthorized"},
-                "403": {"$ref": "#/components/responses/403Forbidden"},
-                "404": {"$ref": "#/components/responses/404NotFound"},
-                "400": {"$ref": "#/components/responses/400BadRequest"},
-                "500": {"$ref": "#/components/responses/500InternalServerError"}
-                }
-            }
-            },    
-        "/api/admin/assignments/{id}": {
-            "put": {
-                "summary": "Lock/unlock assignment",
-                "description": "Admin can lock or unlock assignments",
-                "operationId": "toggleAssignmentStatus",
-                "tags": ["admin"],
-                "parameters": [
-                {
-                    "$ref": "#/components/parameters/assignmentIdParam"
-                }
-                ],
-                "requestBody": {
-                "required": true,
-                "content": {
-                    "application/json": {
-                    "schema": {
-                        "$ref": "#/components/schemas/AssignmentStatusUpdate"
-                    }
-                    }
-                }
-                },
-                "responses": {
-                "200": {
-                    "description": "Assignment status updated",
-                    "content": {
-                    "application/json": {
-                        "schema": {
-                        "$ref": "#/components/schemas/AdminAssignmentView"
-                        }
-                    }
-                    }
-                },
-                "401": {"$ref": "#/components/responses/401Unauthorized"},
-                "403": {"$ref": "#/components/responses/403Forbidden"},
-                "404": {"$ref": "#/components/responses/404NotFound"},
-                "400": {"$ref": "#/components/responses/400BadRequest"},
-                "500": {"$ref": "#/components/responses/500InternalServerError"}
-                }
-            }
-        },
-        "components": {
-            "schemas": {
-            "Users": {
-                "type": "object",
-                "properties": {
-                "uid": { "type": "integer", "readOnly": true },
-                "u_email": { "type": "string", "format": "email" },
-                "u_first_name": { "type":"string", "maxLength": 100 },
-                "u_last_name": { "type":"string", "maxLength": 100 },
-                "u_password": { "type": "string", "format": "password", "writeOnly": true },
-                "u_avatar": { "type": "string", "description": "URL of avatar" },
-                "u_role": {
-                    "type": "string",
-                    "enum": ["Student", "Teacher", "Admin"]
-                },
-                "u_status": { "type": "boolean"},
-                "u_created_at": { "type": "string", "format": "date-time", "readOnly": true },
-                "u_updated_at": { "type": "string", "format": "date-time", "readOnly": true },
-                }
-            },
-            "Classroom": {
-                "type": "object",
-                "properties": {
-                "cid": { "type": "integer", "readOnly": true },
-                "c_name": { "type": "string", "maxLength": 255 },
-                "code": { "type": "string", "maxLength": 6 },
-                "c_status": { "type": "boolean"},
-                "c_created_at": { "type": "string", "format": "date-time" },
-                "c_update_at": { "type": "string", "format": "date-time" }
-                }
-            },
-            "Member": {
-              "type": "object",
-              "properties": {
-                "uid": { "type": "integer" },
-                "cid": { "type": "integer" },
-                "m_status": { "type": "string", "maxLength": 10 },
-                "m_joined_at": { "type": "string", "format": "date-time"},
-                "m_removed_at": { "type": "string", "format": "date-time"}
-              }
-            }
-            "Assignment": {
-                "type": "object",
-                "properties": {
-                "id": { "type": "integer", "readOnly": true },
-                "title": { "type": "string" },
-                "description": { "type": "string" },
-                "dueDate": { "type": "string", "format": "date-time" },
-                "isLocked": { "type": "boolean", "default": false }
-                }
-            },
-            "Submission": {
-                "type": "object",
-                "properties": {
-                "id": { "type": "integer", "readOnly": true },
-                "assignmentId": { "type": "integer" },
-                "studentId": { "type": "integer" },
-                "content": { "type": "string" },
-                "submittedAt": { "type": "string", "format": "date-time" }
-                }
-            },
-            "OverviewStats": {
-                "type": "object",
-                "properties": {
-                "totalUsers": { "type": "integer" },
-                "totalClassrooms": { "type": "integer" },
-                "totalAssignments": { "type": "integer" }
-                }
-=======
           },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
+          "401": {"$ref": "#/components/responses/401Unauthorized"},
+          "403": {"$ref": "#/components/responses/403Forbidden"},
+          "404": {"$ref": "#/components/responses/404NotFound"},
+          "400": {"$ref": "#/components/responses/400BadRequest"},
+          "500": {"$ref": "#/components/responses/500InternalServerError"}
         }
       },
       "delete": {
         "summary": "Delete user account",
         "description": "Delete user account",
-        "operationId": "deleteUser",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "$ref": "#/components/parameters/userIdParam" }],
-        "tags": ["users"],
+        "operationId": "deleteUserAccount",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/userIdParam"}
+        ],
+        "tags": ["profile"],
         "responses": {
           "200": {
             "description": "Account deleted successfully",
             "$ref": "#/components/responses/200NoData"
           },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/classrooms": {
-      "post": {
-        "summary": "Create classroom",
-        "description": "Teacher create a new class room",
-        "operationId": "createClassroom",
-        "tags": ["classrooms"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ClassroomCreate"
+          "401": {"$ref": "#/components/responses/401Unauthorized"},
+          "403": {"$ref": "#/components/responses/403Forbidden"},
+          "404": {"$ref": "#/components/responses/404NotFound"},
+          "500": {"$ref": "#/components/responses/500InternalServerError"}
               }
->>>>>>> f61d9584707be9f1c55696ca9a32f4d54e00e6a1
-            }
           }
-        },
-        "responses": {
-          "201": {
-            "description": "Classroom created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Classroom"
-                }
+       },
+      "api/classrooms": {
+          "post": {
+              "summary": "Create classroom",
+              "description": "Teacher create a new class room",
+              "operationId": "createClassroom",
+              "tags": ["classroom"],
+              "requestBody": true,
+              "content": {
+                  "application/json": {
+                      "schema": {
+                          "$ref": "#/components/schemas/ClassroomCreate"
+                      }
+                  }
               }
-            }
           },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
+          "responses": {
+              "201": {
+                  "description": "Classroom created successfully",
+                  "content": {
+                      "application/json": {
+                          "schema": {
+                              "$ref": "#/components/schemas/Classroom"
+                          }
+                      }
+                  }
+              },
+              "401": {"$ref": "#/components/responses/401Unauthorized"},
+              "403": {"$ref": "#/components/responses/403Forbidden"},
+              "400": {"$ref": "#/components/responses/400BadRequest"},
+              "500": {"$ref": "#/components/responses/500InternalServerError"}
+          }
       },
       "get": {
-        "summary": "Get joined classrooms",
-        "description": "Get list of classroom student has joined",
-        "operationId": "getClassrooms",
-        "tags": ["classrooms"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/limitParam"
-          },
-          {
-            "$ref": "#/components/parameters/pageParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of joined classroom",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "enum": ["success"]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "classrooms": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Classroom"
+          "summary": "Get joined classrooms",
+          "description": "Get list of classroom student has joined",
+          "operationId": "GetJoinedClassrooms",
+          "tags": ["classroom"],
+          "parameters": [
+              {
+                  "$ref": "#/components/parameters/limitParam"
+              },
+              {
+                  "$ref": "#/components/parameters/pageParam"
+              }
+          ],
+          "responses": {
+              "200": {
+                  "description": "List of joined classroom",
+                  "content": {
+                      "application/json": {
+                          "schema": {
+                              "type": "object",
+                              "properties": {
+                                  "status": {
+                                      "type": "string",
+                                      "enum": ["success"]
+                                  },
+                                  "data": {
+                                      "type": "object",
+                                      "properties": {
+                                          "classrooms": {
+                                              "type": "array",
+                                              "items": {
+                                                  "$ref": "#/components/schemas/Classroom"
+                                              }
+                                          },
+                                          "metadata": {
+                                              "$ref": "#/components/schemas/PaginationMetadata"
+                                          }
+                                      }
+                                  }
+                              }
                           }
-                        },
-                        "metadata": {
-                          "$ref": "#/components/schemas/PaginationMetadata"
-                        }
                       }
-                    }
                   }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
+              },
+              "401": {"$ref":"#/components/responses/401Unauthorized"},
+              "500": {"$ref":"#/components/responses/500InternalServerError"}
+          }
       }
-    },
-    "/api/classrooms/join": {
+  },
+  "/api/classrooms/join": {
       "post": {
-        "summary": "Join classroom",
-        "description": "Student joins classroom",
-        "operationId": "joinClassroom",
-        "tags": ["classrooms"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ClassroomJoin"
+          "summary": "Join classroom",
+          "description": "Student joins classroom",
+          "operationId": "joinClassroom",
+          "tags": ["classroom"],
+          "requestBody": {
+              "required": true,
+              "content": {
+                  "application/json": {
+                      "schema": {
+                          "$ref": "#/components/schemas/ClassroomJoin"
+                      }
+                  }
               }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successfully joined classroom",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Classroom"
-                }
-              }
-            }
           },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
+          "responses": {
+              "200": {
+                  "description": "Successfully joined classroom",
+                  "content": {
+                      "application/json": {
+                          "schema": {
+                              "$ref": "#/components/schemas/Classroom"
+                          }
+                      }
+                  }
+              },
+              "401": {"$ref":"#/components/responses/401Unauthorized"},
+              "404": {"$ref":"#/components/responses/404NotFound"},
+              "400": {"$ref":"#/components/responses/400BadRequest"},
+              "500": {"$ref":"#/components/responses/500InternalServerError"}
+          }
       }
-    },
-    "/api/classrooms/{id}": {
+  },
+  "/api/classrooms/{id}": {
       "get": {
-        "summary": "Get classroom details",
-        "description": "Deatail of classroom",
-        "operationId": "getClassroom",
-        "tags": ["classrooms"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/classroomIdParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Classroom details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClassroomDetails"
-                }
+          "summary": "Get classroom details",
+          "description": "Deatail of classroom",
+          "operationId": "getClassroomDetails",
+          "tags": ["classroom"],
+          "parameters": [
+              {
+                  "$ref": "#/components/parameters/classroomIdParam"
               }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
+          ],
+          "responses": {
+              "200": {
+                  "description":"Classroom details",
+                  "content": {
+                      "application/json":{
+                          "schema": {
+                              "$ref":"#/components/schemas/ClassroomDetails"
+                          }
+                      }
+                  }
+              },
+              "401": {"$ref": "#/components/responses/401Unauthorized"},
+              "403": {"$ref": "#/components/responses/403Forbidden"},
+              "404": {"$ref": "#/components/responses/404NotFound"},
+              "500": {"$ref": "#/components/responses/500InternalServerError"}
+          }
       },
       "put": {
-        "summary": "Update classroom",
-        "description": "Update classroom information",
-        "operationId": "updateClassroom",
-        "tags": ["classrooms"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/classroomIdParam"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ClassroomUpdate"
-              }
+          "summary": "Update classroom",
+          "description": "Update classroom information",
+          "operationId": "updateClassroom",
+          "tags": ["classrooms"],
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/classroomIdParam"
             }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Classroom updated successfully",
+          ],
+          "requestBody": {
+            "required": true,
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classroom"
+                  "$ref": "#/components/schemas/ClassroomUpdate"
                 }
               }
             }
           },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
+          "responses": {
+              "200": {
+                  "description": "Classroom updated successfully",
+                  "content": {
+                      "application/json": {
+                          "schema": {
+                              "$ref": "#/components/schemas/Classroom"
+                          }
+                      }
+                  }
+              },
+              "401": {"$ref": "#/components/responses/401Unauthorized"},
+              "403": {"$ref": "#/components/responses/403Forbidden"},
+              "404": {"$ref": "#/components/responses/404NotFound"},
+              "400": {"$ref": "#/components/responses/400BadRequest"},
+              "500": {"$ref": "#/components/responses/500InternalServerError"}
+          }
       },
       "delete": {
-        "summary": "Delete classroom",
-        "description": "Delete a classroom",
-        "operationId": "deleteClassroom",
-        "tags": ["classrooms"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/classroomIdParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Classroom deleted successfully",
-            "$ref": "#/components/responses/200NoData"
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/classrooms/{id}/members": {
-      "get": {
-        "summary": "Get classroom members",
-        "description": "Members of classroom",
-        "operationId": "getMemberInClass",
-        "tags": ["classrooms"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/classroomIdParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Classroom Members",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClassroomMembers"
-                }
-              }
+          "summary": "Delete classroom",
+          "description": "Delete a classroom",
+          "operationId": "deleteClassroom",
+          "tags": ["classrooms"],
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/classroomIdParam"
             }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/classrooms/{id}/assignments": {
-      "post": {
-        "summary": "Create assignment",
-        "description": "Create a new assignment in classroom",
-        "operationId": "createAssignment",
-        "tags": ["assignments"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/classroomIdParam"
+          ],
+          "responses": {
+            "200": {
+              "description": "Classroom deleted successfully",
+              "$ref": "#/components/responses/200NoData"
+            },
+            "401": {"$ref": "#/components/responses/401Unauthorized"},
+            "403": {"$ref": "#/components/responses/403Forbidden"},
+            "404": {"$ref": "#/components/responses/404NotFound"},
+            "500": {"$ref": "#/components/responses/500InternalServerError"}
           }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AssignmentCreate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Assignment created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Assignment"
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
       },
-      "get": {
-        "summary": "Get classroom assignments",
-        "description": "Get list of assignments in a classroom",
-        "operationId": "getAssignments",
-        "tags": ["assignments"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/classroomIdParam"
-          },
-          {
-            "$ref": "#/components/parameters/limitParam"
-          },
-          {
-            "$ref": "#/components/parameters/pageParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of assignments in classroom",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "enum": ["success"]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "assignments": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Assignment"
-                          }
-                        },
-                        "metadata": {
-                          "$ref": "#/components/schemas/PaginationMetadata"
-                        }
-                      }
-                    }
+      "/api/classrooms/{id}/members": {
+          "get": {
+              "summary": "Get classroom members",
+              "description": "Members of classroom",
+              "operationId": "getClassroomMebers",
+              "tags": ["classroom"],
+              "parameters": [
+                  {
+                      "$ref": "#/components/parameters/classroomIdParam"
                   }
-                }
+              ],
+              "responses": {
+                  "200": {
+                      "description":"Classroom Members",
+                      "content": {
+                          "application/json":{
+                              "schema": {
+                                  "$ref":"#/components/schemas/ClassroomMembers"
+                              }
+                          }
+                      }
+                  },
+                  "401": {"$ref": "#/components/responses/401Unauthorized"},
+                  "403": {"$ref": "#/components/responses/403Forbidden"},
+                  "404": {"$ref": "#/components/responses/404NotFound"},
+                  "500": {"$ref": "#/components/responses/500InternalServerError"}
               }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/assignments/{id}": {
-      "get": {
-        "summary": "Get assignment details",
-        "description": "Get detailed information about an assignment",
-        "operationId": "getAssignment",
-        "tags": ["assignments"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/assignmentIdParam"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "Assignment details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AssignmentDetails"
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
       },
-      "put": {
-        "summary": "Update assignment",
-        "description": "Update assignment info",
-        "operationId": "updateAssignment",
-        "tags": ["assignments"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/assignmentIdParam"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AssignmentUpdate"
+      "/api/classrooms/{id}/assignments": {
+          "post": {
+            "summary": "Create assignment",
+            "description": "Create a new assignment in classroom",
+            "operationId": "createAssignment",
+            "tags": ["assignments"],
+            "parameters": [
+              {
+                "$ref": "#/components/parameters/classroomIdParam"
               }
+            ],
+            "requestBody": {
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/AssignmentCreate"
+                  }
+                }
+              }
+            },
+            "responses": {
+              "201": {
+                "description": "Assignment created successfully",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Assignment"
+                    }
+                  }
+                }
+              },
+              "401": {"$ref": "#/components/responses/401Unauthorized"},
+              "403": {"$ref": "#/components/responses/403Forbidden"},
+              "404": {"$ref": "#/components/responses/404NotFound"},
+              "400": {"$ref": "#/components/responses/400BadRequest"},
+              "500": {"$ref": "#/components/responses/500InternalServerError"}
+            }
+          },
+          "get": {
+            "summary": "Get classroom assignments",
+            "description": "Get list of assignments in a classroom",
+            "operationId": "getClassroomAssignments",
+            "tags": ["assignments"],
+            "parameters": [
+              {
+                "$ref": "#/components/parameters/classroomIdParam"
+              },
+              {
+                "$ref": "#/components/parameters/limitParam"
+              },
+              {
+                "$ref": "#/components/parameters/pageParam"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "List of assignments in classroom",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": ["success"]
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "assignments": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/Assignment"
+                              }
+                            },
+                            "metadata": {
+                              "$ref": "#/components/schemas/PaginationMetadata"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "401": {"$ref": "#/components/responses/401Unauthorized"},
+              "403": {"$ref": "#/components/responses/403Forbidden"},
+              "404": {"$ref": "#/components/responses/404NotFound"},
+              "500": {"$ref": "#/components/responses/500InternalServerError"}
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "Assignment updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Assignment"
+      "/api/assignments/{id}": {
+          "get": {
+              "summary": "Get assignment details",
+              "description": "Get detailed information about an assignment",
+              "operationId": "getAssignmentDetails",
+              "tags": ["assignments"],
+              "parameters": [
+                  {
+                      "$ref": "#/components/parameters/assignmentIdParam"
+                  }
+              ],
+              "responses": {
+                  "200": {
+                      "description":"Assignment details",
+                      "content": {
+                          "application/json": {
+                              "schema": {
+                                  "$ref": "#/components/schemas/AssignmentDetails"
+                              }
+                          }
+                      }
+                  },
+                  "401": {"$ref": "#/components/responses/401Unauthorized"},
+                  "403": {"$ref": "#/components/responses/403Forbidden"},
+                  "404": {"$ref": "#/components/responses/404NotFound"},
+                  "500": {"$ref": "#/components/responses/500InternalServerError"}
+              }
+          },
+          "put": {
+              "summary": "Update assignment",
+              "description": "Update assignment info",
+              "operationId": "updateAssignment",
+              "tags":["assignments"],
+              "parameters": [
+                  {
+                      "$ref": "#/components/parameters/assignmentIdParam"
+                  }
+              ],
+              "requestBody": {
+                  "required": true,
+                  "content": {
+                      "application/json": {
+                          "schema": {
+                              "$ref": "#/components/schemas/AssignmentUpdate"
+                          }
+                      }
+                  }
+              },
+              "responses": {
+                  "200": {
+                      "description": "Assignment updated successfully",
+                      "content": {
+                          "application/json": {
+                              "schema": {
+                                  "$ref": "#/components/schemas/Assignment"
+                              }
+                          }
+                      }
+                  },
+                  "401": {"$ref": "#/components/responses/401Unauthorized"},
+                  "403": {"$ref": "#/components/responses/403Forbidden"},
+                  "404": {"$ref": "#/components/responses/404NotFound"},
+                  "400": {"$ref": "#/components/responses/400BadRequest"},
+                  "500": {"$ref": "#/components/responses/500InternalServerError"}
+              }
+          },
+          "delete": {
+              "summary": "Delete assignment",
+              "description": "Delete an assignment",
+              "operationId": "deleteAssignment",
+              "tags": ["assignments"],
+              "parameters": [
+                {
+                  "$ref": "#/components/parameters/assignmentIdParam"
                 }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Assignment deleted successfully",
+                  "$ref": "#/components/responses/200NoData"
+                },
+                "401": {"$ref": "#/components/responses/401Unauthorized"},
+                "403": {"$ref": "#/components/responses/403Forbidden"},
+                "404": {"$ref": "#/components/responses/404NotFound"},
+                "500": {"$ref": "#/components/responses/500InternalServerError"}
               }
             }
           },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
+      "/api/assignments/{id}/submit": {
+          "post": {
+              "summary": "Submit assignment",
+              "description": "Strudent submits assignment",
+              "operationId":"submitAssignment",
+              "tags": ["submissions"],
+              "parameters": [
+                  {
+                      "$ref": "#/components/parameters/assignmentIdParam"
+                  }
+              ],
+              "requestBody": {
+                  "required": true,
+                  "content": {
+                      "multipart/form-data": {
+                          "schema": {
+                              "$ref": "#/components/schemas/AssignmentSubmission"
+                          }
+                      }
+                  }
+              },
+              "responses": {
+                  "201": {
+                      "description": "Assignmrnt submitted successfully",
+                      "content": {
+                          "application/json": {
+                              "schema": {
+                                  "$ref": "#/components/schemas/Submission"
+                              }
+                          }
+                      }
+                  },
+                  "401": {"$ref": "#/components/responses/401Unauthorized"},
+                  "403": {"$ref": "#/components/responses/403Forbidden"},
+                  "404": {"$ref": "#/components/responses/404NotFound"},
+                  "400": {"$ref": "#/components/responses/400BadRequest"},
+                  "500": {"$ref": "#/components/responses/500InternalServerError"}
+              }
+          }
       },
-      "delete": {
-        "summary": "Delete assignment",
-        "description": "Delete an assignment",
-        "operationId": "deleteAssignment",
-        "tags": ["assignments"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/assignmentIdParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Assignment deleted successfully",
-            "$ref": "#/components/responses/200NoData"
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/assignments/{id}/submit": {
-      "post": {
-        "summary": "Submit assignment",
-        "description": "Strudent submits assignment",
-        "operationId": "submitAssignment",
-        "tags": ["submissions"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/assignmentIdParam"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/AssignmentSubmission"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Assignment submitted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Submission"
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/assignments/{id}/submissions": {
-      "get": {
-        "summary": "Get assignment submissions",
-        "description": "View submission",
-        "operationId": "getSubmissions",
-        "tags": ["submissions"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/assignmentIdParam"
-          },
-          {
-            "$ref": "#/components/parameters/limitParam"
-          },
-          {
-            "$ref": "#/components/parameters/pageParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of submissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "enum": ["success"]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "submissions": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Submission"
-                          }
-                        },
-                        "metadata": {
-                          "$ref": "#/components/schemas/PaginationMetadata"
-                        }
-                      }
-                    }
+      "/api/assignments/{id}/submissions": {
+          "get": {
+              "summary": "Get assignment submissions",
+              "description": "View submission",
+              "operationId": "getAssignmentSubmissions",
+              "tags": ["submissions"],
+              "parameters": [
+                  {
+                      "$ref":"#/components/parameters/assignmentIdParam"
+                  },
+                  {
+                      "$ref": "#/components/parameters/limitParam"
+                  },
+                  {
+                      "$ref":"#/components/parameters/pageParam"
                   }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/admin/overview": {
-      "get": {
-        "summary": "Get admin statistic",
-        "description": "Get overall statistics",
-        "operationId": "getOverview",
-        "tags": ["admin"],
-        "responses": {
-          "200": {
-            "description": "Admin view statistic",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminOverview"
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/admin/users": {
-      "get": {
-        "summary": "Get all users",
-        "description": "Get list of all users",
-        "operationId": "getAllUsers",
-        "tags": ["admin"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/limitParam"
-          },
-          {
-            "$ref": "#/components/parameters/pageParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of all users",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "enum": ["success"]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "users": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/AdminUserView"
+              ],
+              "responses": {
+                  "200": {
+                      "description": "List of submissions",
+                      "content": {
+                          "application/json": {
+                              "schema": {
+                                  "type":"object",
+                                  "properties": {
+                                      "status": {
+                                          "type":"string",
+                                          "enum":["success"]
+                                      },
+                                      "data": {
+                                          "type":"object",
+                                          "properties": {
+                                              "submissions": {
+                                                  "type": "array",
+                                                  "items": {
+                                                      "$ref":"#/components/schemas/Submission"
+                                                  }
+                                              },
+                                              "metadata": {
+                                                  "$ref": "#/components/schemas/PaginationMetadata"
+                                              }
+                                          }
+                                      }
+                                  }
+                              }
                           }
-                        },
-                        "metadata": {
-                          "$ref": "#/components/schemas/PaginationMetadata"
-                        }
-                      }
-                    }
+                      },
+                      "401": {"$ref": "#/components/responses/401Unauthorized"},
+                      "403": {"$ref": "#/components/responses/403Forbidden"},
+                      "404": {"$ref": "#/components/responses/404NotFound"},
+                      "500": {"$ref": "#/components/responses/500InternalServerError"}
                   }
-                }
               }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/admin/users/{id}": {
-      "put": {
-        "summary": "Lock/unlock user account",
-        "description": "Admin can lock or unlock user accounts",
-        "operationId": "toggleUserStatus",
-        "tags": ["admin"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/userIdParam"
           }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserStatusUpdate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "User account status updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminUserView"
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/admin/classrooms": {
-      "get": {
-        "summary": "Get all classrooms",
-        "description": "Get list of all classrooms for admin management",
-        "operationId": "getAllClassrooms",
-        "tags": ["admin"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/limitParam"
-          },
-          {
-            "$ref": "#/components/parameters/pageParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of all classrooms",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "enum": ["success"]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "classrooms": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/AdminClassroomView"
-                          }
-                        },
-                        "metadata": {
-                          "$ref": "#/components/schemas/PaginationMetadata"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/admin/classrooms/{id}": {
-      "put": {
-        "summary": "Lock/unlock classroom",
-        "description": "Admin can lock or unlock classrooms",
-        "operationId": "toggleClassroomStatus",
-        "tags": ["admin"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/classroomIdParam"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ClassroomStatusUpdate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Classroom status updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminClassroomView"
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/admin/assignments/{id}": {
-      "put": {
-        "summary": "Lock/unlock assignment",
-        "description": "Admin can lock or unlock assignments",
-        "operationId": "toggleAssignmentStatus",
-        "tags": ["admin"],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/assignmentIdParam"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AssignmentStatusUpdate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Assignment status updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminAssignmentView"
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
       }
     }
-  },
-  "components": {
-    "schemas": {
-      "Users": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer", "readOnly": true },
-          "username": { "type": "string" },
-          "email": { "type": "string", "format": "email" },
-          "role": {
-            "type": "string",
-            "enum": ["Student", "Teacher", "Admin"]
-          },
-          "isLocked": {
-            "type": "boolean",
-            "default": false
-          }
-        }
-      },
-      "Classroom": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer", "readOnly": true },
-          "name": { "type": "string" },
-          "description": { "type": "string" },
-          "code": { "type": "string", "readOnly": true },
-          "isLocked": { "type": "boolean", "default": false }
-        }
-      },
-      "Assignment": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer", "readOnly": true },
-          "title": { "type": "string" },
-          "description": { "type": "string" },
-          "dueDate": { "type": "string", "format": "date-time" },
-          "isLocked": { "type": "boolean", "default": false }
-        }
-      },
-      "Submission": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer", "readOnly": true },
-          "assignmentId": { "type": "integer" },
-          "studentId": { "type": "integer" },
-          "content": { "type": "string" },
-          "submittedAt": { "type": "string", "format": "date-time" }
-        }
-      },
-      "OverviewStats": {
-        "type": "object",
-        "properties": {
-          "totalUsers": { "type": "integer" },
-          "totalClassrooms": { "type": "integer" },
-          "totalAssignments": { "type": "integer" }
-        }
-      }
-    },
-    "responses": {
-      "200Success": {
-        "description": "Success",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "status": { "type": "string", "example": "success" },
-                "data": { "type": ["object", "array", "null"] }
-              }
-            }
-          }
-        }
-      },
-      "400BadRequest": {
-        "description": "Invalid request"
-      },
-      "401Unauthorized": {
-        "description": "Unauthorized access"
-      },
-      "404NotFound": {
-        "description": "Resource not found"
-      },
-      "500InternalServerError": {
-        "description": "Internal server error"
-      }
-    },
-    "parameters": {
-      "idParam": {
-        "name": "id",
-        "in": "path",
-        "required": true,
-        "description": "Resource ID",
-        "schema": { "type": "integer" }
-      },
-      "classroomIdParam": {
-        "name": "classroomId",
-        "in": "path",
-        "required": true,
-        "description": "Classroom ID",
-        "schema": { "type": "integer" }
-      },
-      "assignmentIdParam": {
-        "name": "assignmentId",
-        "in": "path",
-        "required": true,
-        "description": "Assignment ID",
-        "schema": { "type": "integer" }
-      }
-    }
-  },
-  "tags": [
-    {
-      "name": "auth",
-      "description": "Auth operations"
-    },
-    {
-      "name": "users",
-      "description": "Users operations"
-    },
-    {
-      "name": "classrooms",
-      "description": "Classrooms operations"
-    },
-    {
-      "name": "assignments",
-      "description": "Assignments operations"
-    },
-    {
-      "name": "submissions",
-      "description": "Assignment submissions operations"
-    },
-    {
-      "name": "admin",
-      "description": "Admin operations & statistics"
-    }
-  ]
-}
