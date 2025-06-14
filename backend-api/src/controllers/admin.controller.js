@@ -12,31 +12,31 @@ function overview(req, res) {
   );
 }
 
-function getUsers(req, res) {
+function getAllUsers(req, res) {
   return res.status(201).json(JSend.success({ users: [] }));
 }
 
-function updateUser(req, res) {
+function toggleUserStatus(req, res) {
   return res.status(201).json(JSend.success({ user: {} }));
 }
 
-function getClassrooms(req, res) {
+function getAllClassrooms(req, res) {
   return res.status(201).json(JSend.success({ classrooms: [] }));
 }
 
-function updateClassroom(req, res) {
+function toggleClassroomStatus(req, res) {
   return res.status(201).json(JSend.success({ classroom: {} }));
 }
 
-function updateAssignment(req, res) {
+function toggleAssignmentStatus(req, res) {
   return res.status(201).json(JSend.success({ assignment: {} }));
 }
 
 module.exports = {
   overview,
-  getUsers,
-  updateUser,
-  getClassrooms,
-  updateClassroom,
-  updateAssignment,
+  getAllUsers,
+  toggleUserStatus,
+  getAllClassrooms,
+  toggleClassroomStatus,
+  toggleAssignmentStatus,
 };

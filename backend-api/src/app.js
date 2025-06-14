@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
 
 // standardize json responses
 const JSend = require("./jsend");
@@ -18,6 +19,9 @@ const {
   handleError,
 } = require("./controllers/errors.controller");
 
+// swagger ui - openAPI
+const swaggerDocument = require("../docs/openapiSpec.json");
+
 const app = express();
 
 app.use(cors());
@@ -28,6 +32,7 @@ app.get("/", (req, res) => {
   return res.json(JSend.success());
 });
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/public", express.static("public"));
 
 adminRouter.setup(app);

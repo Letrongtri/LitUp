@@ -15,26 +15,26 @@ module.exports.setup = (app) => {
 
   router
     .route("/users")
-    .get(adminController.getUsers)
+    .get(adminController.getAllUsers)
     .all(allowedMethods(["GET"]));
 
   router
     .route("/users/:id")
-    .put(adminController.updateUser)
+    .put(adminController.toggleUserStatus)
     .all(allowedMethods(["PUT"]));
 
   router
     .route("/classrooms")
-    .get(adminController.getClassrooms)
+    .get(adminController.getAllClassrooms)
     .all(allowedMethods(["GET"]));
 
   router
     .route("/classrooms/:id")
-    .put(adminController.updateClassroom)
+    .put(adminController.toggleClassroomStatus)
     .all(allowedMethods(["PUT"]));
 
   router
     .route("/assignments/:id")
-    .put(adminController.updateAssignment)
+    .put(adminController.toggleAssignmentStatus)
     .all(allowedMethods(["PUT"]));
 };
