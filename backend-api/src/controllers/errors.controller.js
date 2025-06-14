@@ -1,6 +1,7 @@
 const ApiError = require("../api-error");
 const JSend = require("../jsend");
 
+// error: 405
 function methodNotAllowed(req, res, next, allowedMethods = []) {
   const allowHeader = allowedMethods.length
     ? allowedMethods.join(", ")
@@ -18,6 +19,7 @@ function methodNotAllowed(req, res, next, allowedMethods = []) {
   );
 }
 
+// error: 404
 function resourceNotFound(req, res, next) {
   // Handler for unknown URL path.
   // Call next() to pass to the error handling function.
