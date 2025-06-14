@@ -160,7 +160,7 @@
           "401": { "$ref": "#/components/responses/401Unauthorized" },
           "403": { "$ref": "#/components/responses/403Forbidden" },
           "404": { "$ref": "#/components/responses/404NotFound" },
-          "405": {"ref": "#/components/responses/405MethodNotAllow"},
+          "405": { "$ref": "#/components/responses/405MethodNotAllow" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
       },
@@ -273,7 +273,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["code"],
+                "required": ["c_code"],
                 "properties": {
                   "c_code": {"type": "string"}
                 }
@@ -392,7 +392,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classes"
+                  "$ref": "#/components/schemas/Members"
                 }
               }
             }
@@ -428,7 +428,8 @@
                 }
               }
             }
-          },
+          }
+        },
         "responses": {
           "201": {
             "description": "Assignment created successfully",
@@ -581,7 +582,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/Submissions"
+                "$ref": "#/components/schemas/SubmissionRequest"
               }
             }
           }
@@ -697,7 +698,7 @@
                       "properties": {
                         "users": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/AdminOverview" }
+                          "items": { "$ref": "#/components/schemas/Users" }
                         },
                         "metadata": { "$ref": "#/components/schemas/PaginationMetadata" }
                       }
@@ -746,7 +747,7 @@
           "401": { "$ref": "#/components/responses/401Unauthorized" },
           "403": { "$ref": "#/components/responses/403Forbidden" },
           "404": { "$ref": "#/components/responses/404NotFound" },
-          "405": {"ref": "#/components/responses/405MethodNotAllow"},
+          "405": { "$ref": "#/components/responses/405MethodNotAllow" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
       }
@@ -776,7 +777,7 @@
                       "properties": {
                         "classrooms": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/AdminOverView" }
+                          "items": { "$ref": "#/components/schemas/AdminOverview" }
                         },
                         "metadata": { "$ref": "#/components/schemas/PaginationMetadata" }
                       }
@@ -816,7 +817,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminOverView"
+                  "$ref": "#/components/schemas/AdminOverview"
                 }
               }
             }
@@ -825,7 +826,7 @@
           "401": { "$ref": "#/components/responses/401Unauthorized" },
           "403": { "$ref": "#/components/responses/403Forbidden" },
           "404": { "$ref": "#/components/responses/404NotFound" },
-          "405": {"ref": "#/components/responses/405MethodNotAllow"},
+          "405": { "$ref": "#/components/responses/405MethodNotAllow" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
       }
@@ -843,7 +844,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AdminOverView"
+                "$ref": "#/components/schemas/AdminOverview"
               }
             }
           }
@@ -863,7 +864,7 @@
           "401": { "$ref": "#/components/responses/401Unauthorized" },
           "403": { "$ref": "#/components/responses/403Forbidden" },
           "404": { "$ref": "#/components/responses/404NotFound" },
-          "405": {"ref": "#/components/responses/405MethodNotAllow"},
+          "405": { "$ref": "#/components/responses/405MethodNotAllow" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
       }
@@ -931,6 +932,16 @@
           "s_graded_at": { "type": "string", "format": "date-time" }
         }
       },
+      "Members": {
+        "type": "object",
+        "properties": {
+          "uid": { "type": "integer" },
+          "cid": { "type": "integer" },
+          "m_status": { "type": "string", "enum": ["active", "removed", "suspended"] },
+          "m_joined_at": { "type": "string", "format": "date-time" },
+          "m_removed_at": { "type": "string", "format": "date-time", "nullable": true }
+        }
+      },
       "Attachments": {
         "type": "object",
         "properties": {
@@ -943,13 +954,36 @@
           "f_created_at": { "type": "string", "format": "date-time" }
         }
       },
-      "OverviewStats": {
+      "AdminOverview": {
         "type": "object",
         "properties": {
           "totalUsers": { "type": "integer" },
           "totalClassrooms": { "type": "integer" },
-          "totalAssignments": { "type": "integer" }
+          "totalAssignments": { "type": "integer" },
+          "totalSubmissions": { "type": "integer" },
+          "activeUsers": { "type": "integer" },
+          "activeClassrooms": { "type": "integer" }
         }
+      },
+      "SubmissionRequest": {
+        "type": "object",
+        "properties": {
+          "s_comment": {
+            "type": "string",
+            "description": "Student's comment or notes about the submission",
+            "maxLength": 1000
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "binary"
+            },
+            "description": "Assignment files to upload",
+            "maxItems": 10
+          }
+        },
+        "required": ["files"]
       },
       "PaginationMetadata": {
         "type": "object",
@@ -1002,6 +1036,48 @@
           }
         }
       },
+      "201Created": {
+        "description": "Resource created successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": { "type": "string", "example": "success" },
+                "data": { "type": ["object", "null"] }
+              }
+            }
+          }
+        }
+      },
+      "200NoData": {
+        "description": "Success without data",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": { "type": "string", "example": "success" },
+                "message": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "403Forbidden": {
+        "description": "Forbidden - insufficient permissions",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": { "type": "string", "example": "error" },
+                "message": { "type": "string", "example": "Forbidden" }
+              }
+            }
+          }
+        }
+      },
       "400BadRequest": {
         "description": "Invalid request"
       },
@@ -1027,14 +1103,14 @@
         "schema": { "type": "integer" }
       },
       "classroomIdParam": {
-        "name": "classroomId",
+        "name": "id",
         "in": "path",
         "required": true,
         "description": "Classroom ID",
         "schema": { "type": "integer" }
       },
       "assignmentIdParam": {
-        "name": "assignmentId",
+        "name": "id",
         "in": "path",
         "required": true,
         "description": "Assignment ID",
@@ -1078,6 +1154,5 @@
       "description": "Admin operations & statistics"
     }
   ]
-}
 }
 
