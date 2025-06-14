@@ -937,32 +937,45 @@
         },
         "components": {
             "schemas": {
-            "User": {
+            "Users": {
                 "type": "object",
                 "properties": {
-                "id": { "type": "integer", "readOnly": true },
-                "username": { "type": "string" },
-                "email": { "type": "string", "format": "email" },
-                "role": {
+                "uid": { "type": "integer", "readOnly": true },
+                "u_email": { "type": "string", "format": "email" },
+                "u_first_name": { "type":"string", "maxLength": 100 },
+                "u_last_name": { "type":"string", "maxLength": 100 },
+                "u_password": { "type": "string", "format": "password", "writeOnly": true },
+                "u_avatar": { "type": "string", "description": "URL of avatar" },
+                "u_role": {
                     "type": "string",
                     "enum": ["Student", "Teacher", "Admin"]
                 },
-                "isLocked": {
-                    "type": "boolean",
-                    "default": false
-                }
+                "u_status": { "type": "boolean"},
+                "u_created_at": { "type": "string", "format": "date-time", "readOnly": true },
+                "u_updated_at": { "type": "string", "format": "date-time", "readOnly": true },
                 }
             },
             "Classroom": {
                 "type": "object",
                 "properties": {
-                "id": { "type": "integer", "readOnly": true },
-                "name": { "type": "string" },
-                "description": { "type": "string" },
-                "code": { "type": "string", "readOnly": true },
-                "isLocked": { "type": "boolean", "default": false }
+                "cid": { "type": "integer", "readOnly": true },
+                "c_name": { "type": "string", "maxLength": 255 },
+                "code": { "type": "string", "maxLength": 6 },
+                "c_status": { "type": "boolean"},
+                "c_created_at": { "type": "string", "format": "date-time" },
+                "c_update_at": { "type": "string", "format": "date-time" }
                 }
             },
+            "Member": {
+              "type": "object",
+              "properties": {
+                "uid": { "type": "integer" },
+                "cid": { "type": "integer" },
+                "m_status": { "type": "string", "maxLength": 10 },
+                "m_joined_at": { "type": "string", "format": "date-time"},
+                "m_removed_at": { "type": "string", "format": "date-time"}
+              }
+            }
             "Assignment": {
                 "type": "object",
                 "properties": {
