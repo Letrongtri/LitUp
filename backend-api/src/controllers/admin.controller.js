@@ -1,38 +1,42 @@
+const JSend = require("../jsend");
+
 function overview(req, res) {
-  return res.json({
-    users: {},
-    classrooms: {},
-    assignments: {},
-    submissions: {},
-    assignment: {},
-  });
+  return res.status(201).json(
+    JSend.success({
+      users: {},
+      classrooms: {},
+      assignments: {},
+      submissions: {},
+      assignment: {},
+    })
+  );
 }
 
-function getUsers(req, res) {
-  return res.json({ users: [] });
+function getAllUsers(req, res) {
+  return res.status(201).json(JSend.success({ users: [] }));
 }
 
-function getUser(req, res) {
-  return res.json({ user: {} });
+function toggleUserStatus(req, res) {
+  return res.status(201).json(JSend.success({ user: {} }));
 }
 
-function getClassrooms(req, res) {
-  return res.json({ classrooms: [] });
+function getAllClassrooms(req, res) {
+  return res.status(201).json(JSend.success({ classrooms: [] }));
 }
 
-function getClassroom(req, res) {
-  return res.json({ Classroom: {} });
+function toggleClassroomStatus(req, res) {
+  return res.status(201).json(JSend.success({ classroom: {} }));
 }
 
-function updateAssignment(req, res) {
-  return res.json({ assignment: {} });
+function toggleAssignmentStatus(req, res) {
+  return res.status(201).json(JSend.success({ assignment: {} }));
 }
 
 module.exports = {
   overview,
-  getUsers,
-  getUser,
-  getClassrooms,
-  getClassroom,
-  updateAssignment,
+  getAllUsers,
+  toggleUserStatus,
+  getAllClassrooms,
+  toggleClassroomStatus,
+  toggleAssignmentStatus,
 };
