@@ -899,7 +899,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminOverview"
+                  "$ref": "#/components/schemas/Users"
                 }
               }
             }
@@ -1037,6 +1037,75 @@
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
       }
+    },
+    "/api/assignments/{id}/attachments": {
+      "post": {
+        "summary": "Upload assignment attachments",
+        "description": "Teacher uploads files for assigment",
+        "tags": ["assignments"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": {
+          "$ref": "#/components/parameters/assignmentIdParam"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Files uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Attachments"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get assignment attachments",
+        "description": "Get list of files attached to assignment",
+        "tags": ["assignments"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": {
+          "$ref": "#/components/parameters/assignmentIdParam"
+        },
+        "responses": {
+          "200": {
+            "description": "List of assignment attachments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Attachments"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1052,6 +1121,7 @@
         "type": "object",
         "properties": {
           "uid": { "type": "integer", "readOnly": true },
+          "u_avatar_id": { "type": "string" },
           "u_email": { "type": "string", "format": "email" },
           "u_first_name": { "type": "string", "maxLength": 100 },
           "u_last_name": { "type": "string", "maxLength": 100 },
@@ -1074,6 +1144,7 @@
         "type": "object",
         "properties": {
           "cid": { "type": "integer" },
+          "uid": { "type": "integer" },
           "c_name": { "type": "string" },
           "c_code": { "type": "string" },
           "c_status": { "type": "boolean" },
@@ -1098,6 +1169,7 @@
       "Submissions": {
         "type": "object",
         "properties": {
+          "sid": { "type": "integer" },
           "uid": { "type": "integer" },
           "aid": { "type": "integer" },
           "s_status": { "type": "string" },
@@ -1111,6 +1183,7 @@
       "Members": {
         "type": "object",
         "properties": {
+          "mid": { "type": "string" },
           "uid": { "type": "integer" },
           "cid": { "type": "integer" },
           "m_status": {
@@ -1129,7 +1202,6 @@
         "type": "object",
         "properties": {
           "fid": { "type": "integer" },
-          "aid": { "type": "integer" },
           "f_name": { "type": "string" },
           "f_original_name": { "type": "string" },
           "f_type": { "type": "string" },
