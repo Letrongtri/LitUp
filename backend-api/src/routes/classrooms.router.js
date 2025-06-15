@@ -47,8 +47,6 @@ const getClassroomId = z.object({
   input: z
     .object({
       cid: z.coerce.number().nonnegative(),
-      limit: z.coerce.number().nonnegative().default(10),
-      page: z.coerce.number().nonnegative().default(1),
     })
     .strict(),
 });
