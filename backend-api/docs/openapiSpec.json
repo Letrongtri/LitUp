@@ -62,8 +62,8 @@
                 "type": "object",
                 "required": ["u_email", "u_password"],
                 "properties": {
-                  "u_email": { "type": "string", "format": "email"},
-                  "u_password": { "type": "string", "format": "password"}
+                  "u_email": { "type": "string", "format": "email" },
+                  "u_password": { "type": "string", "format": "password" }
                 }
               }
             }
@@ -129,9 +129,25 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/Users"
+                "type": "object",
+                "properties": {
+                  "u_email": { "type": "string", "format": "email" },
+                  "u_first_name": { "type": "string", "maxLength": 100 },
+                  "u_last_name": { "type": "string", "maxLength": 100 },
+                  "u_password": {
+                    "type": "string",
+                    "format": "password",
+                    "writeOnly": true
+                  },
+                  "u_avatar_file": {
+                    "type": "string",
+                    "format": "binary",
+                    "writeOnly": true,
+                    "description": "Avatar file"
+                  }
+                }
               }
             }
           }
@@ -210,7 +226,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classes"
+                  "$ref": "#/components/schemas/Classroom"
                 }
               }
             }
@@ -245,9 +261,11 @@
                       "properties": {
                         "classrooms": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/Classes" }
+                          "items": { "$ref": "#/components/schemas/Classroom" }
                         },
-                        "metadata": { "$ref": "#/components/schemas/PaginationMetadata" }
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
                       }
                     }
                   }
@@ -275,7 +293,7 @@
                 "type": "object",
                 "required": ["c_code"],
                 "properties": {
-                  "c_code": {"type": "string"}
+                  "c_code": { "type": "string" }
                 }
               }
             }
@@ -287,7 +305,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classes"
+                  "$ref": "#/components/schemas/Classroom"
                 }
               }
             }
@@ -313,7 +331,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classes"
+                  "$ref": "#/components/schemas/Classroom"
                 }
               }
             }
@@ -336,7 +354,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Classes"
+                "$ref": "#/components/schemas/Classroom"
               }
             }
           }
@@ -347,7 +365,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classes"
+                  "$ref": "#/components/schemas/Classroom"
                 }
               }
             }
@@ -415,16 +433,18 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["a_title"],
                 "properties": {
                   "a_title": { "type": "string" },
                   "a_description": { "type": "string" },
                   "a_max_points": { "type": "number" },
                   "a_deadline_at": { "type": "string", "format": "date-time" },
-                  "a_allow_late_submission": { "type": "boolean", "default": false }
+                  "a_allow_late_submission": {
+                    "type": "boolean",
+                    "default": false
+                  }
                 }
               }
             }
@@ -436,7 +456,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Assignment"
+                  "$ref": "#/components/schemas/Assignments"
                 }
               }
             }
@@ -473,9 +493,13 @@
                       "properties": {
                         "assignments": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/Assignment" }
+                          "items": {
+                            "$ref": "#/components/schemas/Assignments"
+                          }
                         },
-                        "metadata": { "$ref": "#/components/schemas/PaginationMetadata" }
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
                       }
                     }
                   }
@@ -504,7 +528,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Assignment"
+                  "$ref": "#/components/schemas/Assignments"
                 }
               }
             }
@@ -525,9 +549,21 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/Assignment"
+                "type": "object",
+                "properties": {
+                  "a_title": { "type": "string" },
+                  "a_description": { "type": "string" },
+                  "a_max_points": { "type": "number" },
+                  "a_deadline_at": { "type": "string", "format": "date-time" },
+                  "a_allow_late_submission": { "type": "boolean" },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": ["a_title"]
               }
             }
           }
@@ -538,7 +574,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Assignment"
+                  "$ref": "#/components/schemas/Assignments"
                 }
               }
             }
@@ -582,7 +618,21 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/SubmissionRequest"
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary",
+                      "writeOnly": true,
+                      "description": "Submission files"
+                    },
+                    "description": "Assignment files to upload",
+                    "maxItems": 10
+                  }
+                },
+                "required": ["files"]
               }
             }
           }
@@ -632,15 +682,112 @@
                       "properties": {
                         "submissions": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/Submissions" }
+                          "items": {
+                            "$ref": "#/components/schemas/Submissions"
+                          }
                         },
-                        "metadata": { "$ref": "#/components/schemas/PaginationMetadata" }
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
                       }
                     }
                   }
                 }
               }
             }
+          },
+          "401": { "$ref": "#/components/responses/401Unauthorized" },
+          "403": { "$ref": "#/components/responses/403Forbidden" },
+          "404": { "$ref": "#/components/responses/404NotFound" },
+          "500": { "$ref": "#/components/responses/500InternalServerError" }
+        }
+      }
+    },
+    "/api/submissions/{id}": {
+      "get": {
+        "summary": "Get submissions details",
+        "description": "Get detailed information about an submission",
+        "operationId": "getSubmission",
+        "tags": ["submissions"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/submissionIdParam" }],
+        "responses": {
+          "200": {
+            "description": "submission details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Submissions"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401Unauthorized" },
+          "403": { "$ref": "#/components/responses/403Forbidden" },
+          "404": { "$ref": "#/components/responses/404NotFound" },
+          "500": { "$ref": "#/components/responses/500InternalServerError" }
+        }
+      },
+      "put": {
+        "summary": "Update submission and grade assignment",
+        "description": "Update submission info",
+        "operationId": "updateSubmission",
+        "tags": ["submissions"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/submissionIdParam" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary",
+                      "writeOnly": true,
+                      "description": "Submission files"
+                    },
+                    "description": "Assignment files to upload",
+                    "maxItems": 10
+                  }
+                },
+                "required": ["files"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "submission updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Submissions"
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/400BadRequest" },
+          "401": { "$ref": "#/components/responses/401Unauthorized" },
+          "403": { "$ref": "#/components/responses/403Forbidden" },
+          "404": { "$ref": "#/components/responses/404NotFound" },
+          "500": { "$ref": "#/components/responses/500InternalServerError" }
+        }
+      },
+      "delete": {
+        "summary": "Delete submission",
+        "description": "Delete an submission",
+        "operationId": "deleteSubmission",
+        "tags": ["submissions"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/submissionIdParam" }],
+        "responses": {
+          "200": {
+            "description": "Submission deleted successfully",
+            "$ref": "#/components/responses/200NoData"
           },
           "401": { "$ref": "#/components/responses/401Unauthorized" },
           "403": { "$ref": "#/components/responses/403Forbidden" },
@@ -662,7 +809,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminOverview"
+                  "type": "object",
+                  "properties": {
+                    "totalUsers": { "type": "integer" },
+                    "totalClassrooms": { "type": "integer" },
+                    "totalAssignments": { "type": "integer" },
+                    "totalSubmissions": { "type": "integer" },
+                    "activeUsers": { "type": "integer" },
+                    "activeClassrooms": { "type": "integer" }
+                  }
                 }
               }
             }
@@ -700,7 +855,9 @@
                           "type": "array",
                           "items": { "$ref": "#/components/schemas/Users" }
                         },
-                        "metadata": { "$ref": "#/components/schemas/PaginationMetadata" }
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
                       }
                     }
                   }
@@ -727,7 +884,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Users"
+                "type": "object",
+                "properties": {
+                  "u_status": { "type": "boolean" }
+                },
+                "required": ["u_status"]
               }
             }
           }
@@ -777,9 +938,13 @@
                       "properties": {
                         "classrooms": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/AdminOverview" }
+                          "items": {
+                            "$ref": "#/components/schemas/AdminOverview"
+                          }
                         },
-                        "metadata": { "$ref": "#/components/schemas/PaginationMetadata" }
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
                       }
                     }
                   }
@@ -806,7 +971,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Classes"
+                "$ref": "#/components/schemas/Classroom"
               }
             }
           }
@@ -817,7 +982,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminOverview"
+                  "$ref": "#/components/schemas/Classroom"
                 }
               }
             }
@@ -844,7 +1009,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AdminOverview"
+                "type": "object",
+                "properties": {
+                  "a_status": { "type": "boolean" }
+                },
+                "required": ["a_status"]
               }
             }
           }
@@ -855,7 +1024,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminOverview"
+                  "$ref": "#/components/schemas/Assignments"
                 }
               }
             }
@@ -886,15 +1055,22 @@
           "u_email": { "type": "string", "format": "email" },
           "u_first_name": { "type": "string", "maxLength": 100 },
           "u_last_name": { "type": "string", "maxLength": 100 },
-          "u_password": { "type": "string", "format": "password", "writeOnly": true },
+          "u_password": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true
+          },
           "u_avatar": { "type": "string" },
-          "u_role": { "type": "string", "enum": ["Student", "Teacher", "Admin"] },
+          "u_role": {
+            "type": "string",
+            "enum": ["Student", "Teacher", "Admin"]
+          },
           "u_status": { "type": "boolean" },
           "u_created_at": { "type": "string", "format": "date-time" },
           "u_updated_at": { "type": "string", "format": "date-time" }
         }
       },
-      "Classes": {
+      "Classroom": {
         "type": "object",
         "properties": {
           "cid": { "type": "integer" },
@@ -905,7 +1081,7 @@
           "c_updated_at": { "type": "string", "format": "date-time" }
         }
       },
-      "Assignment": {
+      "Assignments": {
         "type": "object",
         "properties": {
           "aid": { "type": "integer" },
@@ -937,9 +1113,16 @@
         "properties": {
           "uid": { "type": "integer" },
           "cid": { "type": "integer" },
-          "m_status": { "type": "string", "enum": ["active", "removed", "suspended"] },
+          "m_status": {
+            "type": "string",
+            "enum": ["active", "removed", "suspended"]
+          },
           "m_joined_at": { "type": "string", "format": "date-time" },
-          "m_removed_at": { "type": "string", "format": "date-time", "nullable": true }
+          "m_removed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
         }
       },
       "Attachments": {
@@ -963,6 +1146,20 @@
           "totalSubmissions": { "type": "integer" },
           "activeUsers": { "type": "integer" },
           "activeClassrooms": { "type": "integer" }
+        }
+      },
+      "Submission_Attachments": {
+        "type": "object",
+        "properties": {
+          "sid": { "type": "integer" },
+          "fid": { "type": "integer" }
+        }
+      },
+      "Assignment_Attachments": {
+        "type": "object",
+        "properties": {
+          "fid": { "type": "integer" },
+          "aid": { "type": "integer" }
         }
       },
       "SubmissionRequest": {
@@ -994,7 +1191,7 @@
             "minimum": 1
           },
           "limit": {
-            "type": "integer", 
+            "type": "integer",
             "description": "Number of items per page",
             "minimum": 1,
             "maximum": 100
@@ -1014,11 +1211,26 @@
             "description": "Whether there is a next page"
           },
           "hasPrevPage": {
-            "type": "boolean", 
+            "type": "boolean",
             "description": "Whether there is a previous page"
           }
         },
         "required": ["page", "limit", "total", "totalPages"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["fail", "error"],
+            "description": "JSend status"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          }
+        },
+        "required": ["status", "message"]
       }
     },
     "responses": {
@@ -1069,29 +1281,84 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "object",
-              "properties": {
-                "status": { "type": "string", "example": "error" },
-                "message": { "type": "string", "example": "Forbidden" }
-              }
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "fail",
+              "message": "Insufficient permissions"
             }
           }
         }
       },
       "400BadRequest": {
-        "description": "Invalid request"
+        "description": "Invalid request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "fail",
+              "message": "Invalid request"
+            }
+          }
+        }
       },
       "401Unauthorized": {
-        "description": "Unauthorized access"
+        "description": "Unauthorized access",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "fail",
+              "message": "Unauthorized access"
+            }
+          }
+        }
       },
       "404NotFound": {
-        "description": "Resource not found"
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "fail",
+              "message": "Resource not found"
+            }
+          }
+        }
       },
       "405MethodNotAllow": {
-        "description": "Method not allow"
+        "description": "Method not allow",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "fail",
+              "message": "Method not allow"
+            }
+          }
+        }
       },
       "500InternalServerError": {
-        "description": "Internal server error"
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "error",
+              "message": "Internal Server Error"
+            }
+          }
+        }
       }
     },
     "parameters": {
@@ -1114,6 +1381,13 @@
         "in": "path",
         "required": true,
         "description": "Assignment ID",
+        "schema": { "type": "integer" }
+      },
+      "submissionIdParam": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Submission ID",
         "schema": { "type": "integer" }
       },
       "limitParam": {
@@ -1155,4 +1429,3 @@
     }
   ]
 }
-
