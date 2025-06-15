@@ -38,7 +38,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Users"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/Users"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -75,7 +90,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Users"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/Users"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -101,11 +131,17 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": { "type": "string", "enum": ["success"] },
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
                     "data": {
                       "type": "object",
                       "properties": {
-                        "user": { "$ref": "#/components/schemas/Users" }
+                        "user": {
+                          "$ref": "#/components/schemas/Users"
+                        }
                       }
                     }
                   }
@@ -226,7 +262,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classroom"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "classroom": {
+                          "$ref": "#/components/schemas/Classrooms"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -261,7 +312,7 @@
                       "properties": {
                         "classrooms": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/Classroom" }
+                          "items": { "$ref": "#/components/schemas/Classrooms" }
                         },
                         "metadata": {
                           "$ref": "#/components/schemas/PaginationMetadata"
@@ -305,7 +356,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classroom"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "classroom": {
+                          "$ref": "#/components/schemas/Classrooms"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -331,7 +397,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classroom"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "classroom": {
+                          "$ref": "#/components/schemas/Classrooms"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -354,7 +435,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Classroom"
+                "type": "object",
+                "required": ["c_name"],
+                "properties": {
+                  "c_name": { "type": "string" }
+                }
               }
             }
           }
@@ -365,7 +450,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classroom"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "classroom": {
+                          "$ref": "#/components/schemas/Classrooms"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -403,14 +503,39 @@
         "operationId": "getMemberInClass",
         "tags": ["classrooms"],
         "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
+        "parameters": [
+          { "$ref": "#/components/parameters/classroomIdParam" },
+          { "$ref": "#/components/parameters/limitParam" },
+          { "$ref": "#/components/parameters/pageParam" }
+        ],
         "responses": {
           "200": {
             "description": "Classroom Members",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Members"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "members": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Members"
+                          }
+                        },
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -456,7 +581,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Assignments"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "assignment": {
+                          "$ref": "#/components/schemas/Assignments"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -528,7 +668,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Assignments"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "assignment": {
+                          "$ref": "#/components/schemas/Assignments"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -574,7 +729,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Assignments"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "assignment": {
+                          "$ref": "#/components/schemas/Assignments"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -643,7 +813,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Submissions"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "submission": {
+                          "$ref": "#/components/schemas/Submissions"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -717,7 +902,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Submissions"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "submission": {
+                          "$ref": "#/components/schemas/Submissions"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -765,7 +965,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Submissions"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "submission": {
+                          "$ref": "#/components/schemas/Submissions"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -899,7 +1114,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Users"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/Users"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -939,7 +1169,7 @@
                         "classrooms": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/AdminOverview"
+                            "$ref": "#/components/schemas/Classrooms"
                           }
                         },
                         "metadata": {
@@ -971,7 +1201,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Classroom"
+                "$ref": "#/components/schemas/Classrooms"
               }
             }
           }
@@ -982,7 +1212,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classroom"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "classroom": {
+                          "$ref": "#/components/schemas/Classrooms"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -1024,7 +1269,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Assignments"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "assignment": {
+                          "$ref": "#/components/schemas/Assignments"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -1035,75 +1295,6 @@
           "404": { "$ref": "#/components/responses/404NotFound" },
           "405": { "$ref": "#/components/responses/405MethodNotAllow" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
-    "/api/assignments/{id}/attachments": {
-      "post": {
-        "summary": "Upload assignment attachments",
-        "description": "Teacher uploads files for assigment",
-        "tags": ["assignments"],
-        "security": [{ "bearerAuth": [] }],
-        "parameters": {
-          "$ref": "#/components/parameters/assignmentIdParam"
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "files": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "binary"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Files uploaded successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Attachments"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "summary": "Get assignment attachments",
-        "description": "Get list of files attached to assignment",
-        "tags": ["assignments"],
-        "security": [{ "bearerAuth": [] }],
-        "parameters": {
-          "$ref": "#/components/parameters/assignmentIdParam"
-        },
-        "responses": {
-          "200": {
-            "description": "List of assignment attachments",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Attachments"
-                  }
-                }
-              }
-            }
-          }
         }
       }
     }
@@ -1140,7 +1331,7 @@
           "u_updated_at": { "type": "string", "format": "date-time" }
         }
       },
-      "Classroom": {
+      "Classrooms": {
         "type": "object",
         "properties": {
           "cid": { "type": "integer" },
@@ -1192,9 +1383,8 @@
           },
           "m_joined_at": { "type": "string", "format": "date-time" },
           "m_removed_at": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
+            "type": ["string", "null"],
+            "format": "date-time"
           }
         }
       },
@@ -1207,17 +1397,6 @@
           "f_type": { "type": "string" },
           "f_size": { "type": "integer" },
           "f_created_at": { "type": "string", "format": "date-time" }
-        }
-      },
-      "AdminOverview": {
-        "type": "object",
-        "properties": {
-          "totalUsers": { "type": "integer" },
-          "totalClassrooms": { "type": "integer" },
-          "totalAssignments": { "type": "integer" },
-          "totalSubmissions": { "type": "integer" },
-          "activeUsers": { "type": "integer" },
-          "activeClassrooms": { "type": "integer" }
         }
       },
       "Submission_Attachments": {
@@ -1233,26 +1412,6 @@
           "fid": { "type": "integer" },
           "aid": { "type": "integer" }
         }
-      },
-      "SubmissionRequest": {
-        "type": "object",
-        "properties": {
-          "s_comment": {
-            "type": "string",
-            "description": "Student's comment or notes about the submission",
-            "maxLength": 1000
-          },
-          "files": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "binary"
-            },
-            "description": "Assignment files to upload",
-            "maxItems": 10
-          }
-        },
-        "required": ["files"]
       },
       "PaginationMetadata": {
         "type": "object",
@@ -1320,20 +1479,6 @@
           }
         }
       },
-      "201Created": {
-        "description": "Resource created successfully",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "status": { "type": "string", "example": "success" },
-                "data": { "type": ["object", "null"] }
-              }
-            }
-          }
-        }
-      },
       "200NoData": {
         "description": "Success without data",
         "content": {
@@ -1344,20 +1489,6 @@
                 "status": { "type": "string", "example": "success" },
                 "message": { "type": "string" }
               }
-            }
-          }
-        }
-      },
-      "403Forbidden": {
-        "description": "Forbidden - insufficient permissions",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            },
-            "example": {
-              "status": "fail",
-              "message": "Insufficient permissions"
             }
           }
         }
@@ -1386,6 +1517,20 @@
             "example": {
               "status": "fail",
               "message": "Unauthorized access"
+            }
+          }
+        }
+      },
+      "403Forbidden": {
+        "description": "Forbidden - insufficient permissions",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "fail",
+              "message": "Insufficient permissions"
             }
           }
         }
