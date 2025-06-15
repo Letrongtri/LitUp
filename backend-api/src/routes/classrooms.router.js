@@ -14,7 +14,6 @@ const {
   classroomSchema,
   partialClassroomSchema,
 } = require("../schemas/classroom.schemas");
-const { memberSchema } = require("../schemas/member.schemas");
 const { assignmentSchema } = require("../schemas/assignment.schemas");
 
 const router = express.Router();
@@ -26,7 +25,8 @@ const router = express.Router();
 const getClassroomsParams = z.object({
   input: z
     .object({
-      limit: z.coerce.number().nonnegative().default(5),
+      uid: z.coerce.number().nonnegative(),
+      limit: z.coerce.number().nonnegative().default(10),
       page: z.coerce.number().nonnegative().default(1),
     })
     .strict(),
@@ -34,19 +34,23 @@ const getClassroomsParams = z.object({
 
 /** Teacher create a new classroom */
 const createClassroomData = z.object({
-  input: classroomSchema
-    .omit({ cid: true, c_code: true, c_updated_at: true })
-    .strict(),
+  input: classroomSchema.pick({ c_name: true }).strict(),
 });
 
 /** Student joins classroom */
 const joinClassroomData = z.object({
-  input: memberSchema.omit({ m_removed_at: true }).strict(),
+  input: classroomSchema.pick({ c_code: true }).strict(),
 });
 
 /** Get classroom id */
 const getClassroomId = z.object({
-  input: classroomSchema.pick({ cid: true }).strict(),
+  input: z
+    .object({
+      cid: z.coerce.number().nonnegative(),
+      limit: z.coerce.number().nonnegative().default(10),
+      page: z.coerce.number().nonnegative().default(1),
+    })
+    .strict(),
 });
 
 /** Teacher update classroom */
@@ -66,7 +70,7 @@ const updateClassroomData = z.object({
 
 /** Teacher create a new assignment */
 const createAssignmentData = z.object({
-  input: assignmentSchema.omit({ cid: true, c_updated_at: true }).strict(),
+  input: assignmentSchema.omit({ aid: true, a_updated_at: true }).strict(),
 });
 
 module.exports.setup = (app) => {
@@ -93,7 +97,7 @@ module.exports.setup = (app) => {
     .all(allowedMethods(["POST"]));
 
   router
-    .route("/:id")
+    .route("/:cid")
     .get(validateRequest(getClassroomId), classroomsController.getClassroom)
     .put(
       validateRequest(updateClassroomData),
@@ -106,7 +110,7 @@ module.exports.setup = (app) => {
     .all(allowedMethods(["GET", "PUT", "DELETE"]));
 
   router
-    .route("/:id/members")
+    .route("/:cid/members")
     .get(
       validateRequest(getClassroomId),
       classroomsController.getMembersInClass
@@ -114,7 +118,7 @@ module.exports.setup = (app) => {
     .all(allowedMethods(["GET"]));
 
   router
-    .route("/:id/assignments")
+    .route("/:cid/assignments")
     .post(
       validateRequest(createAssignmentData),
       assignmentsController.createAssignment

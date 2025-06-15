@@ -438,7 +438,8 @@
                 "type": "object",
                 "required": ["c_name"],
                 "properties": {
-                  "c_name": { "type": "string" }
+                  "c_name": { "type": "string" },
+                  "c_status": { "type": "boolean" }
                 }
               }
             }
@@ -569,6 +570,12 @@
                   "a_allow_late_submission": {
                     "type": "boolean",
                     "default": false
+                  },
+                  "attachments": {
+                    "type": "string",
+                    "format": "binary",
+                    "writeOnly": true,
+                    "description": "assignment attachments"
                   }
                 }
               }

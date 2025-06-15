@@ -22,6 +22,7 @@ function validateRequest(validator) {
           ...(req.body ? req.body : {}),
           ...(req.file ? req.file : {}),
         };
+        console.log(req.body);
       }
 
       validator.parse({ input });
