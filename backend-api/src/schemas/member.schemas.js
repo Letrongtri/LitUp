@@ -1,6 +1,7 @@
 const { z } = require("zod");
 
 const memberSchema = z.object({
+  mid: z.coerce.number().int().nonnegative(),
   uid: z.coerce.number().int().nonnegative(),
   cid: z.coerce.number().int().nonnegative(),
   m_status: z.boolean().optional().default(true),

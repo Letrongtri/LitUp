@@ -2,6 +2,7 @@ const { z } = require("zod");
 
 const classroomSchema = z.object({
   cid: z.coerce.number().int().nonnegative(),
+  uid: z.coerce.number().int().nonnegative(),
   c_name: z.string().max(255),
   c_code: z.string().length(6),
   c_status: z.boolean().optional().default(true),
