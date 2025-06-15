@@ -9,8 +9,8 @@ const userSchema = z.object({
   u_role: z.string().max(10),
   u_avatar_id: z.coerce.number().int().nonnegative().optional(),
   u_status: z.boolean().optional().default(true),
-  s_created_at: z.date().optional(),
-  s_updated_at: z.date().optional(),
+  u_created_at: z.date().optional(),
+  u_updated_at: z.date().optional(),
 });
 
 // Mostly used for JSDoc annotations

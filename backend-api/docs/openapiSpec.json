@@ -27,7 +27,21 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Users"
+                "type": "object",
+                "properties": {
+                  "u_email": { "type": "string", "format": "email" },
+                  "u_first_name": { "type": "string", "maxLength": 100 },
+                  "u_last_name": { "type": "string", "maxLength": 100 },
+                  "u_password": {
+                    "type": "string",
+                    "format": "password",
+                    "writeOnly": true
+                  },
+                  "u_role": {
+                    "type": "string",
+                    "enum": ["Student", "Teacher"]
+                  }
+                }
               }
             }
           }
@@ -1328,7 +1342,6 @@
             "format": "password",
             "writeOnly": true
           },
-          "u_avatar": { "type": "string" },
           "u_role": {
             "type": "string",
             "enum": ["Student", "Teacher", "Admin"]
