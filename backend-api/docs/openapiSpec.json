@@ -22,6 +22,7 @@
         "description": "Register a new user account",
         "operationId": "register",
         "tags": ["auth"],
+        "tags": ["auth"],
         "requestBody": {
           "required": true,
           "content": {
@@ -62,8 +63,8 @@
                 "type": "object",
                 "required": ["u_email", "u_password"],
                 "properties": {
-                  "u_email": { "type": "string", "format": "email"},
-                  "u_password": { "type": "string", "format": "password"}
+                  "u_email": { "type": "string", "format": "email" },
+                  "u_password": { "type": "string", "format": "password" }
                 }
               }
             }
@@ -245,9 +246,13 @@
                       "properties": {
                         "classrooms": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/Classes" }
+                          "items": {
+                            "$ref": "#/components/schemas/Classroom"
+                          }
                         },
-                        "metadata": { "$ref": "#/components/schemas/PaginationMetadata" }
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
                       }
                     }
                   }
@@ -275,7 +280,7 @@
                 "type": "object",
                 "required": ["c_code"],
                 "properties": {
-                  "c_code": {"type": "string"}
+                  "c_code": { "type": "string" }
                 }
               }
             }
@@ -313,7 +318,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classes"
+                  "$ref": "#/components/schemas/ClassroomDetails"
                 }
               }
             }
@@ -336,7 +341,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Classes"
+                "$ref": "#/components/schemas/ClassroomUpdate"
               }
             }
           }
@@ -424,7 +429,10 @@
                   "a_description": { "type": "string" },
                   "a_max_points": { "type": "number" },
                   "a_deadline_at": { "type": "string", "format": "date-time" },
-                  "a_allow_late_submission": { "type": "boolean", "default": false }
+                  "a_allow_late_submission": {
+                    "type": "boolean",
+                    "default": false
+                  }
                 }
               }
             }
@@ -475,7 +483,9 @@
                           "type": "array",
                           "items": { "$ref": "#/components/schemas/Assignment" }
                         },
-                        "metadata": { "$ref": "#/components/schemas/PaginationMetadata" }
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
                       }
                     }
                   }
@@ -632,9 +642,13 @@
                       "properties": {
                         "submissions": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/Submissions" }
+                          "items": {
+                            "$ref": "#/components/schemas/Submissions"
+                          }
                         },
-                        "metadata": { "$ref": "#/components/schemas/PaginationMetadata" }
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
                       }
                     }
                   }
@@ -700,7 +714,9 @@
                           "type": "array",
                           "items": { "$ref": "#/components/schemas/Users" }
                         },
-                        "metadata": { "$ref": "#/components/schemas/PaginationMetadata" }
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
                       }
                     }
                   }
@@ -738,7 +754,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminOverview"
+                  "$ref": "#/components/schemas/AdminUserView"
                 }
               }
             }
@@ -777,9 +793,13 @@
                       "properties": {
                         "classrooms": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/AdminOverview" }
+                          "items": {
+                            "$ref": "#/components/schemas/AdminOverview"
+                          }
                         },
-                        "metadata": { "$ref": "#/components/schemas/PaginationMetadata" }
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
                       }
                     }
                   }
@@ -806,7 +826,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Classes"
+                "$ref": "#/components/schemas/ClassroomStatusUpdate"
               }
             }
           }
@@ -817,7 +837,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminOverview"
+                  "$ref": "#/components/schemas/AdminClassroomView"
                 }
               }
             }
@@ -868,6 +888,75 @@
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
       }
+    },
+    "/api/assignments/{id}/attachments": {
+      "post": {
+        "summary": "Upload assignment attachments",
+        "description": "Teacher uploads files for assigment",
+        "tags": ["assignments"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": {
+          "$ref": "#/components/parameters/assignmentIdParam"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Files uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Attachments"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get assignment attachments",
+        "description": "Get list of files attached to assignment",
+        "tags": ["assignments"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": {
+          "$ref": "#/components/parameters/assignmentIdParam"
+        },
+        "responses": {
+          "200": {
+            "description": "List of assignment attachments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Attachments"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -883,21 +972,30 @@
         "type": "object",
         "properties": {
           "uid": { "type": "integer", "readOnly": true },
+          "u_avatar_id": { "type": "integer" },
           "u_email": { "type": "string", "format": "email" },
           "u_first_name": { "type": "string", "maxLength": 100 },
           "u_last_name": { "type": "string", "maxLength": 100 },
-          "u_password": { "type": "string", "format": "password", "writeOnly": true },
+          "u_password": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true
+          },
           "u_avatar": { "type": "string" },
-          "u_role": { "type": "string", "enum": ["Student", "Teacher", "Admin"] },
+          "u_role": {
+            "type": "string",
+            "enum": ["Student", "Teacher", "Admin"]
+          },
           "u_status": { "type": "boolean" },
           "u_created_at": { "type": "string", "format": "date-time" },
           "u_updated_at": { "type": "string", "format": "date-time" }
         }
       },
-      "Classes": {
+      "Classrooms": {
         "type": "object",
         "properties": {
           "cid": { "type": "integer" },
+          "uid": { "type": "integer" },
           "c_name": { "type": "string" },
           "c_code": { "type": "string" },
           "c_status": { "type": "boolean" },
@@ -905,7 +1003,7 @@
           "c_updated_at": { "type": "string", "format": "date-time" }
         }
       },
-      "Assignment": {
+      "Members": {
         "type": "object",
         "properties": {
           "aid": { "type": "integer" },
@@ -922,6 +1020,7 @@
       "Submissions": {
         "type": "object",
         "properties": {
+          "sid": { "type": "integer" },
           "uid": { "type": "integer" },
           "aid": { "type": "integer" },
           "s_status": { "type": "string" },
@@ -935,18 +1034,25 @@
       "Members": {
         "type": "object",
         "properties": {
+          "mid": { "type": "string" },
           "uid": { "type": "integer" },
           "cid": { "type": "integer" },
-          "m_status": { "type": "string", "enum": ["active", "removed", "suspended"] },
+          "m_status": {
+            "type": "string",
+            "enum": ["active", "removed", "suspended"]
+          },
           "m_joined_at": { "type": "string", "format": "date-time" },
-          "m_removed_at": { "type": "string", "format": "date-time", "nullable": true }
+          "m_removed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
         }
       },
       "Attachments": {
         "type": "object",
         "properties": {
           "fid": { "type": "integer" },
-          "aid": { "type": "integer" },
           "f_name": { "type": "string" },
           "f_original_name": { "type": "string" },
           "f_type": { "type": "string" },
@@ -959,66 +1065,8 @@
         "properties": {
           "totalUsers": { "type": "integer" },
           "totalClassrooms": { "type": "integer" },
-          "totalAssignments": { "type": "integer" },
-          "totalSubmissions": { "type": "integer" },
-          "activeUsers": { "type": "integer" },
-          "activeClassrooms": { "type": "integer" }
+          "totalAssignments": { "type": "integer" }
         }
-      },
-      "SubmissionRequest": {
-        "type": "object",
-        "properties": {
-          "s_comment": {
-            "type": "string",
-            "description": "Student's comment or notes about the submission",
-            "maxLength": 1000
-          },
-          "files": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "binary"
-            },
-            "description": "Assignment files to upload",
-            "maxItems": 10
-          }
-        },
-        "required": ["files"]
-      },
-      "PaginationMetadata": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "minimum": 1
-          },
-          "limit": {
-            "type": "integer", 
-            "description": "Number of items per page",
-            "minimum": 1,
-            "maximum": 100
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total number of items",
-            "minimum": 0
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number of pages",
-            "minimum": 0
-          },
-          "hasNextPage": {
-            "type": "boolean",
-            "description": "Whether there is a next page"
-          },
-          "hasPrevPage": {
-            "type": "boolean", 
-            "description": "Whether there is a previous page"
-          }
-        },
-        "required": ["page", "limit", "total", "totalPages"]
       }
     },
     "responses": {
@@ -1155,4 +1203,3 @@
     }
   ]
 }
-
