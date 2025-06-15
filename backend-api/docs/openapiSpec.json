@@ -22,7 +22,6 @@
         "description": "Register a new user account",
         "operationId": "register",
         "tags": ["auth"],
-        "tags": ["auth"],
         "requestBody": {
           "required": true,
           "content": {
@@ -211,7 +210,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classes"
+                  "$ref": "#/components/schemas/Classroom"
                 }
               }
             }
@@ -246,9 +245,7 @@
                       "properties": {
                         "classrooms": {
                           "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Classroom"
-                          }
+                          "items": { "$ref": "#/components/schemas/Classroom" }
                         },
                         "metadata": {
                           "$ref": "#/components/schemas/PaginationMetadata"
@@ -292,7 +289,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classes"
+                  "$ref": "#/components/schemas/Classroom"
                 }
               }
             }
@@ -318,7 +315,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassroomDetails"
+                  "$ref": "#/components/schemas/Classroom"
                 }
               }
             }
@@ -341,7 +338,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ClassroomUpdate"
+                "$ref": "#/components/schemas/Classroom"
               }
             }
           }
@@ -352,7 +349,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classes"
+                  "$ref": "#/components/schemas/Classroom"
                 }
               }
             }
@@ -754,7 +751,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminUserView"
+                  "$ref": "#/components/schemas/Users"
                 }
               }
             }
@@ -826,7 +823,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ClassroomStatusUpdate"
+                "$ref": "#/components/schemas/Classroom"
               }
             }
           }
@@ -837,7 +834,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminClassroomView"
+                  "$ref": "#/components/schemas/Classroom"
                 }
               }
             }
@@ -972,7 +969,7 @@
         "type": "object",
         "properties": {
           "uid": { "type": "integer", "readOnly": true },
-          "u_avatar_id": { "type": "integer" },
+          "u_avatar_id": { "type": "string" },
           "u_email": { "type": "string", "format": "email" },
           "u_first_name": { "type": "string", "maxLength": 100 },
           "u_last_name": { "type": "string", "maxLength": 100 },
@@ -991,7 +988,7 @@
           "u_updated_at": { "type": "string", "format": "date-time" }
         }
       },
-      "Classrooms": {
+      "Classroom": {
         "type": "object",
         "properties": {
           "cid": { "type": "integer" },
@@ -1003,7 +1000,7 @@
           "c_updated_at": { "type": "string", "format": "date-time" }
         }
       },
-      "Members": {
+      "Assignment": {
         "type": "object",
         "properties": {
           "aid": { "type": "integer" },
@@ -1065,8 +1062,80 @@
         "properties": {
           "totalUsers": { "type": "integer" },
           "totalClassrooms": { "type": "integer" },
-          "totalAssignments": { "type": "integer" }
+          "totalAssignments": { "type": "integer" },
+          "totalSubmissions": { "type": "integer" },
+          "activeUsers": { "type": "integer" },
+          "activeClassrooms": { "type": "integer" }
         }
+      },
+      "Submission_Attachments": {
+        "type": "object",
+        "properties": {
+          "sid": { "type": "integer" },
+          "fid": { "type": "integer" }
+        }
+      },
+      "Assignment_Attachments": {
+        "type": "object",
+        "properties": {
+          "fid": { "type": "integer" },
+          "aid": { "type": "integer" }
+        }
+      },
+      "SubmissionRequest": {
+        "type": "object",
+        "properties": {
+          "s_comment": {
+            "type": "string",
+            "description": "Student's comment or notes about the submission",
+            "maxLength": 1000
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "binary"
+            },
+            "description": "Assignment files to upload",
+            "maxItems": 10
+          }
+        },
+        "required": ["files"]
+      },
+      "PaginationMetadata": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Current page number",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items per page",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of items",
+            "minimum": 0
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "minimum": 0
+          },
+          "hasNextPage": {
+            "type": "boolean",
+            "description": "Whether there is a next page"
+          },
+          "hasPrevPage": {
+            "type": "boolean",
+            "description": "Whether there is a previous page"
+          }
+        },
+        "required": ["page", "limit", "total", "totalPages"]
       }
     },
     "responses": {
