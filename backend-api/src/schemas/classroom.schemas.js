@@ -12,14 +12,11 @@ const classroomSchema = z.object({
   limit: z.coerce.number().positive().default(5)
 });
 
-const getClassroomsByUID = z.object({ 
-  input: z.object({ 
-    uid: z.coerce.number().positive(), 
-    page: z.coerce.number().positive().default(1),
-    limit: z.coerce.number().positive().default(5),
-  }).strict()
+const getClassroomsParams = z.object({
+  uid: z.coerce.number().nonnegative(),
+  limit: z.coerce.number().positive().default(10),
+  page: z.coerce.number().positive().default(1),
 });
-
 
 // Mostly used for JSDoc annotations
 const partialClassroomSchema = classroomSchema.partial();
@@ -27,5 +24,5 @@ const partialClassroomSchema = classroomSchema.partial();
 module.exports = {
   classroomSchema,
   partialClassroomSchema,
-  getClassroomsByUID
+  getClassroomsParams,
 };
