@@ -358,9 +358,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["c_code"],
+                "required": ["c_code", "uid"],
                 "properties": {
-                  "c_code": { "type": "string" }
+                  "c_code": { "type": "string" },
+                  "uid": {"type": "integer"}
                 }
               }
             }
@@ -399,7 +400,7 @@
         }
       }
     },
-    "/api/classrooms/{id}": {
+    "/api/classrooms/{cid}": {
       "get": {
         "summary": "Get classroom details",
         "description": "Detail of classroom",
@@ -513,7 +514,7 @@
         }
       }
     },
-    "/api/classrooms/{id}/members": {
+    "/api/classrooms/{cid}/members": {
       "get": {
         "summary": "Get classroom members",
         "description": "Members of classroom",
