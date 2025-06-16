@@ -34,7 +34,7 @@ const getClassroomsParams = z.object({
 
 /** Teacher create a new classroom */
 const createClassroomData = z.object({
-  input: classroomSchema.pick({ c_name: true }).strict(),
+  input: classroomSchema.pick({ c_name: true, uid: true }).strict(),
 });
 
 /** Student joins classroom */
