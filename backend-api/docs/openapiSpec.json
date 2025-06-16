@@ -310,6 +310,7 @@
         "tags": ["classrooms"],
         "security": [{ "bearerAuth": [] }],
         "parameters": [
+          { "$ref": "#/components/parameters/userIdParam"},
           { "$ref": "#/components/parameters/limitParam" },
           { "$ref": "#/components/parameters/pageParam" }
         ],
@@ -1601,28 +1602,28 @@
     },
     "parameters": {
       "userIdParam": {
-        "name": "id",
-        "in": "path",
+        "name": "uid",
+        "in": "query",
         "required": true,
         "description": "User ID",
         "schema": { "type": "integer" }
       },
       "classroomIdParam": {
-        "name": "id",
+        "name": "cid",
         "in": "path",
         "required": true,
         "description": "Classroom ID",
         "schema": { "type": "integer" }
       },
       "assignmentIdParam": {
-        "name": "id",
+        "name": "aid",
         "in": "path",
         "required": true,
         "description": "Assignment ID",
         "schema": { "type": "integer" }
       },
       "submissionIdParam": {
-        "name": "id",
+        "name": "sid",
         "in": "path",
         "required": true,
         "description": "Submission ID",
