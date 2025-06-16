@@ -25,7 +25,7 @@ function validateRequest(validator) {
         console.log(req.body);
       }
 
-      validator.parse({ input });
+      validator.parse(input);
 
       return next();
     } catch (error) {
