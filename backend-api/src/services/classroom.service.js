@@ -51,8 +51,21 @@ async function updateClassroom(cid, updateData) {
     return{ ...updatedClassroom, ...classroomData };
 }
 
+async function deleteClassroom(cid) {
+    const deletedClassroom = await classroomRepository()
+    .where('cid', cid)
+    .first()
+    if(!deletedClassroom) {
+        return null;
+    }
+
+    await classroomRepository().where('cid', cid).del();
+    return deletedClassroom;
+}
+
 module.exports = {
     createClassroom,
     getClassroomById,
-    updateClassroom
+    updateClassroom,
+    deleteClassroom
 }
