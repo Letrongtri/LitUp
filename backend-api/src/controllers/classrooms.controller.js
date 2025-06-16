@@ -100,13 +100,43 @@ async function deleteClassroom(req, res, next) {
   }
 }
 
-function joinClassroom(req, res) {
-  return res.status(201).json(JSend.success({ users: [] }));
+async function joinClassroom(req, res, next) {
+  try {
+    const { c_code, uid } = req.body;
+
+    if(!c_code || !uid) {
+      return next(new ApiError(400, 'Missing code or id'));
+    }
+
+    const result = await classroomsService.joinClassroomByCode(uid, c_code);
+    if(!result) {
+      return next(new ApiError(400, 'Error to find classroom'));
+    }
+
+    return res.status(201).json(JSend.success());
+  }catch (err) {
+    console.log(err);
+    return next(new ApiError(500, 'Internal Server Error'));
+  }
 }
 
-function getMembersInClass(req, res) {
-  return res.status(201).json(JSend.success({ users: [] }));
+async function getMembersInClass(req, res, next) {
+  try {
+    const cid = Number(req.params.cid);
+
+    if (!cid) {
+      return next(new ApiError(400, 'Missing or invalid classroom ID'));
+    }
+
+    const members = await classroomsService.getMemberByClassId(cid);
+
+    return res.status(200).json(JSend.success({ users: members }));
+  } catch (err) {
+    console.error('getMembersInClass error:', err);
+    return next(new ApiError(500, 'Internal Server Error'));
+  }
 }
+
 
 module.exports = {
   createClassroom,
