@@ -73,10 +73,42 @@ async function getClassroomsByUser(uid, limit, page) {
     .offset((page - 1 ) * limit);
 }
 
+async function joinClassroomByCode(uid, c_code) {
+    const classroom = await classroomRepository()
+    .where({c_code})
+    .first()
+    if(!classroom) return null;
+
+    const exists = await knex('members')
+    .where({cid: classroom.cid, uid, m_status: true})
+    .first();
+
+    if(exists) return null;
+
+    const now = new Date();
+    await knex('members').insert({
+        cid: classroom.cid,
+        uid,
+        m_status: true,
+        m_joined_at: now
+    });
+    return true;
+}
+
+async function getMemberByClassId(cid) {
+    return knex('members as m')
+    .join('users as u', 'm.uid', 'u.uid')
+    .where('m.cid', cid)
+    .andWhere('m.m_status', true)
+    .select('u.uid', 'u.u_first_name','u.u_last_name', 'u.u_email', 'm.m_joined_at');
+}
+
 module.exports = {
     createClassroom,
     getClassroomById,
     updateClassroom,
     deleteClassroom,
-    getClassroomsByUser
+    getClassroomsByUser,
+    joinClassroomByCode,
+    getMemberByClassId
 }
