@@ -38,17 +38,15 @@ const createClassroomData = z.object({
 
 /** Student joins classroom */
 const joinClassroomData = z.object({
-  input: classroomSchema.pick({ c_code: true }).strict(),
+  c_code: z.string().length(6),
+  uid: z.coerce.number().nonnegative().optional(),
 });
 
 /** Get classroom id */
 const getClassroomId = z.object({
-  input: z
-    .object({
-      cid: z.coerce.number().nonnegative(),
-    })
-    .strict(),
+  cid: z.coerce.number().nonnegative()
 });
+
 
 /** Teacher update classroom */
 const updateClassroomData = z.object({
