@@ -21,6 +21,7 @@ const registerData = z.object({
       u_avatar_id: true,
       u_created_at: true,
       u_updated_at: true,
+      u_avatar_file: true,
     })
     .strict(),
 });

@@ -17,12 +17,17 @@ function validateRequest(validator) {
       }
 
       if (req.method == "POST" || req.method == "PUT") {
+        // middleware cleanEmptyString(req.body.input)
+        for (const key in req.body) {
+          if (req.body[key] === "") {
+            delete req.body[key];
+          }
+        }
         input = {
           ...input,
           ...(req.body ? req.body : {}),
           ...(req.file ? req.file : {}),
         };
-        console.log(req.body);
       }
 
       validator.parse(input);
