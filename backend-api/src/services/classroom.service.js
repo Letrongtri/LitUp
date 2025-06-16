@@ -22,9 +22,12 @@ async function createClassroom(payload) {
 }
 
 
-
+async function getClassroomById(cid) {
+    return classroomRepository().where('cid', cid).select('*').first();
+}
 
 
 module.exports = {
-    createClassroom
+    createClassroom,
+    getClassroomById
 }
