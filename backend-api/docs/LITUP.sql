@@ -93,3 +93,6 @@ CREATE TABLE Assignment_Attachments (
     FOREIGN KEY (fid) REFERENCES Attachments(fid) ON DELETE CASCADE,
     FOREIGN KEY (aid) REFERENCES Assignments(aid) ON DELETE CASCADE
 );
+
+-- password: abc123
+update users set u_password = '$2b$10$upaNUUJbE/IW/9NiCsLg0erT6PVEgB6CQkNJ84HHcFxevNQYNh.nK' where uid < 200;

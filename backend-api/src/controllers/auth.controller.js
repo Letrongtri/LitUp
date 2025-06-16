@@ -1,11 +1,34 @@
+const authService = require("../services/auth.service");
+const ApiError = require("../api-error");
 const JSend = require("../jsend");
 
-function register(req, res) {
-  return res.status(201).json(JSend.success({ user: {} }));
+async function register(req, res, next) {
+  try {
+    const userData = { ...req.body };
+
+    const user = await authService.createUser(userData);
+
+    return res
+      .status(201)
+      .set({ Location: `${req.baseUrl}/${user.uid}` })
+      .json(JSend.success({ user }));
+  } catch (error) {
+    console.log(error);
+    return next(new ApiError(500, "Internal Server Error"));
+  }
 }
 
-function login(req, res) {
-  return res.status(201).json(JSend.success({ user: {} }));
+async function login(req, res, next) {
+  try {
+    const userData = { ...req.body };
+
+    const user = await authService.loginUser(userData);
+
+    return res.json(JSend.success({ user }));
+  } catch (error) {
+    console.log(error);
+    return next(new ApiError(500, "Internal Server Error"));
+  }
 }
 
 module.exports = {
