@@ -264,6 +264,7 @@
                 "type": "object",
                 "required": ["c_name"],
                 "properties": {
+                  "uid": {"type": "integer"},
                   "c_name": { "type": "string" }
                 }
               }
