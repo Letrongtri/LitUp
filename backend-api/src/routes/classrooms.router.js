@@ -22,15 +22,14 @@ const router = express.Router();
  * Get list of classroom student has joined
  * query: ?limit=10&page=2
  */
-const getClassroomsParams = z.object({
-  input: z
-    .object({
-      uid: z.coerce.number().nonnegative(),
-      limit: z.coerce.number().nonnegative().default(10),
-      page: z.coerce.number().nonnegative().default(1),
-    })
-    .strict(),
-});
+const { getClassroomsParams } = require("../schemas/classroom.schemas");
+
+router.get(
+  "/",
+  validateRequest(getClassroomsParams),
+  classroomsController.getClassrooms
+);
+
 
 /** Teacher create a new classroom */
 const createClassroomData = z.object({
