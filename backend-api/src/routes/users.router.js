@@ -6,7 +6,7 @@ const usersController = require("../controllers/users.controller");
 // middlewares
 const allowedMethods = require("../middlewares/allowedMethods.middleware");
 const { validateRequest } = require("../middlewares/validator.middleware");
-const { avatarUpload } = require("../middlewares/avatar-upload.middleware");
+const { avatarUpload } = require("../middlewares/files-upload.middleware");
 
 // schema
 const { partialUserSchema } = require("../schemas/user.schemas");

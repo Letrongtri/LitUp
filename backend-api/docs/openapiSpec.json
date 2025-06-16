@@ -591,10 +591,13 @@
                     "default": false
                   },
                   "attachments": {
-                    "type": "string",
-                    "format": "binary",
-                    "writeOnly": true,
-                    "description": "assignment attachments"
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary",
+                      "writeOnly": true,
+                      "description": "assignment attachments"
+                    }
                   }
                 }
               }
