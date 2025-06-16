@@ -8,6 +8,7 @@ const assignmentsController = require("../controllers/assignments.controller");
 // middlewares
 const allowedMethods = require("../middlewares/allowedMethods.middleware");
 const { validateRequest } = require("../middlewares/validator.middleware");
+const { filesUpload } = require("../middlewares/files-upload.middleware");
 
 // schema
 const {
@@ -68,7 +69,9 @@ const updateClassroomData = z.object({
 
 /** Teacher create a new assignment */
 const createAssignmentData = z.object({
-  input: assignmentSchema.omit({ aid: true, a_updated_at: true }).strict(),
+  input: assignmentSchema
+    .omit({ aid: true, a_created_at: true, a_updated_at: true })
+    .strict(),
 });
 
 module.exports.setup = (app) => {
@@ -118,7 +121,7 @@ module.exports.setup = (app) => {
   router
     .route("/:cid/assignments")
     .post(
-      validateRequest(createAssignmentData),
+      [filesUpload, validateRequest(createAssignmentData)],
       assignmentsController.createAssignment
     )
     .get(validateRequest(getClassroomId), assignmentsController.getAssignments)

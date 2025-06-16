@@ -1,4 +1,3 @@
-// const { unlink } = require("node:fs");
 const knex = require("../database/knex");
 const { saveFile, deleteFileByPath } = require("./attachments.service");
 

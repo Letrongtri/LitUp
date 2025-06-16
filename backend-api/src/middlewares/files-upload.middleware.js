@@ -32,6 +32,23 @@ function avatarUpload(req, res, next) {
     next();
   });
 }
+
+function filesUpload(req, res, next) {
+  const upload = multer({ storage: storage }).array("attachments");
+
+  upload(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      return next(new ApiError(400, "An error occurred while uploading files"));
+    } else if (err) {
+      return next(
+        new ApiError(500, "An unknown error occurred while uploading files")
+      );
+    }
+    next();
+  });
+}
+
 module.exports = {
   avatarUpload,
+  filesUpload,
 };
