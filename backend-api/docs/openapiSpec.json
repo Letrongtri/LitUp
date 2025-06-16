@@ -130,13 +130,14 @@
         }
       }
     },
-    "/api/users": {
+    "/api/users/{id}": {
       "get": {
         "summary": "Get user profile",
         "description": "Get current user profile information (requires JWT)",
         "operationId": "getUser",
         "tags": ["users"],
         "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/userIdParam" }],
         "responses": {
           "200": {
             "description": "User profile information",
@@ -166,9 +167,7 @@
           "401": { "$ref": "#/components/responses/401Unauthorized" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
-      }
-    },
-    "/api/users/{id}": {
+      },
       "put": {
         "summary": "Update user profile",
         "description": "Update user profile information",
@@ -190,6 +189,9 @@
                     "type": "string",
                     "format": "password",
                     "writeOnly": true
+                  },
+                  "u_status": {
+                    "type": "boolean"
                   },
                   "u_avatar_file": {
                     "type": "string",
@@ -264,7 +266,7 @@
                 "type": "object",
                 "required": ["c_name"],
                 "properties": {
-                  "uid": {"type": "integer"},
+                  "uid": { "type": "integer" },
                   "c_name": { "type": "string" }
                 }
               }

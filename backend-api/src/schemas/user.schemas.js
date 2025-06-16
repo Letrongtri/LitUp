@@ -8,9 +8,10 @@ const userSchema = z.object({
   u_password: z.string().max(255),
   u_role: z.string().max(10),
   u_avatar_id: z.coerce.number().int().nonnegative().optional(),
-  u_status: z.boolean().optional().default(true),
+  u_status: z.coerce.boolean().optional(),
   u_created_at: z.date().optional(),
   u_updated_at: z.date().optional(),
+  u_avatar_file: z.any().optional(),
 });
 
 // Mostly used for JSDoc annotations
