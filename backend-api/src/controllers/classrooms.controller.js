@@ -26,9 +26,23 @@ async function createClassroom(req, res, next) {
  
 }
 
-function getClassrooms(req, res,) {
-  return res.status(201).json(JSend.success({ classrooms: [] }));
+async function getClassrooms(req, res, next) {
+  try {
+    const { uid, limit = 10, page = 1 } = req.query;
+
+    if (!uid) {
+      return next(new ApiError(400, "uid is required"));
+    }
+
+    const classrooms = await classroomsService.getClassroomsByUser(uid, limit, page);
+    return res.json(JSend.success({ classrooms }));
+  } catch (err) {
+    console.log("getClassrooms error:", err);
+    return next(new ApiError(500, 'Internal Server Error'));
+  }
 }
+
+
 
 async function getClassroom(req, res, next) {
   const { cid } = req.params;
