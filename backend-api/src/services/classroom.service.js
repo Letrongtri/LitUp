@@ -63,9 +63,20 @@ async function deleteClassroom(cid) {
     return deletedClassroom;
 }
 
+async function getClassroomsByUser(uid, limit, page) {
+    return knex('classrooms as c')
+    .join('members as m', 'c.cid', 'm.cid')
+    .where('m.uid', uid)
+    .andWhere('m.m_status', true)
+    .select('c.*')
+    .limit(limit)
+    .offset((page - 1 ) * limit);
+}
+
 module.exports = {
     createClassroom,
     getClassroomById,
     updateClassroom,
-    deleteClassroom
+    deleteClassroom,
+    getClassroomsByUser
 }
