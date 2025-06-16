@@ -46,9 +46,29 @@ async function getClassroom(req, res, next) {
   }
 }
 
-function updateClassroom(req, res) {
-  return res.status(201).json(JSend.success({ classroom: {} }));
-}
+async function updateClassroom(req, res, next) {
+  const { cid } = req.params;
+  
+  try {
+    const updateData = {
+      ...req.body
+    };
+
+    const updated = await classroomsService.updateClassroom(cid, updateData);
+    if(!updated) {
+      return next(new ApiError(404, 'Classroom not found'));
+    }
+
+    return res.json(
+      JSend.success({
+        classroom: updated,
+      })
+    );
+  }catch (err) {
+    console.log(err);
+    return next(new ApiError(500, 'Internal Server Error'));
+  }
+} 
 
 function deleteClassroom(req, res) {
   return res.status(201).json(JSend.success());
