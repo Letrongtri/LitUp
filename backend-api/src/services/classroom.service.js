@@ -3,6 +3,15 @@ function classroomRepository() {
     return knex('classrooms');
 }
 
+function readClassroomData(payload) {
+    return {
+        ...(payload.uid && { uid: payload.uid }),
+        ...(payload.c_name && { c_name: payload.c_name }),
+        ...(payload.c_code && { c_code: payload.c_code }),
+        ...(payload.c_status !== undefined && { c_status: payload.c_status })
+    };
+}
+
 function extractClassroomData(payload) {
     return {
         uid: payload.uid,
@@ -26,8 +35,24 @@ async function getClassroomById(cid) {
     return classroomRepository().where('cid', cid).select('*').first();
 }
 
+async function updateClassroom(cid, updateData) {
+    const updatedClassroom = await classroomRepository()
+    .where('cid', cid)
+    .select('*')
+    .first();
+    if(!updatedClassroom) {
+        return null;
+    }
+
+    const classroomData = readClassroomData(updateData);
+    if(Object.keys(classroomData).length>0) {
+        await classroomRepository().where('cid', cid).update(classroomData);
+    }
+    return{ ...updatedClassroom, ...classroomData };
+}
 
 module.exports = {
     createClassroom,
-    getClassroomById
+    getClassroomById,
+    updateClassroom
 }
