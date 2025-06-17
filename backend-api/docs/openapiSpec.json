@@ -963,7 +963,7 @@
         }
       },
       "put": {
-        "summary": "Update submission and grade assignment",
+        "summary": "Update submission",
         "description": "Update submission info",
         "operationId": "updateSubmission",
         "tags": ["submissions"],
@@ -976,7 +976,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "files": {
+                  "attachments": {
                     "type": "array",
                     "items": {
                       "type": "string",
@@ -988,7 +988,7 @@
                     "maxItems": 10
                   }
                 },
-                "required": ["files"]
+                "required": ["attachments"]
               }
             }
           }
@@ -1038,6 +1038,63 @@
             "description": "Submission deleted successfully",
             "$ref": "#/components/responses/200NoData"
           },
+          "401": { "$ref": "#/components/responses/401Unauthorized" },
+          "403": { "$ref": "#/components/responses/403Forbidden" },
+          "404": { "$ref": "#/components/responses/404NotFound" },
+          "500": { "$ref": "#/components/responses/500InternalServerError" }
+        }
+      }
+    },
+    "/api/submissions/{sid}/grade": {
+      "put": {
+        "summary": "Grade assignment",
+        "description": "Teacher grade student's submissions",
+        "operationId": "gradeSubmission",
+        "tags": ["submissions"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/submissionIdParam" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "s_grade": { "type": "number" },
+                  "s_comment": { "type": "string" }
+                },
+                "required": ["s_grade"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "submission graded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "submission": {
+                          "$ref": "#/components/schemas/Submissions"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/400BadRequest" },
           "401": { "$ref": "#/components/responses/401Unauthorized" },
           "403": { "$ref": "#/components/responses/403Forbidden" },
           "404": { "$ref": "#/components/responses/404NotFound" },

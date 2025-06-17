@@ -1,5 +1,9 @@
 const knex = require("../database/knex");
-const { saveFile, deleteFileByPath } = require("./attachments.service");
+const {
+  saveFile,
+  deleteFileByPath,
+  getAttachments,
+} = require("./attachments.service");
 const Paginator = require("./paginator");
 
 function assignmentRepository() {
@@ -83,9 +87,7 @@ async function getAssignments(cid, query) {
 
   const fids = assignmentAttachments.map((a) => a.fid);
 
-  const attachments = await attachmentRepository()
-    .whereIn("fid", fids)
-    .select("fid", "f_name", "f_original_name", "f_type", "f_size");
+  const attachments = await getAttachments(fids);
 
   const attachmentMap = new Map();
   attachments.forEach((a) => attachmentMap.set(a.fid, a));
@@ -131,9 +133,7 @@ async function getAssignment(aid) {
   if (!fids) return result;
 
   const fidList = fids.map((f) => f.fid);
-  const attachments = await attachmentRepository()
-    .whereIn("fid", fidList)
-    .select("fid", "f_name", "f_original_name", "f_type", "f_size");
+  const attachments = await getAttachments(fidList);
 
   const assignments = {
     ...result,
@@ -170,9 +170,7 @@ async function updateAssignment(aid, updateData, files) {
 
     let oldFiles = [];
     if (fidList.length > 0) {
-      oldFiles = await attachmentRepository()
-        .whereIn("fid", fidList)
-        .select("fid", "f_name", "f_original_name", "f_type", "f_size");
+      oldFiles = await getAttachments(fidList);
 
       attachments = oldFiles;
     }

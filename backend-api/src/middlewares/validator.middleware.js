@@ -24,25 +24,28 @@ function validateRequest(validator) {
           }
         }
 
-        const files = [];
-        if (req.files && typeof req.files === "object") {
-          for (const key in req.files) {
-            const file = req.files[key];
-            if (file && file.fieldname === "attachments") {
-              files.push(file);
-            }
-          }
-        }
-
         input = {
           ...input,
           ...(req.body ? req.body : {}),
           ...(req.file ? req.file : {}),
-          attachments: files.length > 0 ? files : undefined,
         };
+
+        const attachments = [];
+        if (req.files && typeof req.files === "object") {
+          for (const key in req.files) {
+            const file = req.files[key];
+            if (file && file.fieldname === "attachments") {
+              attachments.push(file);
+            }
+          }
+        }
+
+        if (attachments.length > 0) {
+          input.attachments = attachments;
+        }
       }
 
-      validator.parse(input);
+      validator.parse({ input });
 
       return next();
     } catch (error) {

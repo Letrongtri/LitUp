@@ -23,4 +23,10 @@ function deleteFileByPath(filePath) {
   unlink(`.${filePath}`, () => {});
 }
 
-module.exports = { saveFile, deleteFileByPath };
+function getAttachments(fids) {
+  return attachmentRepository()
+    .whereIn("fid", fids)
+    .select("fid", "f_name", "f_original_name", "f_type", "f_size");
+}
+
+module.exports = { saveFile, deleteFileByPath, getAttachments };
