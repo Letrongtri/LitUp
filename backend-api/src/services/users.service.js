@@ -71,6 +71,7 @@ async function updateUser(uid, updateData, file) {
 
   // Nếu có ít nhất một trường cần cập nhật, thực hiện truy vấn UPDATE
   if (Object.keys(userData).length > 0) {
+    userData.u_updated_at = new Date().toISOString();
     await userRepository().where("uid", uid).update(userData);
   }
 

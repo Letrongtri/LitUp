@@ -168,7 +168,7 @@
         }
       }
     },
-    "/api/users/{id}": {
+    "/api/users/{uid}": {
       "put": {
         "summary": "Update user profile",
         "description": "Update user profile information",
@@ -264,7 +264,7 @@
                 "type": "object",
                 "required": ["c_name"],
                 "properties": {
-                  "uid": {"type": "integer"},
+                  "uid": { "type": "integer" },
                   "c_name": { "type": "string" }
                 }
               }
@@ -310,7 +310,7 @@
         "tags": ["classrooms"],
         "security": [{ "bearerAuth": [] }],
         "parameters": [
-          { "$ref": "#/components/parameters/userIdParam"},
+          { "$ref": "#/components/parameters/userIdParam" },
           { "$ref": "#/components/parameters/limitParam" },
           { "$ref": "#/components/parameters/pageParam" }
         ],
@@ -361,7 +361,7 @@
                 "required": ["c_code", "uid"],
                 "properties": {
                   "c_code": { "type": "string" },
-                  "uid": {"type": "integer"}
+                  "uid": { "type": "integer" }
                 }
               }
             }
@@ -565,7 +565,7 @@
         }
       }
     },
-    "/api/classrooms/{id}/assignments": {
+    "/api/classrooms/{cid}/assignments": {
       "post": {
         "summary": "Create assignment",
         "description": "Create a new assignment in classroom",
@@ -678,7 +678,7 @@
         }
       }
     },
-    "/api/assignments/{id}": {
+    "/api/assignments/{aid}": {
       "get": {
         "summary": "Get assignment details",
         "description": "Get detailed information about an assignment",
@@ -803,7 +803,7 @@
         }
       }
     },
-    "/api/assignments/{id}/submit": {
+    "/api/assignments/{aid}/submit": {
       "post": {
         "summary": "Submit assignment",
         "description": "Student submits assignment",
@@ -818,7 +818,8 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "files": {
+                  "uid": { "type": "integer" },
+                  "attachments": {
                     "type": "array",
                     "items": {
                       "type": "string",
@@ -830,7 +831,7 @@
                     "maxItems": 10
                   }
                 },
-                "required": ["files"]
+                "required": ["attachments"]
               }
             }
           }
@@ -869,7 +870,7 @@
         }
       }
     },
-    "/api/assignments/{id}/submissions": {
+    "/api/assignments/{aid}/submissions": {
       "get": {
         "summary": "Get assignment submissions",
         "description": "View submissions",
@@ -916,7 +917,7 @@
         }
       }
     },
-    "/api/submissions/{id}": {
+    "/api/submissions/{sid}": {
       "get": {
         "summary": "Get submissions details",
         "description": "Get detailed information about an submission",
@@ -1114,7 +1115,7 @@
         }
       }
     },
-    "/api/admin/users/{id}": {
+    "/api/admin/users/{uid}": {
       "put": {
         "summary": "Lock/unlock user account",
         "description": "Admin can lock or unlock user accounts",
@@ -1216,7 +1217,7 @@
         }
       }
     },
-    "/api/admin/classrooms/{id}": {
+    "/api/admin/classrooms/{sid}": {
       "put": {
         "summary": "Lock/unlock classroom",
         "description": "Admin can lock or unlock classrooms",
@@ -1269,7 +1270,7 @@
         }
       }
     },
-    "/api/admin/assignments/{id}": {
+    "/api/admin/assignments/{aid}": {
       "put": {
         "summary": "Lock/unlock assignment",
         "description": "Admin can lock or unlock assignments",
@@ -1608,7 +1609,7 @@
     "parameters": {
       "userIdParam": {
         "name": "uid",
-        "in": "query",
+        "in": "path",
         "required": true,
         "description": "User ID",
         "schema": { "type": "integer" }
