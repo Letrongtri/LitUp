@@ -7,6 +7,7 @@ const { validateRequest } = require("../middlewares/validator.middleware");
 
 const router = express.Router();
 
+// Zod schemas
 const getClassroomId = z.object({
   cid: z.coerce.number().nonnegative()
 });
@@ -18,42 +19,57 @@ const getUserId = z.object({
 const getAssignmentId = z.object({
   aid: z.coerce.number().nonnegative()
 });
+
+const toggleUserStatusBody = z.object({
+    u_status: z.boolean()
+});
+
+const toggleAssigmentStatusBody = z.object({
+  a_status: z.boolean()
+});
+
+
 module.exports.setup = (app) => {
   app.use("/api/admin", router);
 
-  
+  // Overview
   router
     .route("/overview")
     .get(adminController.overview)
     .all(allowedMethods(["GET"]));
 
- 
+  // Users
   router
     .route("/users")
     .get(adminController.getAllUsers)
     .all(allowedMethods(["GET"]));
 
-  
-  router
-    .route("/users/:id")
-    .put(validateRequest(getUserId), adminController.toggleUserStatus)
+    router
+    .route("/users/:uid")
+    .put(
+      validateRequest(getUserId),              
+      validateRequest(toggleUserStatusBody),   
+      adminController.toggleUserStatus
+    )
     .all(allowedMethods(["PUT"]));
-
-  
+  // Classrooms
   router
     .route("/classrooms")
     .get(adminController.getAllClassrooms)
     .all(allowedMethods(["GET"]));
 
- 
   router
-    .route("/classrooms/:id")
+    .route("/classrooms/:cid")
     .put(validateRequest(getClassroomId), adminController.toggleClassroomStatus)
     .all(allowedMethods(["PUT"]));
 
- 
+  // Assignments
   router
-    .route("/assignments/:id")
-    .put(validateRequest(getAssignmentId), adminController.toggleAssignmentStatus)
-    .all(allowedMethods(["PUT"]));
+  .route("/assignments/:aid")
+  .put(
+    validateRequest(getAssignmentId),              
+    validateRequest(toggleAssigmentStatusBody),   
+    adminController.toggleAssignmentStatus
+  )
+  .all(allowedMethods(["PUT"]));
 };

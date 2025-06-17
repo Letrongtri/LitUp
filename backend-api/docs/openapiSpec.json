@@ -1110,7 +1110,7 @@
         }
       }
     },
-    "/api/admin/users/{id}": {
+    "/api/admin/users/{uid}": {
       "put": {
         "summary": "Lock/unlock user account",
         "description": "Admin can lock or unlock user accounts",
@@ -1212,20 +1212,23 @@
         }
       }
     },
-    "/api/admin/classrooms/{id}": {
+    "/api/admin/classrooms/{cid}": {
       "put": {
-        "summary": "Lock/unlock classroom",
-        "description": "Admin can lock or unlock classrooms",
-        "operationId": "toggleClassroomStatus",
         "tags": ["admin"],
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
+        "summary": "Lock/unlock classroom",
+        "parameters": [
+          { "$ref": "#/components/parameters/classroomIdParam" }
+        ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Classrooms"
+             "application/json": {
+                "schema": {
+                "type": "object",
+                "properties": {
+                  "c_status": { "type": "boolean" }
+                },
+                "required": ["c_status"]
               }
             }
           }
@@ -1265,7 +1268,7 @@
         }
       }
     },
-    "/api/admin/assignments/{id}": {
+    "/api/admin/assignments/{aid}": {
       "put": {
         "summary": "Lock/unlock assignment",
         "description": "Admin can lock or unlock assignments",
@@ -1604,7 +1607,7 @@
     "parameters": {
       "userIdParam": {
         "name": "uid",
-        "in": "query",
+        "in": "path",
         "required": true,
         "description": "User ID",
         "schema": { "type": "integer" }
