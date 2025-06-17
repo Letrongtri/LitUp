@@ -168,7 +168,7 @@
         }
       }
     },
-    "/api/users/{id}": {
+    "/api/users/{uid}": {
       "put": {
         "summary": "Update user profile",
         "description": "Update user profile information",
@@ -264,7 +264,7 @@
                 "type": "object",
                 "required": ["c_name"],
                 "properties": {
-                  "uid": {"type": "integer"},
+                  "uid": { "type": "integer" },
                   "c_name": { "type": "string" }
                 }
               }
@@ -310,7 +310,7 @@
         "tags": ["classrooms"],
         "security": [{ "bearerAuth": [] }],
         "parameters": [
-          { "$ref": "#/components/parameters/userIdParam"},
+          { "$ref": "#/components/parameters/userIdParam" },
           { "$ref": "#/components/parameters/limitParam" },
           { "$ref": "#/components/parameters/pageParam" }
         ],
@@ -361,7 +361,7 @@
                 "required": ["c_code", "uid"],
                 "properties": {
                   "c_code": { "type": "string" },
-                  "uid": {"type": "integer"}
+                  "uid": { "type": "integer" }
                 }
               }
             }
@@ -565,7 +565,7 @@
         }
       }
     },
-    "/api/classrooms/{id}/assignments": {
+    "/api/classrooms/{cid}/assignments": {
       "post": {
         "summary": "Create assignment",
         "description": "Create a new assignment in classroom",
@@ -583,6 +583,10 @@
                   "a_title": { "type": "string" },
                   "a_description": { "type": "string" },
                   "a_max_points": { "type": "number" },
+                  "a_status": {
+                    "type": "boolean",
+                    "default": true
+                  },
                   "a_deadline_at": { "type": "string", "format": "date-time" },
                   "a_allow_late_submission": {
                     "type": "boolean",
@@ -678,7 +682,7 @@
         }
       }
     },
-    "/api/assignments/{id}": {
+    "/api/assignments/{aid}": {
       "get": {
         "summary": "Get assignment details",
         "description": "Get detailed information about an assignment",
@@ -735,6 +739,7 @@
                   "a_title": { "type": "string" },
                   "a_description": { "type": "string" },
                   "a_max_points": { "type": "number" },
+                  "a_status": { "type": "boolean" },
                   "a_deadline_at": { "type": "string", "format": "date-time" },
                   "a_allow_late_submission": { "type": "boolean" },
                   "attachments": {
@@ -803,7 +808,7 @@
         }
       }
     },
-    "/api/assignments/{id}/submit": {
+    "/api/assignments/{aid}/submit": {
       "post": {
         "summary": "Submit assignment",
         "description": "Student submits assignment",
@@ -818,7 +823,8 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "files": {
+                  "uid": { "type": "integer" },
+                  "attachments": {
                     "type": "array",
                     "items": {
                       "type": "string",
@@ -830,7 +836,7 @@
                     "maxItems": 10
                   }
                 },
-                "required": ["files"]
+                "required": ["attachments"]
               }
             }
           }
@@ -869,7 +875,7 @@
         }
       }
     },
-    "/api/assignments/{id}/submissions": {
+    "/api/assignments/{aid}/submissions": {
       "get": {
         "summary": "Get assignment submissions",
         "description": "View submissions",
@@ -916,7 +922,7 @@
         }
       }
     },
-    "/api/submissions/{id}": {
+    "/api/submissions/{sid}": {
       "get": {
         "summary": "Get submissions details",
         "description": "Get detailed information about an submission",
@@ -1220,14 +1226,12 @@
       "put": {
         "tags": ["admin"],
         "summary": "Lock/unlock classroom",
-        "parameters": [
-          { "$ref": "#/components/parameters/classroomIdParam" }
-        ],
+        "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
         "requestBody": {
           "required": true,
           "content": {
-             "application/json": {
-                "schema": {
+            "application/json": {
+              "schema": {
                 "type": "object",
                 "properties": {
                   "c_status": { "type": "boolean" }
@@ -1381,6 +1385,7 @@
           "a_title": { "type": "string" },
           "a_description": { "type": "string" },
           "a_max_points": { "type": "number" },
+          "a_status": { "type": "boolean" },
           "a_created_at": { "type": "string", "format": "date-time" },
           "a_updated_at": { "type": "string", "format": "date-time" },
           "a_deadline_at": { "type": "string", "format": "date-time" },

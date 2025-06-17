@@ -54,6 +54,7 @@ CREATE TABLE Assignments (
     a_title VARCHAR(255) NOT NULL,
     a_description TEXT,
     a_max_points FLOAT,
+    a_status BOOLEAN DEFAULT TRUE,
     a_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     a_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     a_deadline_at TIMESTAMP,
