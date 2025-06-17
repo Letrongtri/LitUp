@@ -737,12 +737,16 @@
                   "a_max_points": { "type": "number" },
                   "a_deadline_at": { "type": "string", "format": "date-time" },
                   "a_allow_late_submission": { "type": "boolean" },
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
+                  "attachments": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary",
+                      "writeOnly": true,
+                      "description": "assignment attachments"
+                    }
                   }
-                },
-                "required": ["a_title"]
+                }
               }
             }
           }
