@@ -583,6 +583,10 @@
                   "a_title": { "type": "string" },
                   "a_description": { "type": "string" },
                   "a_max_points": { "type": "number" },
+                  "a_status": {
+                    "type": "boolean",
+                    "default": true
+                  },
                   "a_deadline_at": { "type": "string", "format": "date-time" },
                   "a_allow_late_submission": {
                     "type": "boolean",
@@ -735,6 +739,7 @@
                   "a_title": { "type": "string" },
                   "a_description": { "type": "string" },
                   "a_max_points": { "type": "number" },
+                  "a_status": { "type": "boolean" },
                   "a_deadline_at": { "type": "string", "format": "date-time" },
                   "a_allow_late_submission": { "type": "boolean" },
                   "attachments": {
@@ -1379,6 +1384,7 @@
           "a_title": { "type": "string" },
           "a_description": { "type": "string" },
           "a_max_points": { "type": "number" },
+          "a_status": { "type": "boolean" },
           "a_created_at": { "type": "string", "format": "date-time" },
           "a_updated_at": { "type": "string", "format": "date-time" },
           "a_deadline_at": { "type": "string", "format": "date-time" },

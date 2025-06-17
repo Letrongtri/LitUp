@@ -6,6 +6,7 @@ const assignmentSchema = z.object({
   a_title: z.string().max(255),
   a_description: z.string().max(10000),
   a_max_points: z.coerce.number(),
+  a_status: z.coerce.boolean().optional(),
   a_created_at: z.string().optional(),
   a_updated_at: z.string().optional(),
   a_deadline_at: z.string().optional(),
