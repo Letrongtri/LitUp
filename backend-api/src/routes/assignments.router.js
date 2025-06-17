@@ -7,6 +7,7 @@ const submissionsController = require("../controllers/submissions.controller");
 // middlewares
 const allowedMethods = require("../middlewares/allowedMethods.middleware");
 const { validateRequest } = require("../middlewares/validator.middleware");
+const { filesUpload } = require("../middlewares/files-upload.middleware");
 
 // schema
 const {
@@ -33,7 +34,6 @@ const getAssignmentId = z.object({
 const updateAssignmentData = z.object({
   input: partialAssignmentSchema
     .omit({ cid: true, a_created_at: true, a_updated_at: true })
-    .strict()
     .refine(
       ({
         a_title,
@@ -41,13 +41,15 @@ const updateAssignmentData = z.object({
         a_max_points,
         a_dealine_at,
         a_allow_late_submission,
+        attachments,
       }) => {
         return (
           a_title ||
           a_description ||
           a_max_points ||
           a_dealine_at ||
-          a_allow_late_submission
+          a_allow_late_submission !== undefined ||
+          attachments
         );
       },
       {
@@ -95,7 +97,7 @@ module.exports.setup = (app) => {
     .route("/:aid")
     .get(validateRequest(getAssignmentId), assignmentsController.getAssignment)
     .put(
-      validateRequest(updateAssignmentData),
+      [filesUpload, validateRequest(updateAssignmentData)],
       assignmentsController.updateAssignment
     )
     .delete(

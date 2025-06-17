@@ -101,7 +101,7 @@ async function deleteUser(uid) {
     }
   }
 
-  return deleteUser;
+  return deletedUser;
 }
 
 module.exports = {
