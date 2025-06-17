@@ -74,6 +74,15 @@ const createAssignmentData = z.object({
     .strict(),
 });
 
+/** Get list of assignments */
+const getAssignmentsData = z.object({
+  input: z.object({
+    cid: z.coerce.number().nonnegative(),
+    page: z.coerce.number().nonnegative(),
+    limit: z.coerce.number().nonnegative(),
+  }),
+});
+
 module.exports.setup = (app) => {
   app.use("/api/classrooms", router);
 
@@ -124,6 +133,9 @@ module.exports.setup = (app) => {
       [filesUpload, validateRequest(createAssignmentData)],
       assignmentsController.createAssignment
     )
-    .get(validateRequest(getClassroomId), assignmentsController.getAssignments)
+    .get(
+      validateRequest(getAssignmentsData),
+      assignmentsController.getAssignments
+    )
     .all(allowedMethods(["POST", "GET"]));
 };
