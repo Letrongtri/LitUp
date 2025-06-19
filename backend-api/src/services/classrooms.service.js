@@ -34,32 +34,54 @@ async function getClassroomById(cid) {
 }
 
 async function updateClassroom(cid, updateData) {
-  const updatedClassroom = await classroomRepository()
-    .where("cid", cid)
-    .select("*")
-    .first();
-  if (!updatedClassroom) {
-    return null;
-  }
+  const trx = await knex.transaction();
 
-  const classroomData = readClassroomData(updateData);
-  if (Object.keys(classroomData).length > 0) {
-    updateData.c_updated_at = new Date().toISOString();
-    await classroomRepository().where("cid", cid).update(classroomData);
+  try {
+    const updatedClassroom = await classroomRepository()
+      .transacting(trx)
+      .where("cid", cid)
+      .select("*")
+      .first();
+    if (!updatedClassroom) {
+      return null;
+    }
+
+    const classroomData = readClassroomData(updateData);
+    if (Object.keys(classroomData).length > 0) {
+      updateData.c_updated_at = new Date().toISOString();
+      await classroomRepository()
+        .transacting(trx)
+        .where("cid", cid)
+        .update(classroomData);
+    }
+    await trx.commit();
+    return { ...updatedClassroom, ...classroomData };
+  } catch (error) {
+    await trx.rollback();
+    throw error;
   }
-  return { ...updatedClassroom, ...classroomData };
 }
 
 async function deleteClassroom(cid) {
-  const deletedClassroom = await classroomRepository()
-    .where("cid", cid)
-    .first();
-  if (!deletedClassroom) {
-    return null;
-  }
+  const trx = await knex.transaction();
 
-  await classroomRepository().where("cid", cid).del();
-  return deletedClassroom;
+  try {
+    const deletedClassroom = await classroomRepository()
+      .transacting(trx)
+      .where("cid", cid)
+      .first();
+    if (!deletedClassroom) {
+      return null;
+    }
+
+    await classroomRepository().transacting(trx).where("cid", cid).del();
+
+    await trx.commit();
+    return deletedClassroom;
+  } catch (error) {
+    await trx.rollback();
+    throw error;
+  }
 }
 
 async function getClassroomsByUser(uid, limit, page) {

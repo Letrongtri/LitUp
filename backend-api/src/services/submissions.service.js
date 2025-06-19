@@ -41,24 +41,33 @@ function readSubmissionData(payload) {
 // Define functions for accessing the database
 
 async function createSubmission(newSubmission, files) {
-  const submissionData = readSubmissionData(newSubmission);
+  const trx = await knex.transaction();
 
-  const [result] = await submissionRepository()
-    .insert(submissionData)
-    .returning("sid");
-  const sid = result.sid;
+  try {
+    const submissionData = readSubmissionData(newSubmission);
 
-  const attachments = [];
-  for (const file of files) {
-    const attachment = await saveFile(file);
-    attachments.push(attachment);
-    await submissionAttachmentRepository().insert({
-      fid: attachment.fid,
-      sid,
-    });
+    const [result] = await submissionRepository()
+      .transacting(trx)
+      .insert(submissionData)
+      .returning("sid");
+    const sid = result.sid;
+
+    const attachments = [];
+    for (const file of files) {
+      const attachment = await saveFile(file, trx);
+      attachments.push(attachment);
+      await submissionAttachmentRepository().transacting(trx).insert({
+        fid: attachment.fid,
+        sid,
+      });
+    }
+
+    trx.commit();
+    return { sid, ...submissionData, attachments };
+  } catch (error) {
+    await trx.rollback();
+    throw error;
   }
-
-  return { sid, ...submissionData, attachments };
 }
 
 async function getSubmissions(aid, query) {
@@ -184,7 +193,7 @@ async function updateSubmission(sid, files) {
     // add new files
     let attachments = [];
     for (const file of files) {
-      const attachment = await saveFile(file);
+      const attachment = await saveFile(file, trx);
       attachments.push(attachment);
       await submissionAttachmentRepository().transacting(trx).insert({
         fid: attachment.fid,
