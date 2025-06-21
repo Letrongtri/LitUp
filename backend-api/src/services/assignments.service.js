@@ -38,24 +38,33 @@ function readAssignmentData(payload) {
 // Define functions for accessing the database
 
 async function createAssignment(newAssignment, files) {
-  const assignmentData = readAssignmentData(newAssignment);
+  const trx = await knex.transaction();
 
-  const [result] = await assignmentRepository()
-    .insert(assignmentData)
-    .returning("aid");
-  const aid = result.aid;
+  try {
+    const assignmentData = readAssignmentData(newAssignment);
 
-  const attachments = [];
-  for (const file of files) {
-    const attachment = await saveFile(file);
-    attachments.push(attachment);
-    await assignmentAttachmentRepository().insert({
-      fid: attachment.fid,
-      aid,
-    });
+    const [result] = await assignmentRepository()
+      .transacting(trx)
+      .insert(assignmentData)
+      .returning("aid");
+    const aid = result.aid;
+
+    const attachments = [];
+    for (const file of files) {
+      const attachment = await saveFile(file, trx);
+      attachments.push(attachment);
+      await assignmentAttachmentRepository().transacting(trx).insert({
+        fid: attachment.fid,
+        aid,
+      });
+    }
+
+    await trx.commit();
+    return { aid, ...assignmentData, attachments };
+  } catch (error) {
+    await trx.rollback();
+    throw error;
   }
-
-  return { aid, ...assignmentData, attachments };
 }
 
 async function getAssignments(cid, query) {
@@ -196,7 +205,7 @@ async function updateAssignment(aid, updateData, files) {
       // add new files
       attachments = [];
       for (const file of files) {
-        const attachment = await saveFile(file);
+        const attachment = await saveFile(file, trx);
         attachments.push(attachment);
         await assignmentAttachmentRepository().transacting(trx).insert({
           fid: attachment.fid,
