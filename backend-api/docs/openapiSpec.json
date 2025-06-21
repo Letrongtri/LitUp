@@ -1673,7 +1673,7 @@
     "parameters": {
       "userIdParam": {
         "name": "uid",
-        "in": "path",
+        "in": "query",
         "required": true,
         "description": "User ID",
         "schema": { "type": "integer" }

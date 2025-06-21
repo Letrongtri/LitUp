@@ -12,17 +12,25 @@ function readClassroomData(payload) {
   };
 }
 
+function generateCode(length = 6) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 function extractClassroomData(payload) {
   return {
     uid: payload.uid,
     c_name: payload.c_name,
-    c_code: Math.random().toString(36).substring(6).toUpperCase(),
+    c_code: generateCode(6),
   };
 }
 
 async function createClassroom(payload) {
   const classroomData = extractClassroomData(payload);
-  // classroomData lúc này đã bao gồm uid
   const [result] = await classroomRepository()
     .insert(classroomData)
     .returning("cid");

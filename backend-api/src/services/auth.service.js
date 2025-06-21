@@ -60,6 +60,8 @@ async function loginUser(payload) {
   const user = await userRepository().where({ u_email }).first();
 
   const isMatch = await bcrypt.compare(inputPassword, user.u_password);
+  console.log(inputPassword, user.u_password)
+  console.log(isMatch)
   if (!isMatch) {
     throw new ApiError(401, "Invalid credentials");
   }
