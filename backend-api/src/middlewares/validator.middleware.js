@@ -44,6 +44,7 @@ function validateRequest(validator) {
           input.attachments = attachments;
         }
       }
+      console.log(input);
 
       validator.parse({ input });
 

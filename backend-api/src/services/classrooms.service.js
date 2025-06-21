@@ -3,6 +3,14 @@ function classroomRepository() {
   return knex("classrooms");
 }
 
+function memberRepository() {
+  return knex("members");
+}
+
+function userRepository() {
+  return knex("users");
+}
+
 function readClassroomData(payload) {
   return {
     ...(payload.uid && { uid: payload.uid }),
@@ -13,8 +21,8 @@ function readClassroomData(payload) {
 }
 
 function generateCode(length = 6) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
@@ -31,6 +39,14 @@ function extractClassroomData(payload) {
 
 async function createClassroom(payload) {
   const classroomData = extractClassroomData(payload);
+
+  const { u_role } = await userRepository()
+    .where("uid", classroomData.uid)
+    .select("u_role")
+    .first();
+
+  if (u_role != "teacher") return { code: 401, message: "Unauthorized access" };
+
   const [result] = await classroomRepository()
     .insert(classroomData)
     .returning("cid");
@@ -54,7 +70,12 @@ async function updateClassroom(cid, updateData) {
       return null;
     }
 
+    if (updateClassroom.uid !== updateData.uid)
+      return { code: 401, message: "Unauthorized access" };
+
     const classroomData = readClassroomData(updateData);
+    classroomData.c_updated_at = new Date().toISOString();
+
     if (Object.keys(classroomData).length > 0) {
       updateData.c_updated_at = new Date().toISOString();
       await classroomRepository()
@@ -82,6 +103,19 @@ async function deleteClassroom(cid) {
       return null;
     }
 
+    const countMember = await memberRepository()
+      .transacting(trx)
+      .where("cid", cid)
+      .select(knex.raw("COUNT(mid) OVER() AS count_member"));
+    console.log(countMember);
+
+    if (countMember.count_member && countMember.count_member != 0) {
+      return {
+        code: 400,
+        message: "Cannot delect a classroom with active members",
+      };
+    }
+
     await classroomRepository().transacting(trx).where("cid", cid).del();
 
     await trx.commit();
@@ -102,24 +136,22 @@ async function getClassroomsByUser(uid, limit, page) {
     .offset((page - 1) * limit);
 }
 
-async function joinClassroomByCode(uid, c_code) {
-  const classroom = await classroomRepository().where({ c_code }).first();
+async function joinClassroomByCode(cid, uid, c_code) {
+  const classroom = await classroomRepository().where({ cid }).first();
   if (!classroom) return null;
 
-  const exists = await knex("members")
-    .where({ cid: classroom.cid, uid, m_status: true })
-    .first();
+  if (classroom.c_code !== c_code) return { message: "Incorrect code" };
 
-  if (exists) return null;
+  const exists = await knex("members").where({ cid, uid }).first();
 
-  const now = new Date();
-  await knex("members").insert({
-    cid: classroom.cid,
-    uid,
-    m_status: true,
-    m_joined_at: now,
-  });
-  return true;
+  if (exists) return { message: "Users has joined classroom" };
+
+  return await knex("members")
+    .insert({
+      cid: classroom.cid,
+      uid,
+    })
+    .returning("mid");
 }
 
 async function getMemberByClassId(cid) {

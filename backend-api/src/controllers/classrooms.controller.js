@@ -9,6 +9,11 @@ async function createClassroom(req, res, next) {
     };
 
     const classroom = await classroomsService.createClassroom(classroomData);
+
+    if (classroom.code && classroom.message) {
+      return next(new ApiError(classroom.code, classroom.message));
+    }
+
     return res
       .status(201)
       .set({
@@ -25,7 +30,7 @@ async function createClassroom(req, res, next) {
   }
 }
 
-async function getClassrooms(req, res, next) {
+async function getJoinedClassrooms(req, res, next) {
   try {
     const { uid, limit = 10, page = 1 } = req.query;
 
@@ -74,6 +79,10 @@ async function updateClassroom(req, res, next) {
       return next(new ApiError(404, "Classroom not found"));
     }
 
+    if (updated.code && updated.message) {
+      return next(new ApiError(updated.code, updated.message));
+    }
+
     return res.json(
       JSend.success({
         classroom: updated,
@@ -87,11 +96,14 @@ async function updateClassroom(req, res, next) {
 
 async function deleteClassroom(req, res, next) {
   const { cid } = req.params;
-
   try {
     const deleted = await classroomsService.deleteClassroom(cid);
     if (!deleted) {
       return next(new ApiError(404, "Classroom not found"));
+    }
+
+    if (deleted.code && deleted.message) {
+      return next(new ApiError(deleted.code, deleted.message));
     }
 
     return res.json(JSend.success());
@@ -103,18 +115,27 @@ async function deleteClassroom(req, res, next) {
 
 async function joinClassroom(req, res, next) {
   try {
+    const { cid } = req.params;
     const { c_code, uid } = req.body;
 
     if (!c_code || !uid) {
       return next(new ApiError(400, "Missing code or id"));
     }
 
-    const result = await classroomsService.joinClassroomByCode(uid, c_code);
+    const result = await classroomsService.joinClassroomByCode(
+      cid,
+      uid,
+      c_code
+    );
     if (!result) {
-      return next(new ApiError(400, "Error to find classroom"));
+      return next(new ApiError(404, "Error to find classroom"));
     }
 
-    return res.status(201).json(JSend.success());
+    if (result.message) {
+      return next(new ApiError(400, result.message));
+    }
+
+    return res.status(201).json(JSend.success(result));
   } catch (err) {
     console.log(err);
     return next(new ApiError(500, "Internal Server Error"));
@@ -140,7 +161,7 @@ async function getMembersInClass(req, res, next) {
 
 module.exports = {
   createClassroom,
-  getClassrooms,
+  getJoinedClassrooms,
   getClassroom,
   updateClassroom,
   deleteClassroom,

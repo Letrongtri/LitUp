@@ -21,16 +21,13 @@ const router = express.Router();
 
 /**
  * Get list of classroom student has joined
- * query: ?limit=10&page=2
+ * query: ?uid=15&limit=10&page=2
  */
-const { getClassroomsParams } = require("../schemas/classroom.schemas");
-
-router.get(
-  "/",
-  validateRequest(getClassroomsParams),
-  classroomsController.getClassrooms
-);
-
+const getJoinedClassroomData = z.object({
+  uid: z.coerce.number().nonnegative().optional(),
+  limit: z.coerce.number().nonnegative().optional(),
+  page: z.coerce.number().nonnegative().optional(),
+});
 
 /** Teacher create a new classroom */
 const createClassroomData = z.object({
@@ -39,20 +36,24 @@ const createClassroomData = z.object({
 
 /** Student joins classroom */
 const joinClassroomData = z.object({
-  c_code: z.string().length(6),
-  uid: z.coerce.number().nonnegative().optional(),
+  input: z.object({
+    cid: z.coerce.number().nonnegative(),
+    c_code: z.string().length(6),
+    uid: z.coerce.number().nonnegative(),
+  }),
 });
 
 /** Get classroom id */
 const getClassroomId = z.object({
-  cid: z.coerce.number().nonnegative()
+  input: z.object({
+    cid: z.coerce.number().nonnegative(),
+  }),
 });
-
 
 /** Teacher update classroom */
 const updateClassroomData = z.object({
   input: partialClassroomSchema
-    .omit({ c_code: true, c_created_at: true })
+    .omit({ c_code: true, c_created_at: true, c_updated_at: true })
     .strict()
     .refine(
       ({ c_name, c_status }) => {
@@ -90,18 +91,10 @@ module.exports.setup = (app) => {
       classroomsController.createClassroom
     )
     .get(
-      validateRequest(getClassroomsParams),
-      classroomsController.getClassrooms
+      validateRequest(getJoinedClassroomData),
+      classroomsController.getJoinedClassrooms
     )
     .all(allowedMethods(["POST", "GET"]));
-
-  router
-    .route("/join")
-    .post(
-      validateRequest(joinClassroomData),
-      classroomsController.joinClassroom
-    )
-    .all(allowedMethods(["POST"]));
 
   router
     .route("/:cid")
@@ -115,6 +108,14 @@ module.exports.setup = (app) => {
       classroomsController.deleteClassroom
     )
     .all(allowedMethods(["GET", "PUT", "DELETE"]));
+
+  router
+    .route("/:cid/join")
+    .post(
+      validateRequest(joinClassroomData),
+      classroomsController.joinClassroom
+    )
+    .all(allowedMethods(["POST"]));
 
   router
     .route("/:cid/members")
