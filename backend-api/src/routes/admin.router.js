@@ -9,23 +9,34 @@ const router = express.Router();
 
 // Zod schemas
 const getClassroomId = z.object({
-  cid: z.coerce.number().nonnegative()
+  input: z.object({
+    cid: z.coerce.number().nonnegative()
+  })
 });
 
 const getUserId = z.object({
-  uid: z.coerce.number().nonnegative()
+  input: z.object({
+    uid: z.coerce.number().nonnegative()
+  })
 });
 
 const getAssignmentId = z.object({
-  aid: z.coerce.number().nonnegative()
+  input: z.object({
+    aid: z.coerce.number().nonnegative()
+  })
 });
 
 const toggleUserStatusBody = z.object({
+  input: z.object({
     u_status: z.boolean()
+  })
 });
 
+
 const toggleAssigmentStatusBody = z.object({
-  a_status: z.boolean()
+  input: z.object({
+    a_status: z.boolean()
+  })
 });
 
 
