@@ -168,6 +168,20 @@ async function getMemberByClassId(cid) {
     );
 }
 
+async function getClassroomsByTeacher(uid, limit = 10, page = 1) {
+  // optional: validate that this uid belongs to a user with role "teacher"
+  const teacher = await knex("users").where({ uid, u_role: "teacher" }).first();
+  if (!teacher) return [];
+
+  return knex("classrooms")
+    .where({ uid })
+    .andWhere("u_role", "teacher")
+    .limit(limit)
+    .offset((page - 1) * limit)
+    .orderBy("cid", "desc");
+}
+
+
 module.exports = {
   createClassroom,
   getClassroomById,
@@ -176,4 +190,5 @@ module.exports = {
   getClassroomsByUser,
   joinClassroomByCode,
   getMemberByClassId,
+  getClassroomsByTeacher,
 };

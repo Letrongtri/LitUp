@@ -689,6 +689,69 @@
         }
       }
     },
+    "/api/classrooms/teacher": {
+      "get": {
+        "summary": "Get classrooms created by teacher",
+        "description": "Return list of classrooms where the user is teacher",
+        "operationId": "getTeacherClassrooms",
+        "tags": ["classrooms"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "query",
+            "required": true,
+            "description": "User ID of teacher",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": true,
+            "description": "User role must be 'teacher'",
+            "schema": {
+              "type": "string",
+              "enum": ["teacher"]
+            }
+          },
+          { "$ref": "#/components/parameters/limitParam" },
+          { "$ref": "#/components/parameters/pageParam" }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of classrooms created by the teacher",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "classrooms": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Classrooms" }
+                        },
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/400BadRequest" },
+          "401": { "$ref": "#/components/responses/401Unauthorized" },
+          "500": { "$ref": "#/components/responses/500InternalServerError" }
+        }
+      }
+    },
     "/api/assignments/{aid}": {
       "get": {
         "summary": "Get assignment details",

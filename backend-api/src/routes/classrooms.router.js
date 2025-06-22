@@ -81,8 +81,24 @@ const getAssignmentsData = z.object({
   }),
 });
 
+const getTeacherClassroomQuery = z.object({
+  input: z.object ({
+    uid: z.coerce.number().nonnegative(),
+    role: z.literal("teacher"),
+    limit: z.coerce.number().optional(),
+    page: z.coerce.number().optional()
+  })
+});
+
+
+
 module.exports.setup = (app) => {
   app.use("/api/classrooms", router);
+
+  router
+  .route("/teacher")
+  .get(validateRequest(getTeacherClassroomQuery), classroomsController.getTeacherClassrooms)
+  .all(allowedMethods(["GET"]));
 
   router
     .route("/")
@@ -136,4 +152,5 @@ module.exports.setup = (app) => {
       assignmentsController.getAssignments
     )
     .all(allowedMethods(["POST", "GET"]));
+  
 };

@@ -1,6 +1,7 @@
 const classroomsService = require("../services/classrooms.service");
 const ApiError = require("../api-error");
 const JSend = require("../jsend");
+const knex = require('../database/knex');
 
 async function createClassroom(req, res, next) {
   try {
@@ -159,6 +160,50 @@ async function getMembersInClass(req, res, next) {
   }
 }
 
+const getTeacherClassrooms = async (req, res, next) => {
+  try {
+    const { uid, limit = 10, page = 1 } = req.query;
+
+    const user = await knex("users").where("uid", uid).first();
+
+    if (!user) {
+      return res.status(404).json({
+        status: "fail",
+        message: "User not found",
+      });
+    }
+
+    if (user.u_role !== "teacher") {
+      return res.status(403).json({
+        status: "fail",
+        message: "Only teachers can access this resource",
+      });
+    }
+
+    const offset = (page - 1) * limit;
+
+    const classrooms = await knex("classrooms")
+      .where("uid", uid)
+      .limit(limit)
+      .offset(offset);
+
+    return res.json({
+      status: "success",
+      data: {
+        classrooms,
+        metadata: {
+          page: Number(page),
+          limit: Number(limit),
+          total: classrooms.length, // Nếu bạn muốn total thật thì cần count
+        },
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    next(new ApiError(500, "Internal server error"));
+  }
+};
+
 module.exports = {
   createClassroom,
   getJoinedClassrooms,
@@ -167,4 +212,5 @@ module.exports = {
   deleteClassroom,
   joinClassroom,
   getMembersInClass,
+  getTeacherClassrooms,
 };
