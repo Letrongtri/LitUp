@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
+const apiLimiter = require("./middlewares/rateLimiter.middleware");
 
 // standardize json responses
 const JSend = require("./jsend");
@@ -34,6 +35,9 @@ app.get("/", (req, res) => {
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/public", express.static("public"));
+
+// rate limiter
+app.use("/api", apiLimiter);
 
 adminRouter.setup(app);
 assignmentsRouter.setup(app);
