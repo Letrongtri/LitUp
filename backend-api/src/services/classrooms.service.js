@@ -1,4 +1,5 @@
 const knex = require("../database/knex");
+const Paginator = require("./paginator");
 function classroomRepository() {
   return knex("classrooms");
 }
@@ -127,13 +128,36 @@ async function deleteClassroom(cid) {
 }
 
 async function getClassroomsByUser(uid, limit, page) {
-  return knex("classrooms as c")
+  const paginator = new Paginator(page, limit);
+
+  const results = await knex("classrooms as c")
     .join("members as m", "c.cid", "m.cid")
     .where("m.uid", uid)
     .andWhere("m.m_status", true)
-    .select("c.*")
+    .select(
+      knex.raw("COUNT(c.cid) OVER() AS record_count"),
+      "c.cid",
+      "c.uid",
+      "c.c_name",
+      "c.c_status",
+      "c.c_created_at",
+      "c.c_updated_at"
+    )
+    .orderBy("c.cid")
     .limit(limit)
     .offset((page - 1) * limit);
+
+  const totalRecords = results[0]?.record_count ?? 0;
+
+  const classrooms = results.map((result) => {
+    result.record_count = undefined;
+    return result;
+  });
+
+  return {
+    metadata: paginator.getMetadata(totalRecords),
+    classrooms,
+  };
 }
 
 async function joinClassroomByCode(cid, uid, c_code) {
@@ -180,7 +204,6 @@ async function getClassroomsByTeacher(uid, limit = 10, page = 1) {
     .offset((page - 1) * limit)
     .orderBy("cid", "desc");
 }
-
 
 module.exports = {
   createClassroom,
