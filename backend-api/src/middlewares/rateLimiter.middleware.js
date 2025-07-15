@@ -3,7 +3,7 @@ const ApiError = require("../api-error");
 
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 2,
+  max: 100,
   standardHeaders: true,
   legacyHeader: false,
   handler: (req, res, next) => {

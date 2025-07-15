@@ -18,7 +18,7 @@ async function createClassroom(req, res, next) {
     return res
       .status(201)
       .set({
-        Locarion: `${req.baseUrl}/${classroom.cid}}`,
+        Location: `${req.baseUrl}/${classroom.cid}`, // fix typo "Locarion" -> "Location" và dư dấu "}"
       })
       .json(
         JSend.success({
@@ -33,11 +33,16 @@ async function createClassroom(req, res, next) {
 
 async function getJoinedClassrooms(req, res, next) {
   try {
-    const { uid, limit = 10, page = 1 } = req.query;
+    const { uid } = req.query;
+    let limit = Number(req.query.limit);
+    let page = Number(req.query.page);
 
     if (!uid) {
       return next(new ApiError(400, "uid is required"));
     }
+
+    if (isNaN(page) || page < 1) page = 1;
+    if (isNaN(limit) || limit < 1) limit = 10;
 
     const classrooms = await classroomsService.getClassroomsByUser(
       uid,
@@ -162,7 +167,13 @@ async function getMembersInClass(req, res, next) {
 
 const getTeacherClassrooms = async (req, res, next) => {
   try {
-    const { uid, limit = 10, page = 1 } = req.query;
+    const { uid } = req.query;
+
+    let page = Number(req.query.page);
+    let limit = Number(req.query.limit);
+
+    if (isNaN(page) || page < 1) page = 1;
+    if (isNaN(limit) || limit < 1) limit = 10;
 
     const user = await knex("users").where("uid", uid).first();
 
@@ -192,9 +203,9 @@ const getTeacherClassrooms = async (req, res, next) => {
       data: {
         classrooms,
         metadata: {
-          page: Number(page),
-          limit: Number(limit),
-          total: classrooms.length, // Nếu bạn muốn total thật thì cần count
+          page,
+          limit,
+          total: classrooms.length,
         },
       },
     });
