@@ -1,6 +1,6 @@
 <template>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-      <a class="navbar-brand" href="#">LMS App</a>
+      <a class="navbar-brand" href="#">Lit Up</a>
   
       <div class="ms-auto d-flex align-items-center">
         <!-- ✅ Chỉ giáo viên mới thấy nút tạo lớp -->

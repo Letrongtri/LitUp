@@ -1,21 +1,38 @@
 <template>
-  <div class="container mt-5" style="max-width: 600px;">
-    <h2>Hồ sơ người dùng</h2>
+  <div class="page-container bg-light py-5">
+    <div class="container">
+      <div class="profile-box bg-white shadow rounded p-4 p-md-5">
+        <h2 class="mb-4 text-primary fw-bold">Hồ sơ người dùng</h2>
 
-    <div v-if="error" class="alert alert-danger">{{ error }}</div>
+        <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
-    <div v-if="user">
-      <p><strong>Họ tên:</strong> {{ user.u_first_name }} {{ user.u_last_name }}</p>
-      <p><strong>Email:</strong> {{ user.u_email }}</p>
-      <p><strong>Vai trò:</strong> {{ user.u_role }}</p>
-      <p><strong>Trạng thái:</strong> {{ user.u_status ? 'Đang hoạt động' : 'Bị khóa' }}</p>
+        <div v-if="user">
+          <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item">
+              <strong>Họ tên:</strong> {{ user.u_first_name }} {{ user.u_last_name }}
+            </li>
+            <li class="list-group-item">
+              <strong>Email:</strong> {{ user.u_email }}
+            </li>
+            <li class="list-group-item">
+              <strong>Vai trò:</strong> {{ user.u_role === 'teacher' ? 'Giáo viên' : 'Học sinh' }}
+            </li>
+            <li class="list-group-item">
+              <strong>Trạng thái:</strong>
+              <span :class="user.u_status ? 'text-success' : 'text-danger'">
+                {{ user.u_status ? 'Đang hoạt động' : 'Bị khóa' }}
+              </span>
+            </li>
+          </ul>
+
+          <router-link to="/dashboard" class="btn btn-outline-primary">
+            Quay lại Dashboard
+          </router-link>
+        </div>
+
+        <div v-else-if="!error" class="text-muted">Đang tải thông tin người dùng...</div>
+      </div>
     </div>
-
-    <div v-else-if="!error">Đang tải thông tin...</div>
-
-    <router-link to="/dashboard" class="btn btn-secondary mt-3">
-      ⬅️ Quay lại Dashboard
-    </router-link>
   </div>
 </template>
 
@@ -35,3 +52,25 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+.page-container {
+  min-height: 100vh;
+}
+
+.profile-box {
+  max-width: 600px;
+  margin: 0 auto;
+  border-radius: 16px;
+}
+
+.alert {
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.list-group-item {
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+}
+</style>

@@ -11,7 +11,6 @@ const className = ref('');
 const error = ref('');
 const message = ref('');
 
-// Load thông tin lớp khi component được mount
 onMounted(async () => {
   try {
     const res = await api.getClassroomDetail(cid);
@@ -21,7 +20,6 @@ onMounted(async () => {
   }
 });
 
-// Gửi yêu cầu cập nhật lớp học
 async function updateClassroom() {
   error.value = '';
   message.value = '';
@@ -29,9 +27,7 @@ async function updateClassroom() {
   try {
     await api.updateClassroom(cid, { c_name: className.value });
     message.value = 'Cập nhật lớp học thành công!';
-    setTimeout(() => {
-      router.push({ name: 'classrooms' }); // quay về danh sách lớp
-    }, 1000);
+    setTimeout(() => router.push({ name: 'classrooms' }), 1000);
   } catch (err) {
     error.value = 'Cập nhật thất bại: ' + err.message;
   }
@@ -39,25 +35,59 @@ async function updateClassroom() {
 </script>
 
 <template>
-  <div class="container mt-4">
-    <h2>Cập nhật lớp học</h2>
+  <div class="page-container bg-light py-5">
+    <div class="container">
+      <div class="form-box bg-white shadow rounded p-4 p-md-5">
+        <h2 class="mb-4 text-primary fw-bold">Cập nhật lớp học</h2>
 
-    <div v-if="error" class="alert alert-danger">{{ error }}</div>
-    <div v-if="message" class="alert alert-success">{{ message }}</div>
+        <div v-if="error" class="alert alert-danger">{{ error }}</div>
+        <div v-if="message" class="alert alert-success">{{ message }}</div>
 
-    <form @submit.prevent="updateClassroom" class="mt-3">
-      <div class="mb-3">
-        <label for="className" class="form-label">Tên lớp học</label>
-        <input
-          type="text"
-          id="className"
-          v-model="className"
-          class="form-control"
-          required
-        />
+        <form @submit.prevent="updateClassroom">
+          <div class="mb-3">
+            <label for="className" class="form-label fw-semibold">Tên lớp học *</label>
+            <input
+              id="className"
+              type="text"
+              v-model="className"
+              class="form-control"
+              required
+              placeholder="VD: Lập trình Web 1"
+            />
+          </div>
+
+          <button type="submit" class="btn btn-primary px-4 py-2">
+            Cập nhật
+          </button>
+        </form>
       </div>
-
-      <button type="submit" class="btn btn-primary">Cập nhật</button>
-    </form>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.page-container {
+  min-height: 100vh;
+}
+
+.form-box {
+  max-width: 600px;
+  margin: 0 auto;
+  border-radius: 16px;
+}
+
+input.form-control {
+  border-radius: 10px;
+}
+
+button.btn {
+  font-weight: 600;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.alert {
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+</style>
