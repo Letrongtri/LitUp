@@ -51,7 +51,6 @@ async function getJoinedClassrooms(req, res, next) {
     // };
 
     let result = await classroomsService.getClassroomsByUser(uid, limit, page);
-    console.log(result);
 
     return res.json(JSend.success(result));
   } catch (err) {

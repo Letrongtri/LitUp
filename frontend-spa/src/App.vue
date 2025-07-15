@@ -1,3 +1,11 @@
+<script setup>
+import AppHeader from './components/AppHeader.vue'
+</script>
+
 <template>
-  <h1>Hello, Vue.js</h1>
+  <AppHeader />
+
+  <div class="container mt-3">
+    <router-view />
+  </div>
 </template>
