@@ -9,6 +9,11 @@ import EditAssignment from '@/views/EditAssignment.vue';
 import ViewAssignment from '@/views/ViewAssignment.vue';
 import ClassroomTeacher from '@/views/ClassroomTeacher.vue';
 import ClassroomStudent from '@/views/ClassroomStudent.vue';
+import CreateSubmission from '@/views/CreateSubmission.vue';
+import EditSubmission from '@/views/EditSubmission.vue';
+import AdminDashboard from '@/views/AdminDashboard.vue';
+import AdminUserManagement from '@/views/AdminUserManagement.vue';
+import AdminClassManagement from '@/views/AdminClassManagement.vue';
 
 const routes = [
     { path: '/',
@@ -33,7 +38,12 @@ const routes = [
     { path: '/classrooms/:cid/edit', name: 'class.edit', component: EditClassroom},
     { path: '/classrooms/:cid/assigments/create', name: 'assignment.create', component: CreateAssigment},
     { path: '/assignments/:aid/edit', name: 'assignment.edit', component: EditAssignment },
-    { path: '/assignments/:aid', name: 'assignment.view', component: ViewAssignment }
+    { path: '/assignments/:aid', name: 'assignment.view', component: ViewAssignment },
+    { path: '/assignments/:aid/submission', name:'assignment.submission.view', component: CreateSubmission},
+    { path: '/assignments/:aid/submission/edit', name: 'assignment.submission.edit', component: EditSubmission},
+    { path: '/admin/dashboard', name: 'admin.dashboard', component: AdminDashboard},
+    { path: '/admin/users', name: 'admin.users', component: AdminUserManagement},
+    { path: '/admin/classes', name: 'admin.classes', component: AdminClassManagement},
 
 
 ];
