@@ -6,11 +6,7 @@
 </template>
 
 <script setup>
-import AppHeader from '@/components/AppHeader.vue';
-import { useUserStore } from '@/stores/userStore';
-const userStore = useUserStore();
-
-userStore.initFromLocalStorage();
+import AppHeader from '@/components/AppHeader.vue'
 </script>
 
 <style>
