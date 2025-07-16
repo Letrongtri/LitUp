@@ -752,6 +752,57 @@
         }
       }
     },
+    "/api/student/classrooms": {
+      "get": {
+        "summary": "Get classrooms the student has joined",
+        "description": "Retrieve list of classrooms a student is enrolled in",
+        "operationId": "getStudentClassrooms",
+        "tags": ["classrooms"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "query",
+            "required": true,
+            "description": "User ID of the student",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          { "$ref": "#/components/parameters/limitParam" },
+          { "$ref": "#/components/parameters/pageParam" }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of classrooms the student has joined",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "enum": ["success"] },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "classrooms": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Classrooms" }
+                        },
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401Unauthorized" },
+          "500": { "$ref": "#/components/responses/500InternalServerError" }
+        }
+      }
+    },
     "/api/assignments/{aid}": {
       "get": {
         "summary": "Get assignment details",
