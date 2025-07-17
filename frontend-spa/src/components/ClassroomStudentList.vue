@@ -8,7 +8,7 @@ defineProps({
 const router = useRouter();
 
 function goToClassroom(id) {
-  router.push({ name: 'classrooms', params: { cid: id } });
+  router.push({ name: 'class.joined.detail', params: { cid: id } });
 }
 </script>
 
@@ -17,6 +17,7 @@ function goToClassroom(id) {
     <div v-for="classroom in classrooms" class="classroom-card" :key="classroom.cid">
       <div class="card-header">
         <h4>{{ classroom.c_name }}</h4>
+        <p>Teacher: {{ classroom.teacher_name }}</p>
       </div>
       <div class="card-body">
         <div class="card-actions">

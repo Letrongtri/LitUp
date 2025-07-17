@@ -16,7 +16,7 @@ async function handleLogin() {
   try {
     const result = await authService.login(loginForm.value);
 
-    localStorage.setItem('user', JSON.stringify(result.user));
+    localStorage.setItem('user', JSON.stringify(result));
 
     emit('set-error', '');
     emit('set-success', 'Log in successful!');

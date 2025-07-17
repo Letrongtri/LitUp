@@ -3,16 +3,26 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
+const user = JSON.parse(localStorage.getItem('user')).user;
+
 function handleLogout() {
   localStorage.removeItem('user');
   router.push('/auth');
+}
+
+function goToProfilePage(uid) {
+  router.push({ name: 'profile', params: { uid } });
+}
+
+function goToHomePage() {
+  router.push('/');
 }
 </script>
 
 <template>
   <nav class="navbar navbar-expand-lg bg-body-tertiary px-3">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">LitUp!</a>
+      <a class="navbar-brand" href="" @click="goToHomePage">LitUp!</a>
       <button
         class="navbar-toggler"
         type="button"
@@ -53,6 +63,7 @@ function handleLogout() {
             <a class="nav-link disabled" aria-disabled="true">Disabled</a>
           </li>
         </ul>
+
         <router-link
           v-if="user && user.u_role === 'teacher'"
           to="/classrooms/create"
@@ -61,9 +72,35 @@ function handleLogout() {
           <i class="fas fa-plus me-1"></i> Tạo lớp học
         </router-link>
 
-        <router-link to="/profile" class="btn btn-primary btn-sm me-2"> Hồ sơ </router-link>
-
-        <button class="btn btn-outline-danger btn-sm" @click="handleLogout">Đăng xuất</button>
+        <div class="dropdown d-flex justify-content-end gap-3" style="max-width: 300px">
+          <a
+            class="d-flex align-items-center link-dark text-decoration-none"
+            id="dropdownUser2"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            style="cursor: pointer"
+          >
+            <strong class="dropdown-toggle">{{ user.u_first_name }} {{ user.u_last_name }}</strong>
+            <img
+              :src="`http://localhost:3000${user.avatar_url}`"
+              :alt="user.u_first_name + ' ' + user.u_last_name"
+              width="32"
+              height="32"
+              class="rounded-circle me-2 ms-2"
+            />
+          </a>
+          <ul
+            class="dropdown-menu text-small shadow"
+            aria-labelledby="dropdownUser2"
+            style="left: auto; right: 0"
+          >
+            <li><a class="dropdown-item" href="#">New project...</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" @click="goToProfilePage(user.uid)">Profile</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" @click="handleLogout">Sign out</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </nav>

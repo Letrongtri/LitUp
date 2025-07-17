@@ -1,3 +1,25 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import usersService from '@/services/users.service';
+import { useRoute } from 'vue-router';
+
+const user = ref(null);
+const error = ref('');
+
+const route = useRoute();
+
+onMounted(async () => {
+  try {
+    const uid = Number(route.params?.uid);
+
+    const profile = await usersService.getUserById(uid);
+    user.value = profile.user;
+  } catch (err) {
+    error.value = 'Lỗi khi tải hồ sơ: ' + err.message;
+  }
+});
+</script>
+
 <template>
   <div class="page-container bg-light py-5">
     <div class="container">
@@ -11,9 +33,7 @@
             <li class="list-group-item">
               <strong>Họ tên:</strong> {{ user.u_first_name }} {{ user.u_last_name }}
             </li>
-            <li class="list-group-item">
-              <strong>Email:</strong> {{ user.u_email }}
-            </li>
+            <li class="list-group-item"><strong>Email:</strong> {{ user.u_email }}</li>
             <li class="list-group-item">
               <strong>Vai trò:</strong> {{ user.u_role === 'teacher' ? 'Giáo viên' : 'Học sinh' }}
             </li>
@@ -35,23 +55,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue';
-import { api } from '@/services/litup_service';
-
-const user = ref(null);
-const error = ref('');
-
-onMounted(async () => {
-  try {
-    const profile = await api.getUserProfile();
-    user.value = profile.user;
-  } catch (err) {
-    error.value = 'Lỗi khi tải hồ sơ: ' + err.message;
-  }
-});
-</script>
 
 <style scoped>
 .page-container {

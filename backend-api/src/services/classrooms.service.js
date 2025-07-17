@@ -55,7 +55,14 @@ async function createClassroom(payload) {
 }
 
 async function getClassroomById(cid) {
-  return classroomRepository().where("cid", cid).select("*").first();
+  return await knex("classrooms as c")
+    .join("users as u", "c.uid", "u.uid")
+    .where("c.cid", cid)
+    .select(
+      "c.*",
+      knex.raw("concat(u_first_name, ' ', u_last_name) as teacher_name")
+    )
+    .first();
 }
 
 async function updateClassroom(cid, updateData) {
@@ -132,16 +139,13 @@ async function getClassroomsByUser(uid, limit, page) {
 
   const results = await knex("classrooms as c")
     .join("members as m", "c.cid", "m.cid")
+    .join("users as u", "u.uid", "c.uid")
     .where("m.uid", uid)
     .andWhere("m.m_status", true)
     .select(
       knex.raw("COUNT(c.cid) OVER() AS record_count"),
-      "c.cid",
-      "c.uid",
-      "c.c_name",
-      "c.c_status",
-      "c.c_created_at",
-      "c.c_updated_at"
+      knex.raw("CONCAT(u_first_name, ' ', u_last_name) as teacher_name"),
+      "c.*"
     )
     .orderBy("c.cid")
     .limit(limit)

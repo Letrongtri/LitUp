@@ -649,11 +649,7 @@
         "operationId": "getAssignments",
         "tags": ["assignments"],
         "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "$ref": "#/components/parameters/classroomIdParam" },
-          { "$ref": "#/components/parameters/limitParam" },
-          { "$ref": "#/components/parameters/pageParam" }
-        ],
+        "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
         "responses": {
           "200": {
             "description": "List of assignments in classroom",
@@ -671,9 +667,6 @@
                           "items": {
                             "$ref": "#/components/schemas/Assignments"
                           }
-                        },
-                        "metadata": {
-                          "$ref": "#/components/schemas/PaginationMetadata"
                         }
                       }
                     }

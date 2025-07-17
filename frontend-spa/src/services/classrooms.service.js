@@ -4,9 +4,9 @@ function classroomsService() {
   const baseUrl = '/api/classrooms';
 
   async function getClassrooms(page, limit = 10) {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(localStorage.getItem('user')).user;
 
-    let url = `${baseUrl}?uid=${user.user.uid}&page=${page}&limit=${limit}`;
+    let url = `${baseUrl}?uid=${user.uid}&page=${page}&limit=${limit}`;
     const data = await efetch(url);
 
     return data;
@@ -35,12 +35,20 @@ function classroomsService() {
     });
   }
 
+  async function getClassroomAssignment(cid, page, limit = 10) {
+    let url = `${baseUrl}/${cid}/assignments?page=${page}&limit=${limit}`;
+    const data = await efetch(url);
+
+    return data;
+  }
+
   return {
     getClassrooms,
     getClassroom,
     createClassroom,
     updateClassroom,
     deleteClassroom,
+    getClassroomAssignment,
   };
 }
 
