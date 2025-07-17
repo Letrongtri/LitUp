@@ -4,7 +4,9 @@ function classroomsService() {
   const baseUrl = '/api/classrooms';
 
   async function getClassrooms(page, limit = 10) {
-    let url = `${baseUrl}?uid=1&page=${page}&limit=${limit}`;
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    let url = `${baseUrl}?uid=${user.user.uid}&page=${page}&limit=${limit}`;
     const data = await efetch(url);
 
     return data;

@@ -18,5 +18,7 @@ export async function efetch(url, options = {}) {
     throw new Error(json.message);
   }
 
+  console.log(json.data);
+
   return json.data;
 }

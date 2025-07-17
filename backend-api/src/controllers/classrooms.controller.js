@@ -1,7 +1,7 @@
 const classroomsService = require("../services/classrooms.service");
 const ApiError = require("../api-error");
 const JSend = require("../jsend");
-const knex = require('../database/knex');
+const knex = require("../database/knex");
 
 async function createClassroom(req, res, next) {
   try {
@@ -44,12 +44,21 @@ async function getJoinedClassrooms(req, res, next) {
     if (isNaN(page) || page < 1) page = 1;
     if (isNaN(limit) || limit < 1) limit = 10;
 
-    const classrooms = await classroomsService.getClassroomsByUser(
-      uid,
-      limit,
-      page
-    );
-    return res.json(JSend.success({ classrooms }));
+    let result = {
+      classrooms: [],
+      metadata: {
+        totalRecords: 0,
+        firstPage: 1,
+        lastPage: 1,
+        page: 1,
+        limit: 5,
+      },
+    };
+
+    result = await classroomsService.getClassroomsByUser(uid, limit, page);
+    console.log(result);
+
+    return res.json(JSend.success(result));
   } catch (err) {
     console.log("getClassrooms error:", err);
     return next(new ApiError(500, "Internal Server Error"));
