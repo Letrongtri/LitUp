@@ -3,7 +3,7 @@ import classroomsService from '@/services/classrooms.service';
 import { useRoute } from 'vue-router';
 
 import { onMounted, ref } from 'vue';
-import AssignmentStudentList from '@/components/AssignmentStudentList.vue';
+import AssignmentStudentList from '@/components/AssignmentList.vue';
 
 const route = useRoute();
 const cid = Number(route.params?.cid);
@@ -48,7 +48,11 @@ onMounted(() => {
       <div class="assignment-section bg-white shadow-sm rounded-4 p-4 border">
         <h4 class="mb-4">Assignments</h4>
 
-        <AssignmentStudentList v-if="assignments.length > 0" :assignments="assignments" />
+        <AssignmentStudentList
+          v-if="assignments.length > 0"
+          :assignments="assignments"
+          :role="'student'"
+        />
 
         <p class="text-muted text-center mt-4" v-else>Chưa có bài tập nào</p>
       </div>

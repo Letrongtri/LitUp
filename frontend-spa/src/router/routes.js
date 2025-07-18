@@ -1,7 +1,5 @@
 import AuthPage from '@/views/AuthPage.vue';
 import Dashboard from '@/views/Dashboard.vue';
-import CreateClassroom from '@/views/CreateClassroom.vue';
-import EditClassroom from '@/views/EditClassroom.vue';
 import CreateAssigment from '@/views/CreateAssigment.vue';
 import EditAssignment from '@/views/EditAssignment.vue';
 import ViewAssignment from '@/views/ViewAssignment.vue';
@@ -13,17 +11,19 @@ import AdminDashboard from '@/views/AdminDashboard.vue';
 import AdminUserManagement from '@/views/AdminUserManagement.vue';
 import AdminClassManagement from '@/views/AdminClassManagement.vue';
 import JoinedClassDetail from '@/views/JoinedClassDetail.vue';
+import TeacherDetailClassroom from '@/views/TeacherDetailClassroom.vue';
 
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 import ProfileUser from '@/views/ProfileUser.vue';
 import NotFound from '@/views/NotFound.vue';
 import Forbidden from '@/views/Forbidden.vue';
+import TeacherDetailAssignment from '@/views/TeacherDetailAssignment.vue';
 const routes = [
   {
     path: '/',
     redirect: () => {
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem('user')).user;
       if (!user) return '/auth';
       return user.u_role === 'teacher' ? '/teacher/classrooms' : '/student/classrooms';
     },
@@ -31,7 +31,7 @@ const routes = [
   { path: '/auth', name: 'auth', component: AuthPage, meta: { layout: AuthLayout } },
   {
     path: '/student/classrooms',
-    name: 'student.classrooms',
+    name: 'classrooms.student',
     component: ClassroomStudent,
     meta: { layout: DefaultLayout, role: 'student' },
   },
@@ -53,20 +53,24 @@ const routes = [
     component: JoinedClassDetail,
     meta: { layout: DefaultLayout, role: 'student' },
   },
-
   {
-    path: '/403',
-    name: 'forbidden',
-    component: Forbidden,
-    meta: { layout: DefaultLayout },
+    path: '/teacher/classrooms/:cid/',
+    name: 'class.detail.teacher',
+    component: TeacherDetailClassroom,
+    meta: { layout: DefaultLayout, role: 'teacher' },
   },
   {
-    path: '/:pathMatch(.*)*',  // bắt mọi route không khớp
-    name: 'not-found',
-    component: NotFound,
-    meta: { layout: DefaultLayout },
-  }
-
+    path: '/teacher/assignments/:aid',
+    name: 'assignment.detail.teacher',
+    component: TeacherDetailAssignment,
+    meta: { layout: DefaultLayout, role: 'teacher' },
+  },
+  {
+    path: '/student/assignments/:aid',
+    name: 'assignment.detail.student',
+    component: ViewAssignment,
+    meta: { layout: DefaultLayout, role: 'student' },
+  },
   //   { path: '/dashboard', name: 'dashboard', component: Dashboard },
   //   { path: '/classrooms/student', name: 'classrooms.student', component: ClassroomStudent },
   //   { path: '/classrooms/create', name: 'classrooms.create', component: CreateClassroom },
@@ -77,7 +81,6 @@ const routes = [
   //     component: CreateAssigment,
   //   },
   //   { path: '/assignments/:aid/edit', name: 'assignment.edit', component: EditAssignment },
-  //   { path: '/assignments/:aid', name: 'assignment.view', component: ViewAssignment },
   //   {
   //     path: '/assignments/:aid/submission',
   //     name: 'assignment.submission.view',
@@ -91,6 +94,18 @@ const routes = [
   //   { path: '/admin/dashboard', name: 'admin.dashboard', component: AdminDashboard },
   //   { path: '/admin/users', name: 'admin.users', component: AdminUserManagement },
   //   { path: '/admin/classes', name: 'admin.classes', component: AdminClassManagement },
+  {
+    path: '/403',
+    name: 'forbidden',
+    component: Forbidden,
+    meta: { layout: DefaultLayout },
+  },
+  {
+    path: '/:pathMatch(.*)*', // bắt mọi route không khớp
+    name: 'not-found',
+    component: NotFound,
+    meta: { layout: DefaultLayout },
+  },
 ];
 
 export default routes;

@@ -82,7 +82,6 @@ const getAssignmentsData = z.object({
 const getTeacherClassroomQuery = z.object({
   input: z.object({
     uid: z.coerce.number().nonnegative(),
-    role: z.literal("teacher"),
     limit: z.coerce.number().optional(),
     page: z.coerce.number().optional(),
   }),

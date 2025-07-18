@@ -405,7 +405,6 @@
                 "type": "object",
                 "required": ["uid"],
                 "properties": {
-                  "uid": { "type": "integer" },
                   "c_name": { "type": "string" },
                   "c_status": { "type": "boolean" }
                 }
@@ -696,16 +695,6 @@
             "required": true,
             "description": "User ID of teacher",
             "schema": { "type": "integer" }
-          },
-          {
-            "name": "role",
-            "in": "query",
-            "required": true,
-            "description": "User role must be 'teacher'",
-            "schema": {
-              "type": "string",
-              "enum": ["teacher"]
-            }
           },
           { "$ref": "#/components/parameters/limitParam" },
           { "$ref": "#/components/parameters/pageParam" }

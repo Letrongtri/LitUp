@@ -1,7 +1,7 @@
 const classroomsService = require("../services/classrooms.service");
+const usersService = require("../services/users.service");
 const ApiError = require("../api-error");
 const JSend = require("../jsend");
-const knex = require("../database/knex");
 
 async function createClassroom(req, res, next) {
   try {
@@ -184,7 +184,7 @@ const getTeacherClassrooms = async (req, res, next) => {
     if (isNaN(page) || page < 1) page = 1;
     if (isNaN(limit) || limit < 1) limit = 10;
 
-    const user = await knex("users").where("uid", uid).first();
+    const user = await usersService.getUserById(uid);
 
     if (!user) {
       return res.status(404).json({
@@ -200,12 +200,11 @@ const getTeacherClassrooms = async (req, res, next) => {
       });
     }
 
-    const offset = (page - 1) * limit;
-
-    const classrooms = await knex("classrooms")
-      .where("uid", uid)
-      .limit(limit)
-      .offset(offset);
+    const classrooms = await classroomsService.getClassroomsByTeacher(
+      uid,
+      limit,
+      page
+    );
 
     return res.json({
       status: "success",

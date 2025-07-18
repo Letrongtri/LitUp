@@ -64,14 +64,6 @@ function goToHomePage() {
           </li>
         </ul>
 
-        <router-link
-          v-if="user && user.u_role === 'teacher'"
-          to="/classrooms/create"
-          class="btn btn-outline-success btn-sm me-2"
-        >
-          <i class="fas fa-plus me-1"></i> Tạo lớp học
-        </router-link>
-
         <div class="dropdown d-flex justify-content-end gap-3" style="max-width: 300px">
           <a
             class="d-flex align-items-center link-dark text-decoration-none"

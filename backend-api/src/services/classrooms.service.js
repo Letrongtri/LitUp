@@ -183,7 +183,7 @@ async function joinClassroomByCode(cid, uid, c_code) {
 }
 
 async function getMemberByClassId(cid) {
-  return knex("members as m")
+  return await knex("members as m")
     .join("users as u", "m.uid", "u.uid")
     .where("m.cid", cid)
     .andWhere("m.m_status", true)
@@ -201,12 +201,16 @@ async function getClassroomsByTeacher(uid, limit = 10, page = 1) {
   const teacher = await knex("users").where({ uid, u_role: "teacher" }).first();
   if (!teacher) return [];
 
-  return knex("classrooms")
-    .where({ uid })
-    .andWhere("u_role", "teacher")
+  const data = await knex("classrooms as c")
+    .leftJoin("members as m", "c.cid", "m.cid")
+    .where({ "c.uid": uid })
+    .groupBy("c.cid")
+    .select("c.*", knex.raw("COUNT(m.mid) as student_count"))
     .limit(limit)
     .offset((page - 1) * limit)
-    .orderBy("cid", "desc");
+    .orderBy("c.cid", "desc");
+
+  return data;
 }
 
 module.exports = {

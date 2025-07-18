@@ -38,13 +38,21 @@
         <div class="col-md-12">
           <div class="card p-4 border">
             <div class="d-flex align-items-start gap-2 mb-3">
-              <img src="https://ui-avatars.com/api/?name=Nguyễn+Văn+A" class="rounded-circle" width="36" height="36" />
+              <img
+                src="https://ui-avatars.com/api/?name=Nguyễn+Văn+A"
+                class="rounded-circle"
+                width="36"
+                height="36"
+              />
               <div class="flex-grow-1">
                 <p class="mb-1 fw-semibold">Nguyễn Văn A</p>
                 <p class="mb-0 text-muted small">Thông báo nội dung nào đó cho lớp học của bạn</p>
               </div>
             </div>
-            <p class="text-muted">Đây là nơi bạn giao tiếp với lớp học của mình. Sử dụng bảng tin để thông báo, đăng bài tập và trả lời câu hỏi của học viên.</p>
+            <p class="text-muted">
+              Đây là nơi bạn giao tiếp với lớp học của mình. Sử dụng bảng tin để thông báo, đăng bài
+              tập và trả lời câu hỏi của học viên.
+            </p>
             <button class="btn btn-sm btn-outline-secondary">Cài đặt bảng tin</button>
           </div>
         </div>

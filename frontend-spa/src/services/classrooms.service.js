@@ -12,6 +12,15 @@ function classroomsService() {
     return data;
   }
 
+  async function getClassroomsByTeacher(page, limit = 10) {
+    const user = JSON.parse(localStorage.getItem('user')).user;
+
+    let url = `${baseUrl}/teacher/?uid=${user.uid}&page=${page}&limit=${limit}`;
+    const data = await efetch(url);
+
+    return data;
+  }
+
   async function getClassroom(id) {
     return await efetch(`${baseUrl}/${id}`);
   }
@@ -19,14 +28,22 @@ function classroomsService() {
   async function createClassroom(classroom) {
     return efetch(baseUrl, {
       method: 'POST',
-      body: classroom,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(classroom),
     });
   }
 
   async function updateClassroom(id, classroom) {
+    console.log(classroom);
+
     return efetch(`${baseUrl}/${id}`, {
       method: 'PUT',
-      body: classroom,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(classroom),
     });
   }
   async function deleteClassroom(id) {
@@ -35,8 +52,8 @@ function classroomsService() {
     });
   }
 
-  async function getClassroomAssignment(cid, page, limit = 10) {
-    let url = `${baseUrl}/${cid}/assignments?page=${page}&limit=${limit}`;
+  async function getClassroomAssignment(cid) {
+    let url = `${baseUrl}/${cid}/assignments`;
     const data = await efetch(url);
 
     return data;
@@ -49,6 +66,7 @@ function classroomsService() {
     updateClassroom,
     deleteClassroom,
     getClassroomAssignment,
+    getClassroomsByTeacher,
   };
 }
 

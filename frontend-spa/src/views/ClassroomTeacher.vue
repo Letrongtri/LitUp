@@ -1,213 +1,201 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { api } from '@/services/litup_service';
-import SubmissionManager from '@/components/SubmissionManager.vue';
+import { ref, computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import classroomsService from '@/services/classrooms.service';
+import MainPagination from '@/components/MainPagination.vue';
+import CreateClassroom from '@/components/CreateClassroom.vue';
+import { formatDate } from '@/utils/format';
 
 const classrooms = ref([]);
-const selectedClass = ref(null);
-const assignments = ref([]);
-const students = ref([]);
-const selectedAssignment = ref(null);
 const error = ref('');
+const showModal = ref(false);
+
 const router = useRouter();
+const route = useRoute();
 
-onMounted(async () => {
-  try {
-    const stored = JSON.parse(localStorage.getItem('user'));
-    if (!stored || stored.u_role !== 'teacher') throw new Error('Bạn chưa đăng nhập hoặc không phải giáo viên');
+const totalPages = ref(1);
 
-    const uid = stored.uid;
-    const rawClasses = await api.getTeacherClassrooms(uid);
-    if (!Array.isArray(rawClasses)) throw new Error('API không trả về danh sách lớp học hợp lệ');
-
-    classrooms.value = rawClasses.map(cls => ({
-      ...cls,
-      cid: cls.c_id ?? cls.cid,
-    }));
-  } catch (err) {
-    error.value = err.message;
-  }
+const currentPage = computed(() => {
+  const page = Number(route.query?.page);
+  if (Number.isNaN(page) || page < 1) return 1;
+  return page;
 });
 
-async function viewClassroom(classroom) {
-  const classId = Number(classroom?.cid);
-  if (!classId || isNaN(classId)) {
-    error.value = `Class ID không hợp lệ: ${classroom?.cid}`;
-    return;
-  }
+const searchClass = ref('');
 
-  selectedClass.value = classroom;
-  selectedAssignment.value = null;
+const searchableClassrooms = computed(() =>
+  classrooms.value.map((classroom) => classroom.c_name.toLowerCase()),
+);
 
+// Classroom filtered by searchClass
+const filteredClassrooms = computed(() => {
+  if (!searchClass.value) return classrooms.value;
+  return classrooms.value.filter((contact, index) =>
+    searchableClassrooms.value[index].includes(searchClass.value),
+  );
+});
+
+async function retrieveClassrooms(page) {
   try {
-    const result = await api.getAssignments(classId, 1, 10);
-    assignments.value = result.assignments || [];
-    students.value = await api.getStudentsInClass(classId, 1, 10);
-  } catch (err) {
-    error.value = err.message;
+    const data = await classroomsService.getClassroomsByTeacher(page);
+
+    totalPages.value = data.metadata.lastPage ?? 1;
+    classrooms.value = data.classrooms;
+  } catch (error) {
+    console.log(error);
   }
 }
 
-function goToEditClass(cls) {
-  router.push({ name: 'class.edit', params: { cid: cls.cid } });
+function changeCurrentPage(page) {
+  router.push({ name: 'student.classrooms', query: { page } });
 }
 
-function goToCreateAssignment(cid) {
-  router.push({ name: 'assignment.create', params: { cid } });
+watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: true });
+
+// onMounted(async () => {
+//   try {
+//     const stored = JSON.parse(localStorage.getItem('user')).user;
+//     if (!stored || stored.u_role !== 'teacher')
+//       throw new Error('Bạn chưa đăng nhập hoặc không phải giáo viên');
+
+//     const uid = stored.uid;
+//     const rawClasses = await api.getTeacherClassrooms(uid);
+//     if (!Array.isArray(rawClasses)) throw new Error('API không trả về danh sách lớp học hợp lệ');
+
+//     classrooms.value = rawClasses.map((cls) => ({
+//       ...cls,
+//       cid: cls.c_id ?? cls.cid,
+//     }));
+//   } catch (err) {
+//     error.value = err.message;
+//   }
+// });
+
+// async function viewClassroom(classroom) {
+//   const classId = Number(classroom?.cid);
+//   if (!classId || isNaN(classId)) {
+//     error.value = `Class ID không hợp lệ: ${classroom?.cid}`;
+//     return;
+//   }
+
+//   selectedClass.value = classroom;
+//   selectedAssignment.value = null;
+
+//   try {
+//     const result = await api.getAssignments(classId, 1, 10);
+//     assignments.value = result.assignments || [];
+//     students.value = await api.getStudentsInClass(classId, 1, 10);
+//   } catch (err) {
+//     error.value = err.message;
+//   }
+// }
+
+function goToDetailClassroomPage(cls) {
+  router.push({ name: 'class.detail.teacher', params: { cid: cls.cid } });
 }
 
-function goToEditAssignment(aid) {
-  router.push({ name: 'assignment.edit', params: { aid } });
-}
+// function goToCreateAssignment(cid) {
+//   router.push({ name: 'assignment.create', params: { cid } });
+// }
 
-function goToViewAssignment(aid) {
-  router.push({ name: 'assignment.view', params: { aid } });
-}
+// function goToEditAssignment(aid) {
+//   router.push({ name: 'assignment.edit', params: { aid } });
+// }
 
-function viewAssignmentSubmissions(aid) {
-  selectedAssignment.value = assignments.value.find(a => a.aid === aid);
-}
+// function goToViewAssignment(aid) {
+//   router.push({ name: 'assignment.view', params: { aid } });
+// }
 
-async function onDeleteClass(cid) {
-  if (!confirm('Bạn có chắc chắn muốn xoá lớp học này?')) return;
-  try {
-    await api.deleteClassroom(cid);
-    classrooms.value = classrooms.value.filter(c => c.cid !== cid);
-    if (selectedClass.value?.cid === cid) selectedClass.value = null;
-  } catch (err) {
-    error.value = 'Xoá lớp thất bại: ' + err.message;
-  }
-}
+// function viewAssignmentSubmissions(aid) {
+//   selectedAssignment.value = assignments.value.find((a) => a.aid === aid);
+// }
 
-async function onDeleteAssignment(aid) {
-  if (!confirm('Bạn có chắc chắn muốn xoá bài tập này?')) return;
-  try {
-    await api.deleteAssignment(aid);
-    const result = await api.getAssignments(selectedClass.value.cid, 1, 10);
-    assignments.value = result.assignments || [];
-  } catch (err) {
-    error.value = 'Xoá bài tập thất bại: ' + err.message;
-  }
-}
+// async function onDeleteClass(cid) {
+//   if (!confirm('Bạn có chắc chắn muốn xoá lớp học này?')) return;
+//   try {
+//     await api.deleteClassroom(cid);
+//     classrooms.value = classrooms.value.filter((c) => c.cid !== cid);
+//     if (selectedClass.value?.cid === cid) selectedClass.value = null;
+//   } catch (err) {
+//     error.value = 'Xoá lớp thất bại: ' + err.message;
+//   }
+// }
+
+// async function onDeleteAssignment(aid) {
+//   if (!confirm('Bạn có chắc chắn muốn xoá bài tập này?')) return;
+//   try {
+//     await api.deleteAssignment(aid);
+//     const result = await api.getAssignments(selectedClass.value.cid, 1, 10);
+//     assignments.value = result.assignments || [];
+//   } catch (err) {
+//     error.value = 'Xoá bài tập thất bại: ' + err.message;
+//   }
+// }
 </script>
 
 <template>
   <div class="page-container">
     <!-- Header -->
-    <div class="page-header">
-      <div class="container">
-        <h1 class="page-title">Lớp học của bạn</h1>
-        <p class="page-subtitle">Quản lý lớp học và bài tập</p>
+    <div class="container">
+      <div class="content-section">
+        <div class="row">
+          <div class="col-lg-9 col-sm-12">
+            <h1 class="page-title">Lớp học của bạn</h1>
+            <p class="page-subtitle">Quản lý lớp học và bài tập</p>
+          </div>
+          <div class="col-lg-3 col-sm-12 d-flex justify-content-end align-items-center">
+            <button class="btn btn-primary" @click="showModal = true">Create Classroom</button>
+          </div>
+        </div>
       </div>
     </div>
 
+    <CreateClassroom v-if="showModal" @created="retrieveClassrooms(1)" @close="showModal = false" />
+
     <div class="container">
       <!-- Error Alert -->
-      <div v-if="error" class="alert alert-danger mb-4">
-        <strong>Lỗi:</strong> {{ error }}
-      </div>
+      <div v-if="error" class="alert alert-danger mb-4"><strong>Lỗi:</strong> {{ error }}</div>
 
       <!-- Classrooms List -->
       <div class="content-section">
-        <div class="section-header">
+        <div class="section-header d-flex justify-content-between">
           <h3>Danh sách lớp học</h3>
+          <div class="input-group w-auto">
+            <input
+              type="text"
+              class="form-control px-3"
+              placeholder="Find class"
+              v-model="searchClass"
+            />
+            <button class="btn btn-success" @click="submit">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
         </div>
-        
-        <div class="classrooms-grid">
-          <div v-for="cls in classrooms" :key="cls.cid" class="classroom-card">
+
+        <div v-if="filteredClassrooms" class="classrooms-grid">
+          <div v-for="cls in filteredClassrooms" :key="cls.cid" class="classroom-card">
             <div class="card-header">
-              <h4>{{ cls.c_name }}</h4>
+              <h4 @click="goToDetailClassroomPage(cls)" style="cursor: pointer">
+                {{ cls.c_name }}
+              </h4>
             </div>
             <div class="card-body">
-              <div class="card-actions">
-                <button class="btn btn-primary" @click="viewClassroom(cls)">
-                  Xem chi tiết
-                </button>
-                <button class="btn btn-outline" @click="goToEditClass(cls)">
-                  Chỉnh sửa
-                </button>
-                <button class="btn btn-danger" @click="onDeleteClass(cls.cid)">
-                  Xóa
-                </button>
-              </div>
+              <p>Students: {{ cls.student_count }}</p>
+              <p>Created at: {{ formatDate(cls.c_created_at) }}</p>
             </div>
           </div>
         </div>
-      </div>
+        <h4 v-else>Bạn chưa tạo lớp</h4>
 
-      <!-- Selected Class Details -->
-      <div v-if="selectedClass" class="content-section">
-        <div class="section-header">
-          <h3>{{ selectedClass.c_name }}</h3>
-          <button class="btn btn-success" @click="goToCreateAssignment(selectedClass.cid)">
-            + Tạo bài tập mới
-          </button>
+        <div class="mt-5 d-flex flex-wrap justify-content-center align-items-center">
+          <MainPagination
+            :total-pages="totalPages"
+            :current-page="currentPage"
+            @update:current-page="changeCurrentPage"
+          />
+          <div class="w-100"></div>
         </div>
-
-        <div class="class-content">
-          <!-- Assignments -->
-          <div class="assignments-section">
-            <h4>Bài tập ({{ assignments.length }})</h4>
-            
-            <div v-if="assignments.length" class="assignments-list">
-              <div v-for="assignment in assignments" :key="assignment.aid" class="assignment-item">
-                <div class="assignment-info">
-                  <h5>{{ assignment.a_title }}</h5>
-                  <span class="status-badge">Hoạt động</span>
-                </div>
-                <div class="assignment-actions">
-                  <button class="btn btn-sm btn-outline" @click="goToViewAssignment(assignment.aid)">
-                    Xem
-                  </button>
-                  <button class="btn btn-sm btn-outline" @click="viewAssignmentSubmissions(assignment.aid)">
-                    Bài nộp
-                  </button>
-                  <button class="btn btn-sm btn-outline" @click="goToEditAssignment(assignment.aid)">
-                    Sửa
-                  </button>
-                  <button class="btn btn-sm btn-danger" @click="onDeleteAssignment(assignment.aid)">
-                    Xóa
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <div v-else class="empty-message">
-              <p>Chưa có bài tập nào. <a href="#" @click="goToCreateAssignment(selectedClass.cid)">Tạo bài tập đầu tiên</a></p>
-            </div>
-          </div>
-
-          <!-- Students -->
-          <div class="students-section">
-            <h4>👥 Học sinh ({{ students.length }})</h4>
-            
-            <div v-if="students.length" class="students-list">
-              <div v-for="student in students" :key="student.uid" class="student-item">
-                <div class="student-avatar">{{ student.u_first_name.charAt(0) }}</div>
-                <div class="student-info">
-                  <strong>{{ student.u_first_name }} {{ student.u_last_name }}</strong>
-                  <span class="student-email">{{ student.u_email }}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div v-else class="empty-message">
-              <p>Chưa có học sinh nào trong lớp.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Submission Manager -->
-      <div v-if="selectedAssignment" class="content-section">
-        <div class="section-header">
-          <h3>📤 Bài nộp - {{ selectedAssignment.a_title }}</h3>
-        </div>
-        <SubmissionManager
-          :assignment-id="selectedAssignment.aid"
-          :assignment-title="selectedAssignment.a_title"
-        />
       </div>
     </div>
   </div>
@@ -247,7 +235,7 @@ async function onDeleteAssignment(aid) {
 .content-section {
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin: 2rem 0;
   padding: 2rem;
 }
@@ -281,7 +269,7 @@ async function onDeleteAssignment(aid) {
 }
 
 .classroom-card:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
