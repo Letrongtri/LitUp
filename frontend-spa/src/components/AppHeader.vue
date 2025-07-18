@@ -3,7 +3,15 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-const user = JSON.parse(localStorage.getItem('user')).user;
+// const user = JSON.parse(localStorage.getItem('user')).user;
+
+const user = JSON.parse(localStorage.getItem('user') || 'null') || {
+  u_first_name: 'Demo',
+  u_last_name: 'User',
+  u_role: 'teacher',
+  avatar_url: '/uploads/avatar1.png'
+};
+
 
 function handleLogout() {
   localStorage.removeItem('user');

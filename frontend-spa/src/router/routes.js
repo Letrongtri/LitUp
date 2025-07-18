@@ -19,6 +19,7 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue';
 import ProfileUser from '@/views/ProfileUser.vue';
 import NotFound from '@/views/NotFound.vue';
 import Forbidden from '@/views/Forbidden.vue';
+import DetailAssignment from '@/views/DetailAssignment.vue';
 const routes = [
   {
     path: '/',
@@ -65,7 +66,17 @@ const routes = [
     name: 'not-found',
     component: NotFound,
     meta: { layout: DefaultLayout },
+  },
+
+  {
+  path: '/teacher/classrooms/:cid/assignments/:aid/detail',
+  name: 'teacher.assignment.detail',
+  component: DetailAssignment,
+  meta: { layout: DefaultLayout, role: 'teacher' }
   }
+
+
+  
 
   //   { path: '/dashboard', name: 'dashboard', component: Dashboard },
   //   { path: '/classrooms/student', name: 'classrooms.student', component: ClassroomStudent },
