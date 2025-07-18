@@ -1,56 +1,66 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import usersService from '@/services/users.service';
-import { useRoute } from 'vue-router';
+// import { ref, onMounted } from 'vue';
+// import usersService from '@/services/users.service';
+// import { useRoute, useRouter } from 'vue-router';
 
-const user = ref(null);
-const error = ref('');
+// const route = useRoute();
+// const router = useRouter();
 
-const route = useRoute();
+// const user = ref(null);
+// const error = ref('');
 
-onMounted(async () => {
-  try {
-    const uid = Number(route.params?.uid);
+// onMounted(async () => {
+//   try {
+//     const uid = Number(route.params?.uid);
+//     const profile = await usersService.getUserById(uid);
+//     user.value = profile.user;
+//   } catch (err) {
+//     error.value = 'Lỗi khi tải hồ sơ: ' + err.message;
+//   }
+// });
 
-    const profile = await usersService.getUserById(uid);
-    user.value = profile.user;
-  } catch (err) {
-    error.value = 'Lỗi khi tải hồ sơ: ' + err.message;
-  }
-});
+// function editProfile() {
+//   router.push({ name: 'profile.edit', params: { uid: user.value.u_id } });
+// }
+
+// function deleteProfile() {
+//   alert('⚠️ Tính năng xóa chưa được kích hoạt.');
+// }
 </script>
+
 
 <template>
   <div class="page-container bg-light py-5">
     <div class="container">
-      <div class="profile-box bg-white shadow rounded p-4 p-md-5">
-        <h2 class="mb-4 text-primary fw-bold">Hồ sơ người dùng</h2>
-
-        <div v-if="error" class="alert alert-danger">{{ error }}</div>
-
-        <div v-if="user">
-          <ul class="list-group list-group-flush mb-3">
-            <li class="list-group-item">
-              <strong>Họ tên:</strong> {{ user.u_first_name }} {{ user.u_last_name }}
-            </li>
-            <li class="list-group-item"><strong>Email:</strong> {{ user.u_email }}</li>
-            <li class="list-group-item">
-              <strong>Vai trò:</strong> {{ user.u_role === 'teacher' ? 'Giáo viên' : 'Học sinh' }}
-            </li>
-            <li class="list-group-item">
-              <strong>Trạng thái:</strong>
-              <span :class="user.u_status ? 'text-success' : 'text-danger'">
-                {{ user.u_status ? 'Đang hoạt động' : 'Bị khóa' }}
-              </span>
-            </li>
-          </ul>
-
-          <router-link to="/dashboard" class="btn btn-outline-primary">
-            Quay lại Dashboard
-          </router-link>
+      <div class="profile-card bg-white rounded-4 shadow-sm p-4 p-md-5">
+        <!-- Avatar + Tên -->
+        <div class="text-center mb-4">
+          <img
+            src="https://ui-avatars.com/api/?name=Nguyen+Van+A&background=0D8ABC&color=fff&size=128"
+            class="rounded-circle mb-3"
+            width="100"
+            height="100"
+            alt="Avatar"
+          />
+          <h3 class="fw-bold text-primary">Nguyễn Văn A</h3>
+          <p class="text-muted mb-0">nguyenvana@example.com</p>
         </div>
 
-        <div v-else-if="!error" class="text-muted">Đang tải thông tin người dùng...</div>
+        <!-- Thông tin chi tiết -->
+        <ul class="list-group list-group-flush mb-4">
+          <li class="list-group-item"><strong>Vai trò:</strong> Giáo viên</li>
+          <li class="list-group-item">
+            <strong>Trạng thái:</strong>
+            <span class="text-success">Đang hoạt động</span>
+          </li>
+          <li class="list-group-item"><strong>ID người dùng:</strong> 123</li>
+        </ul>
+
+        <!-- Nút hành động -->
+        <div class="d-flex gap-2 justify-content-center">
+          <button class="btn btn-outline-primary">Chỉnh sửa</button>
+          <button class="btn btn-outline-danger">Xoá hồ sơ</button>
+        </div>
       </div>
     </div>
   </div>
@@ -59,21 +69,17 @@ onMounted(async () => {
 <style scoped>
 .page-container {
   min-height: 100vh;
+  background-color: #f8f9fa;
 }
 
-.profile-box {
+.profile-card {
   max-width: 600px;
   margin: 0 auto;
-  border-radius: 16px;
-}
-
-.alert {
-  border-radius: 8px;
-  font-size: 0.95rem;
 }
 
 .list-group-item {
   font-size: 1rem;
   padding: 0.75rem 1rem;
+  border-color: #f1f1f1;
 }
 </style>

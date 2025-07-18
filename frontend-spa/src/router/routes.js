@@ -1,6 +1,5 @@
 import AuthPage from '@/views/AuthPage.vue';
 import Dashboard from '@/views/Dashboard.vue';
-import Profile from '@/views/ProfileUser.vue';
 import CreateClassroom from '@/views/CreateClassroom.vue';
 import EditClassroom from '@/views/EditClassroom.vue';
 import CreateAssigment from '@/views/CreateAssigment.vue';
@@ -17,7 +16,9 @@ import JoinedClassDetail from '@/views/JoinedClassDetail.vue';
 
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
-
+import ProfileUser from '@/views/ProfileUser.vue';
+import NotFound from '@/views/NotFound.vue';
+import Forbidden from '@/views/Forbidden.vue';
 const routes = [
   {
     path: '/',
@@ -43,7 +44,7 @@ const routes = [
   {
     path: '/users/:uid',
     name: 'profile',
-    component: Profile,
+    component: ProfileUser,
     meta: { layout: DefaultLayout },
   },
   {
@@ -52,6 +53,20 @@ const routes = [
     component: JoinedClassDetail,
     meta: { layout: DefaultLayout, role: 'student' },
   },
+
+  {
+    path: '/403',
+    name: 'forbidden',
+    component: Forbidden,
+    meta: { layout: DefaultLayout },
+  },
+  {
+    path: '/:pathMatch(.*)*',  // bắt mọi route không khớp
+    name: 'not-found',
+    component: NotFound,
+    meta: { layout: DefaultLayout },
+  }
+
   //   { path: '/dashboard', name: 'dashboard', component: Dashboard },
   //   { path: '/classrooms/student', name: 'classrooms.student', component: ClassroomStudent },
   //   { path: '/classrooms/create', name: 'classrooms.create', component: CreateClassroom },
