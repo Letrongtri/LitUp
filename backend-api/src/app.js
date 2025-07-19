@@ -8,10 +8,13 @@ const JSend = require("./jsend");
 
 // routes
 const adminRouter = require("./routes/admin.router");
-const assignmentsRouter = require("./routes/assignments.router");
+const studentAssignmentsRouter = require("./routes/student.assignments.router");
+const teacherAssignmentsRouter = require("./routes/teacher.assignments.router");
 const authRouter = require("./routes/auth.router");
-const classroomsRouter = require("./routes/classrooms.router");
-const submissionsRouter = require("./routes/submissions.router");
+const studentClassroomsRouter = require("./routes/student.classrooms.router");
+const teacherClassroomsRouter = require("./routes/teacher.classrooms.router");
+const studentSubmissionsRouter = require("./routes/student.submissions.router");
+const teacherSubmissionsRouter = require("./routes/teacher.submissions.router");
 const usersRouter = require("./routes/users.router");
 
 // error controller
@@ -40,10 +43,13 @@ app.use("/public", express.static("public"));
 app.use("/api", apiLimiter);
 
 adminRouter.setup(app);
-assignmentsRouter.setup(app);
+studentAssignmentsRouter.setup(app);
+teacherAssignmentsRouter.setup(app);
 authRouter.setup(app);
-classroomsRouter.setup(app);
-submissionsRouter.setup(app);
+studentClassroomsRouter.setup(app);
+teacherClassroomsRouter.setup(app);
+studentSubmissionsRouter.setup(app);
+teacherSubmissionsRouter.setup(app);
 usersRouter.setup(app);
 
 // Handle 404 error for unknow URL paths

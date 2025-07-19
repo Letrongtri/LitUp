@@ -6,7 +6,6 @@ const allowedMethods = require("../middlewares/allowedMethods.middleware");
 
 // middlewares
 const { validateRequest } = require("../middlewares/validator.middleware");
-const { filesUpload } = require("../middlewares/files-upload.middleware");
 
 // schemas
 const { submissionSchema } = require("../schemas/submission.schemas");
@@ -22,37 +21,20 @@ const getSubmissionId = z.object({
     .strict(),
 });
 
-/** Get updated submission data */
-const updateSubmissionData = z.object({
-  input: submissionSchema.pick({ sid: true, attachments: true }).strict(),
-});
-
-/** Get grade */
+/** Grade submission */
 const gradeSubmissionData = z.object({
   input: submissionSchema.pick({ sid: true, s_grade: true, s_comment: true }),
 });
 
 module.exports.setup = (app) => {
-  app.use("/api/submissions", router);
+  app.use("/api/teacher/submissions", router);
 
   router
     .route("/:sid")
     .get(validateRequest(getSubmissionId), submissionsController.getSubmission)
     .put(
-      [filesUpload, validateRequest(updateSubmissionData)],
-      submissionsController.updateSubmission
-    )
-    .delete(
-      validateRequest(getSubmissionId),
-      submissionsController.deleteSubmission
-    )
-    .all(allowedMethods(["GET", "PUT", "DELETE"]));
-
-  router
-    .route("/:sid/grade")
-    .put(
       validateRequest(gradeSubmissionData),
       submissionsController.gradeSubmission
     )
-    .all(allowedMethods(["PUT"]));
+    .all(allowedMethods(["GET", "PUT"]));
 };
