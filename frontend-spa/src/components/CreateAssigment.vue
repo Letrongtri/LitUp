@@ -1,10 +1,9 @@
 <script setup>
 import { ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { api } from '@/services/litup_service';
 
 const route = useRoute();
-const router = useRouter();
 
 const cid = Number(route.params.cid);
 const title = ref('');
@@ -34,7 +33,6 @@ async function submit() {
 
     await api.createAssignmentWithFiles(cid, formData);
     message.value = 'Tạo bài tập thành công!';
-    setTimeout(() => router.push({ name: 'classrooms' }), 1000);
   } catch (err) {
     error.value = 'Tạo bài tập thất bại: ' + err.message;
   }

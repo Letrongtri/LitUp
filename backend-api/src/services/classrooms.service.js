@@ -69,6 +69,33 @@ async function getClassroomById(cid) {
     .first();
 }
 
+async function getClassroomDetailByStudent(cid) {
+  const data = await knex("classrooms as c")
+    .join("users as u", "c.uid", "u.uid")
+    .where("c.cid", cid)
+    .select(
+      "cid",
+      "c_name",
+      "c_created_at",
+      knex.raw("concat(u_first_name, ' ', u_last_name) as teacher_name"),
+      "u_avatar_id"
+    )
+    .first();
+
+  const avatar = data.u_avatar_id
+    ? await attachmentRepository().where("fid", data.u_avatar_id).first()
+    : null;
+
+  const DEFAULT_AVATAR = "/public/images/blank-profile-picture.png";
+
+  return {
+    ...data,
+    teacher_avatar_url: avatar
+      ? `/public/uploads/${avatar.f_name}`
+      : DEFAULT_AVATAR,
+  };
+}
+
 async function updateClassroom(cid, updateData) {
   const trx = await knex.transaction();
 
@@ -249,6 +276,7 @@ async function getClassroomsByTeacher(uid, limit = 10, page = 1) {
 module.exports = {
   createClassroom,
   getClassroomById,
+  getClassroomDetailByStudent,
   updateClassroom,
   deleteClassroom,
   getClassroomsByUser,

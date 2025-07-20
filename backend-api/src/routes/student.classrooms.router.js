@@ -57,7 +57,10 @@ module.exports.setup = (app) => {
 
   router
     .route("/:cid")
-    .get(validateRequest(getClassroomId), classroomsController.getClassroom)
+    .get(
+      validateRequest(getClassroomId),
+      classroomsController.getClassroomDetailByStudent
+    )
     .post(
       validateRequest(joinClassroomData),
       classroomsController.joinClassroom

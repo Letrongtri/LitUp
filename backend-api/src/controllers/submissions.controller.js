@@ -55,10 +55,10 @@ async function getSubmissions(req, res, next) {
 }
 
 async function getSubmission(req, res, next) {
-  const { sid } = req.params;
+  const { uid, aid } = req.query;
 
   try {
-    const submission = await submissionService.getSubmission(sid);
+    const submission = await submissionService.getSubmission(uid, aid);
     if (!submission) {
       return next(new ApiError(404, "Submission not found"));
     }
@@ -73,10 +73,14 @@ async function getSubmission(req, res, next) {
 }
 
 async function updateSubmission(req, res, next) {
-  const { sid } = req.params;
+  const { uid, aid } = req.body;
 
   try {
-    const updated = await submissionService.updateSubmission(sid, req.files);
+    const updated = await submissionService.updateSubmission(
+      uid,
+      aid,
+      req.files
+    );
 
     if (!updated) return next(new ApiError(404, "Submission not found"));
 

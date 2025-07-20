@@ -80,6 +80,22 @@ async function getClassroom(req, res, next) {
   }
 }
 
+async function getClassroomDetailByStudent(req, res, next) {
+  const { cid } = req.params;
+
+  try {
+    const classroom = await classroomsService.getClassroomDetailByStudent(cid);
+    if (!classroom) {
+      return next(new ApiError(404, "Classroom not found"));
+    }
+
+    return res.json(JSend.success({ classroom }));
+  } catch (err) {
+    console.log(err);
+    return next(new ApiError(500, "Internal Server Error"));
+  }
+}
+
 async function updateClassroom(req, res, next) {
   const { cid } = req.params;
 
@@ -241,6 +257,7 @@ module.exports = {
   createClassroom,
   getJoinedClassrooms,
   getClassroom,
+  getClassroomDetailByStudent,
   updateClassroom,
   deleteClassroom,
   joinClassroom,

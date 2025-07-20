@@ -50,6 +50,7 @@ function classroomsService() {
       body: JSON.stringify(classroom),
     });
   }
+
   async function deleteClassroom(id) {
     return efetch(`${baseUrlTeacher}/${id}`, {
       method: 'DELETE',
@@ -80,6 +81,16 @@ function classroomsService() {
     });
   }
 
+  async function joinClassroom(cid, joinData) {
+    return efetch(`${baseUrlStudent}/${cid}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(joinData),
+    });
+  }
+
   return {
     getClassrooms,
     getClassroom,
@@ -91,6 +102,7 @@ function classroomsService() {
     getMembers,
     createAssignment,
     removeMember,
+    joinClassroom,
   };
 }
 

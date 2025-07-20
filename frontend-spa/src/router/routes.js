@@ -1,40 +1,51 @@
+// Layout
+import AuthLayout from '@/layouts/AuthLayout.vue';
+import DefaultLayout from '@/layouts/DefaultLayout.vue';
 import AuthPage from '@/views/AuthPage.vue';
+
+// Views
+import TeacherClassrooms from '@/views/TeacherClassrooms.vue';
+import StudentClassrooms from '@/views/StudentClassrooms.vue';
+import TeacherDetailClassroom from '@/views/TeacherDetailClassroom.vue';
+import TeacherDetailAssignment from '@/views/TeacherDetailAssignment.vue';
+import StudentDetailClassroom from '@/views/StudentDetailClassroom.vue';
+import StudentDetailAssignment from '@/views/StudentDetailAssignment.vue';
+
+import ProfileUser from '@/views/ProfileUser.vue';
+
 import Dashboard from '@/views/Dashboard.vue';
-import ViewAssignment from '@/views/ViewAssignment.vue';
-import ClassroomTeacher from '@/views/ClassroomTeacher.vue';
-import ClassroomStudent from '@/views/ClassroomStudent.vue';
 import AdminDashboard from '@/views/AdminDashboard.vue';
 import AdminUserManagement from '@/views/AdminUserManagement.vue';
 import AdminClassManagement from '@/views/AdminClassManagement.vue';
 import JoinedClassDetail from '@/views/JoinedClassDetail.vue';
-import TeacherDetailClassroom from '@/views/TeacherDetailClassroom.vue';
 
-import AuthLayout from '@/layouts/AuthLayout.vue';
-import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import ProfileUser from '@/views/ProfileUser.vue';
+// Error page
 import NotFound from '@/views/NotFound.vue';
 import Forbidden from '@/views/Forbidden.vue';
-import TeacherDetailAssignment from '@/views/TeacherDetailAssignment.vue';
+
 const routes = [
   {
     path: '/',
     redirect: () => {
-      const user = JSON.parse(localStorage.getItem('user')).user;
-      if (!user) return '/auth';
-      return user.u_role === 'teacher' ? '/teacher/classrooms' : '/student/classrooms';
+      try {
+        const user = JSON.parse(localStorage.getItem('user')).user;
+        return user.u_role === 'teacher' ? '/teacher/classrooms' : '/student/classrooms';
+      } catch (e) {
+        return '/auth';
+      }
     },
   },
   { path: '/auth', name: 'auth', component: AuthPage, meta: { layout: AuthLayout } },
   {
     path: '/student/classrooms',
-    name: 'classrooms.student',
-    component: ClassroomStudent,
+    name: 'student.classrooms',
+    component: StudentClassrooms,
     meta: { layout: DefaultLayout, role: 'student' },
   },
   {
     path: '/teacher/classrooms',
-    name: 'classrooms.teacher',
-    component: ClassroomTeacher,
+    name: 'teacher.classrooms',
+    component: TeacherClassrooms,
     meta: { layout: DefaultLayout, role: 'teacher' },
   },
   {
@@ -45,26 +56,26 @@ const routes = [
   },
   {
     path: '/student/classrooms/:cid/',
-    name: 'class.joined.detail',
-    component: JoinedClassDetail,
+    name: 'student.class.detail',
+    component: StudentDetailClassroom,
     meta: { layout: DefaultLayout, role: 'student' },
   },
   {
     path: '/teacher/classrooms/:cid/',
-    name: 'class.detail.teacher',
+    name: 'teacher.class.detail',
     component: TeacherDetailClassroom,
     meta: { layout: DefaultLayout, role: 'teacher' },
   },
   {
     path: '/teacher/assignments/:aid',
-    name: 'assignment.detail.teacher',
+    name: 'teacher.assignment.detail',
     component: TeacherDetailAssignment,
     meta: { layout: DefaultLayout, role: 'teacher' },
   },
   {
     path: '/student/assignments/:aid',
-    name: 'assignment.detail.student',
-    component: ViewAssignment,
+    name: 'student.assignment.detail',
+    component: StudentDetailAssignment,
     meta: { layout: DefaultLayout, role: 'student' },
   },
   //   { path: '/dashboard', name: 'dashboard', component: Dashboard },

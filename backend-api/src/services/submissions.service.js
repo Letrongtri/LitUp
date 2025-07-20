@@ -46,6 +46,34 @@ async function createSubmission(newSubmission, files) {
   try {
     const submissionData = readSubmissionData(newSubmission);
 
+    const isExistSubmission = await submissionRepository()
+      .transacting(trx)
+      .where({ uid: submissionData.uid, aid: submissionData.aid })
+      .select("sid")
+      .first();
+
+    if (isExistSubmission)
+      throw new ApiError(400, "Already existed submission");
+
+    const assignment = await assignmentRepository()
+      .transacting(trx)
+      .where("aid", submissionData.aid)
+      .select("a_allow_late_submission", "a_deadline_at")
+      .first();
+
+    if (!assignment) {
+      throw new ApiError(404, "Assignment not found");
+    }
+
+    const isLate =
+      !assignment.a_allow_late_submission &&
+      new Date(submissionData.s_submitted_at) >
+        new Date(assignment.a_deadline_at);
+
+    if (isLate) {
+      throw new ApiError(400, "Late submissions are not allowed");
+    }
+
     const [result] = await submissionRepository()
       .transacting(trx)
       .insert(submissionData)
@@ -56,13 +84,15 @@ async function createSubmission(newSubmission, files) {
     for (const file of files) {
       const attachment = await saveFile(file, trx);
       attachments.push(attachment);
+      console.log(attachment.fid, sid);
+
       await submissionAttachmentRepository().transacting(trx).insert({
         fid: attachment.fid,
         sid,
       });
     }
 
-    trx.commit();
+    await trx.commit();
     return { sid, ...submissionData, attachments };
   } catch (error) {
     await trx.rollback();
@@ -129,16 +159,16 @@ async function getSubmissions(aid, query) {
   };
 }
 
-async function getSubmission(sid) {
+async function getSubmission(uid, aid) {
   const result = await submissionRepository()
-    .where("sid", sid)
+    .where({ uid: uid, aid: aid })
     .select("*")
     .first();
 
   if (!result) return null;
 
   const fids = await submissionAttachmentRepository()
-    .where("sid", sid)
+    .where("sid", result.sid)
     .select("fid");
 
   if (!fids) return result;
@@ -154,13 +184,13 @@ async function getSubmission(sid) {
   return submission;
 }
 
-async function updateSubmission(sid, files) {
+async function updateSubmission(uid, aid, files) {
   const trx = await knex.transaction();
 
   try {
     const updatedSubmission = await submissionRepository()
       .transacting(trx)
-      .where("sid", sid)
+      .where({ uid: uid, aid: aid })
       .select("*")
       .first();
 
@@ -169,9 +199,30 @@ async function updateSubmission(sid, files) {
       return null;
     }
 
+    const assignment = await assignmentRepository()
+      .transacting(trx)
+      .where("aid", aid)
+      .select("a_allow_late_submission", "a_deadline_at")
+      .first();
+
+    if (!assignment) {
+      throw new ApiError(404, "Assignment not found");
+    }
+
+    updatedSubmission.s_updated_at = new Date().toISOString();
+
+    const isLate =
+      !assignment.a_allow_late_submission &&
+      new Date(updatedSubmission.s_updated_at) >
+        new Date(assignment.a_deadline_at);
+
+    if (isLate) {
+      throw new ApiError(400, "Late submissions are not allowed");
+    }
+
     const oldFids = await submissionAttachmentRepository()
       .transacting(trx)
-      .where("sid", sid)
+      .where("sid", updatedSubmission.sid)
       .select("fid");
 
     const fidList = oldFids.map((f) => f.fid);
@@ -181,7 +232,7 @@ async function updateSubmission(sid, files) {
     // delete old files
     await submissionAttachmentRepository()
       .transacting(trx)
-      .where("sid", sid)
+      .where("sid", updatedSubmission.sid)
       .del();
 
     await attachmentRepository().transacting(trx).whereIn("fid", fidList).del();
@@ -197,15 +248,13 @@ async function updateSubmission(sid, files) {
       attachments.push(attachment);
       await submissionAttachmentRepository().transacting(trx).insert({
         fid: attachment.fid,
-        sid,
+        sid: updatedSubmission.sid,
       });
     }
 
-    updatedSubmission.s_updated_at = new Date().toISOString();
-
     await submissionRepository()
       .transacting(trx)
-      .where("sid", sid)
+      .where("sid", updatedSubmission.sid)
       .update("s_updated_at", updatedSubmission.s_updated_at);
 
     await trx.commit();

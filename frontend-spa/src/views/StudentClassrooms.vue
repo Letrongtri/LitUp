@@ -5,11 +5,13 @@ import { computed, ref, watch } from 'vue';
 import classroomsService from '@/services/classrooms.service';
 import { useRoute, useRouter } from 'vue-router';
 import MainPagination from '@/components/MainPagination.vue';
+import JoinClassroom from '@/components/JoinClassroom.vue';
 
 const route = useRoute();
 const router = useRouter();
 
 const totalPages = ref(1);
+const showModal = ref(false);
 
 const currentPage = computed(() => {
   const page = Number(route.query?.page);
@@ -55,10 +57,19 @@ watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: tru
     <!-- Header -->
     <div class="container">
       <div class="content-section">
-        <h1 class="page-title">Lớp học đã tham gia</h1>
-        <p class="page-subtitle">Tìm kiếm và xem chi tiết lớp học</p>
+        <div class="row">
+          <div class="col-lg-9 col-sm-12">
+            <h1 class="page-title">Lớp học đã tham gia</h1>
+            <p class="page-subtitle">Tìm kiếm và xem chi tiết lớp học</p>
+          </div>
+          <div class="col-lg-3 col-sm-12 d-flex justify-content-end align-items-center">
+            <button class="btn btn-primary" @click="showModal = true">Join Classroom</button>
+          </div>
+        </div>
       </div>
     </div>
+
+    <JoinClassroom v-if="showModal" @created="retrieveClassrooms(1)" @close="showModal = false" />
 
     <div class="container">
       <!-- Thanh tìm kiếm -->

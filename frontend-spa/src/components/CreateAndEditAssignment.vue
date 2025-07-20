@@ -73,7 +73,6 @@ async function handleAssignment() {
   } catch (err) {
     if (props.task === 'update') error.value = 'Editing failed: ' + err.message;
     else if (props.task === 'create') error.value = 'Creating failed: ' + err.message;
-    handling.value = true;
   } finally {
     handling.value = false;
   }

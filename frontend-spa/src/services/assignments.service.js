@@ -41,12 +41,20 @@ function assignmentsService() {
     return efetch(`${baseUrlTeacher}/${id}/submissions?limit=${limit}&page=${page}`);
   }
 
+  async function submitAssignment(aid, formData) {
+    return efetch(`${baseUrlStudent}/${aid}`, {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
   return {
     getAssignments,
     getAssignment,
     updateAssignment,
     deleteAssignment,
     getSubmissions,
+    submitAssignment,
   };
 }
 

@@ -588,7 +588,7 @@
       "get": {
         "summary": "Get classroom details for student",
         "description": "Detail of classroom",
-        "operationId": "getClassroom",
+        "operationId": "getClassroomDetailByStudent",
         "tags": ["classrooms"],
         "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
@@ -609,7 +609,17 @@
                       "type": "object",
                       "properties": {
                         "classroom": {
-                          "$ref": "#/components/schemas/Classrooms"
+                          "type": "object",
+                          "properties": {
+                            "cid": { "type": "integer" },
+                            "uid": { "type": "integer" },
+                            "teacher_name": { "type": "string" },
+                            "c_name": { "type": "string" },
+                            "c_created_at": {
+                              "type": "string",
+                              "format": "date-time"
+                            }
+                          }
                         }
                       }
                     }
@@ -1204,14 +1214,25 @@
         }
       }
     },
-    "/api/student/submissions/{sid}": {
+    "/api/student/submissions/": {
       "get": {
         "summary": "Get submissions details",
         "description": "Get detailed information about an submission",
-        "operationId": "getSubmission",
+        "operationId": "getSubmissionByStudent",
         "tags": ["submissions"],
         "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "$ref": "#/components/parameters/submissionIdParam" }],
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "query",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "aid",
+            "in": "query",
+            "schema": { "type": "integer" }
+          }
+        ],
         "responses": {
           "200": {
             "description": "submission details",
@@ -1247,10 +1268,9 @@
       "put": {
         "summary": "Update submission",
         "description": "Update submission info",
-        "operationId": "updateSubmission",
+        "operationId": "updateSubmissionByStudent",
         "tags": ["submissions"],
         "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "$ref": "#/components/parameters/submissionIdParam" }],
         "requestBody": {
           "required": true,
           "content": {
@@ -1258,6 +1278,8 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "uid": { "type": "integer" },
+                  "aid": { "type": "integer" },
                   "attachments": {
                     "type": "array",
                     "items": {
@@ -1270,7 +1292,7 @@
                     "maxItems": 10
                   }
                 },
-                "required": ["attachments"]
+                "required": ["uid", "aid", "attachments"]
               }
             }
           }
@@ -1307,11 +1329,13 @@
           "404": { "$ref": "#/components/responses/404NotFound" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
-      },
+      }
+    },
+    "/api/student/submissions/{sid}": {
       "delete": {
         "summary": "Delete submission",
         "description": "Delete an submission",
-        "operationId": "deleteSubmission",
+        "operationId": "deleteSubmissionByStudent",
         "tags": ["submissions"],
         "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/submissionIdParam" }],

@@ -52,85 +52,9 @@ function changeCurrentPage(page) {
 
 watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: true });
 
-// onMounted(async () => {
-//   try {
-//     const stored = JSON.parse(localStorage.getItem('user')).user;
-//     if (!stored || stored.u_role !== 'teacher')
-//       throw new Error('Bạn chưa đăng nhập hoặc không phải giáo viên');
-
-//     const uid = stored.uid;
-//     const rawClasses = await api.getTeacherClassrooms(uid);
-//     if (!Array.isArray(rawClasses)) throw new Error('API không trả về danh sách lớp học hợp lệ');
-
-//     classrooms.value = rawClasses.map((cls) => ({
-//       ...cls,
-//       cid: cls.c_id ?? cls.cid,
-//     }));
-//   } catch (err) {
-//     error.value = err.message;
-//   }
-// });
-
-// async function viewClassroom(classroom) {
-//   const classId = Number(classroom?.cid);
-//   if (!classId || isNaN(classId)) {
-//     error.value = `Class ID không hợp lệ: ${classroom?.cid}`;
-//     return;
-//   }
-
-//   selectedClass.value = classroom;
-//   selectedAssignment.value = null;
-
-//   try {
-//     const result = await api.getAssignments(classId, 1, 10);
-//     assignments.value = result.assignments || [];
-//     students.value = await api.getStudentsInClass(classId, 1, 10);
-//   } catch (err) {
-//     error.value = err.message;
-//   }
-// }
-
 function goToDetailClassroomPage(cls) {
-  router.push({ name: 'class.detail.teacher', params: { cid: cls.cid } });
+  router.push({ name: 'teacher.class.detail', params: { cid: cls.cid } });
 }
-
-// function goToCreateAssignment(cid) {
-//   router.push({ name: 'assignment.create', params: { cid } });
-// }
-
-// function goToEditAssignment(aid) {
-//   router.push({ name: 'assignment.edit', params: { aid } });
-// }
-
-// function goToViewAssignment(aid) {
-//   router.push({ name: 'assignment.view', params: { aid } });
-// }
-
-// function viewAssignmentSubmissions(aid) {
-//   selectedAssignment.value = assignments.value.find((a) => a.aid === aid);
-// }
-
-// async function onDeleteClass(cid) {
-//   if (!confirm('Bạn có chắc chắn muốn xoá lớp học này?')) return;
-//   try {
-//     await api.deleteClassroom(cid);
-//     classrooms.value = classrooms.value.filter((c) => c.cid !== cid);
-//     if (selectedClass.value?.cid === cid) selectedClass.value = null;
-//   } catch (err) {
-//     error.value = 'Xoá lớp thất bại: ' + err.message;
-//   }
-// }
-
-// async function onDeleteAssignment(aid) {
-//   if (!confirm('Bạn có chắc chắn muốn xoá bài tập này?')) return;
-//   try {
-//     await api.deleteAssignment(aid);
-//     const result = await api.getAssignments(selectedClass.value.cid, 1, 10);
-//     assignments.value = result.assignments || [];
-//   } catch (err) {
-//     error.value = 'Xoá bài tập thất bại: ' + err.message;
-//   }
-// }
 </script>
 
 <template>

@@ -1,6 +1,7 @@
 <script setup>
 import router from '@/router';
-import AttachmentList from '@/components/AttachmentList.vue';
+import { formatDate } from '@/utils/format';
+// import AttachmentList from '@/components/AttachmentList.vue';
 
 const props = defineProps({
   assignments: { type: Array },
@@ -9,32 +10,57 @@ const props = defineProps({
 
 function goToAssignmentDetail(id) {
   if (props.role === 'student')
-    router.push({ name: 'assignment.detail.student', params: { aid: id } });
+    router.push({ name: 'student.assignment.detail', params: { aid: id } });
   else if (props.role === 'teacher')
-    router.push({ name: 'assignment.detail.teacher', params: { aid: id } });
+    router.push({ name: 'teacher.assignment.detail', params: { aid: id } });
 }
 </script>
 
 <template>
-  <div class="assignment-list d-flex flex-column gap-3">
+  <div class="assignment-section bg-white shadow-sm rounded-4 border table-hover">
     <div
       v-for="assignment in assignments"
-      class="assignment-item border rounded-3 p-3 px-4"
       :key="assignment.aid"
+      class="assignment-item border-bottom p-4 d-flex flex-column flex-md-row justify-content-between align-items-start gap-3"
     >
-      <div>
+      <div class="flex-grow-1">
         <h5
-          class="mb-1 fw-semibold text-dark"
           @click="goToAssignmentDetail(assignment.aid)"
+          class="fw-semibold text-dark mb-3"
           style="cursor: pointer"
         >
           {{ assignment.a_title }}
         </h5>
-        <p>{{ assignment.a_description }}</p>
+        <p class="mb-2">
+          <strong>Description: </strong>
+          {{ assignment.a_description }}
+        </p>
+        <div class="row">
+          <div class="col-md-6">
+            <p class="mb-2">
+              <strong>Deadline:</strong> {{ formatDate(assignment.a_deadline_at) }}
+            </p>
+            <p class="mb-2"><strong>Status:</strong> Hết hạn</p>
+          </div>
+          <div class="col-md-6">
+            <p class="mb-2"><strong>Max point: </strong> {{ assignment.a_max_points }}</p>
+            <p class="mb-2"><strong>Attachments:</strong> {{ assignment.attachments.length }}</p>
+          </div>
+        </div>
       </div>
-
-      <!-- attachments -->
-      <AttachmentList :attachments="assignment.attachments" />
     </div>
   </div>
 </template>
+
+<style>
+.assignment-section {
+  border-radius: 16px;
+}
+
+.assignment-item {
+  border-bottom: 1px solid #eee;
+}
+.assignment-item:last-child {
+  border-bottom: none;
+}
+</style>

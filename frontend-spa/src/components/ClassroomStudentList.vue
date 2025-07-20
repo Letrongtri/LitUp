@@ -8,7 +8,7 @@ defineProps({
 const router = useRouter();
 
 function goToClassroom(id) {
-  router.push({ name: 'class.joined.detail', params: { cid: id } });
+  router.push({ name: 'student.class.detail', params: { cid: id } });
 }
 </script>
 
