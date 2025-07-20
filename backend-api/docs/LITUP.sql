@@ -3,7 +3,7 @@ CREATE TABLE Attachments (
     fid SERIAL PRIMARY KEY,
     f_name VARCHAR(255) NOT NULL,
     f_original_name VARCHAR(255) NOT NULL,
-    f_type VARCHAR(50),
+    f_type VARCHAR(100),
     f_size BIGINT,
     f_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

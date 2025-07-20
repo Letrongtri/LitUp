@@ -52,6 +52,14 @@ const updateClassroomData = z.object({
     ),
 });
 
+/** Get classroom id */
+const getDeleteMemberData = z.object({
+  input: z.object({
+    cid: z.coerce.number().nonnegative(),
+    mid: z.coerce.number().nonnegative(),
+  }),
+});
+
 /** Teacher create a new assignment */
 const createAssignmentData = z.object({
   input: assignmentSchema
@@ -101,6 +109,14 @@ module.exports.setup = (app) => {
       classroomsController.getMembersInClass
     )
     .all(allowedMethods(["GET"]));
+
+  router
+    .route("/:cid/members/:mid")
+    .delete(
+      validateRequest(getDeleteMemberData),
+      classroomsController.removeMember
+    )
+    .all(allowedMethods(["DELETE"]));
 
   router
     .route("/:cid/assignments")

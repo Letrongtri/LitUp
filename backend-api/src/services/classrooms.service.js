@@ -12,6 +12,10 @@ function userRepository() {
   return knex("users");
 }
 
+function attachmentRepository() {
+  return knex("attachments");
+}
+
 function readClassroomData(payload) {
   return {
     ...(payload.uid && { uid: payload.uid }),
@@ -115,7 +119,6 @@ async function deleteClassroom(cid) {
       .transacting(trx)
       .where("cid", cid)
       .select(knex.raw("COUNT(mid) OVER() AS count_member"));
-    console.log(countMember);
 
     if (countMember.count_member && countMember.count_member != 0) {
       return {
@@ -183,7 +186,7 @@ async function joinClassroomByCode(cid, uid, c_code) {
 }
 
 async function getMemberByClassId(cid) {
-  return await knex("members as m")
+  const users = await knex("members as m")
     .join("users as u", "m.uid", "u.uid")
     .where("m.cid", cid)
     .andWhere("m.m_status", true)
@@ -192,8 +195,38 @@ async function getMemberByClassId(cid) {
       "u.u_first_name",
       "u.u_last_name",
       "u.u_email",
+      "u.u_avatar_id",
+      "m.mid",
       "m.m_joined_at"
     );
+
+  const DEFAULT_AVATAR = "/public/images/blank-profile-picture.png";
+
+  for (const user of users) {
+    const avatar = user.u_avatar_id
+      ? await attachmentRepository().where("fid", user.u_avatar_id).first()
+      : null;
+
+    user.avatar_url = avatar ? `public/uploads/${avatar}` : DEFAULT_AVATAR;
+  }
+
+  return users;
+}
+
+async function removeMember(cid, mid) {
+  const trx = await knex.transaction();
+
+  try {
+    await memberRepository()
+      .transacting(trx)
+      .where({ cid: cid, mid: mid })
+      .del();
+
+    await trx.commit();
+  } catch (error) {
+    await trx.rollback();
+    throw error;
+  }
 }
 
 async function getClassroomsByTeacher(uid, limit = 10, page = 1) {
@@ -222,4 +255,5 @@ module.exports = {
   joinClassroomByCode,
   getMemberByClassId,
   getClassroomsByTeacher,
+  removeMember,
 };

@@ -35,6 +35,8 @@ async function updateClassroom() {
     emit('close');
   } catch (err) {
     error.value = 'Cập nhật thất bại: ' + err.message;
+  } finally {
+    updating.value = false;
   }
 }
 

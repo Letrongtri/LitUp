@@ -12,10 +12,11 @@ const user = JSON.parse(localStorage.getItem('user')).user;
 //   avatar_url: '/uploads/avatar1.png'
 // };
 
-
 function handleLogout() {
-  localStorage.removeItem('user');
-  router.push('/auth');
+  if (confirm('Do you want to log out?')) {
+    localStorage.removeItem('user');
+    router.push('/auth');
+  }
 }
 
 function goToProfilePage(uid) {

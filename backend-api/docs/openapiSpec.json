@@ -475,11 +475,7 @@
         "operationId": "getMemberInClass",
         "tags": ["classrooms"],
         "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "$ref": "#/components/parameters/classroomIdParam" },
-          { "$ref": "#/components/parameters/limitParam" },
-          { "$ref": "#/components/parameters/pageParam" }
-        ],
+        "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
         "responses": {
           "200": {
             "description": "Classroom Members",
@@ -501,9 +497,6 @@
                           "items": {
                             "$ref": "#/components/schemas/Members"
                           }
-                        },
-                        "metadata": {
-                          "$ref": "#/components/schemas/PaginationMetadata"
                         }
                       }
                     }
@@ -511,6 +504,29 @@
                 }
               }
             }
+          },
+          "401": { "$ref": "#/components/responses/401Unauthorized" },
+          "403": { "$ref": "#/components/responses/403Forbidden" },
+          "404": { "$ref": "#/components/responses/404NotFound" },
+          "500": { "$ref": "#/components/responses/500InternalServerError" }
+        }
+      }
+    },
+    "/api/teacher/classrooms/{cid}/members/{mid}": {
+      "delete": {
+        "summary": "Delete classroom member",
+        "description": "Teacher delete a classroom member",
+        "operationId": "removeMember",
+        "tags": ["classrooms"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/classroomIdParam" },
+          { "$ref": "#/components/parameters/memberIdParam" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Remove member successfully",
+            "$ref": "#/components/responses/200NoData"
           },
           "401": { "$ref": "#/components/responses/401Unauthorized" },
           "403": { "$ref": "#/components/responses/403Forbidden" },
@@ -1892,6 +1908,13 @@
         "in": "path",
         "required": true,
         "description": "Submission ID",
+        "schema": { "type": "integer" }
+      },
+      "memberIdParam": {
+        "name": "mid",
+        "in": "path",
+        "required": true,
+        "description": "Member ID",
         "schema": { "type": "integer" }
       },
       "limitParam": {

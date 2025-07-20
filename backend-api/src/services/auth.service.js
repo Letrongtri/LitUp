@@ -79,8 +79,6 @@ async function loginUser(payload) {
     ...user,
     avatar_url: avatar ? `/public/uploads/${avatar.f_name}` : DEFAULT_AVATAR,
   };
-
-  // return { user };
 }
 
 module.exports = {

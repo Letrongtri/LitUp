@@ -4,17 +4,28 @@ import AssignmentStudentList from '@/components/AssignmentList.vue';
 import classroomsService from '@/services/classrooms.service';
 import { useRoute } from 'vue-router';
 
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import EditClassroom from '@/components/EditClassroom.vue';
 import { formatDate } from '@/utils/format';
+import CreateAndEditAssignment from '@/components/CreateAndEditAssignment.vue';
 
 const route = useRoute();
 const cid = Number(route.params?.cid);
-let classroom = ref({});
-let assignments = ref([]);
-const showModal = ref(false);
+const classroom = ref({});
+const assignments = ref([]);
+const members = ref([]);
+const showModalEditClassroom = ref(false);
+const showModalAddAssignment = ref(false);
+const tab = ref('information');
 
-async function retrieveClassroom(cid) {
+const selectedMemberIdx = ref(-1);
+// const selectedMember = ref({});
+const selectedMember = computed(() => {
+  if (selectedMemberIdx.value < 0) return null;
+  return members.value[selectedMemberIdx.value];
+});
+
+async function retrieveClassroom() {
   try {
     const data = await classroomsService.getClassroom(cid);
     classroom.value = data.classroom;
@@ -23,7 +34,7 @@ async function retrieveClassroom(cid) {
   }
 }
 
-async function retrieveAsignments(cid) {
+async function retrieveAssignments() {
   try {
     const data = await classroomsService.getClassroomAssignment(cid);
     assignments.value = data;
@@ -32,9 +43,31 @@ async function retrieveAsignments(cid) {
   }
 }
 
+async function retrieveMembers() {
+  try {
+    const data = await classroomsService.getMembers(cid);
+    members.value = data.users;
+    console.log(data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function removeMember(mid) {
+  if (confirm('Do you want to remove this user from your class?')) {
+    try {
+      await classroomsService.removeMember(cid, mid);
+      retrieveMembers();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
 onMounted(() => {
-  retrieveClassroom(cid);
-  retrieveAsignments(cid);
+  retrieveClassroom();
+  retrieveAssignments();
+  retrieveMembers();
 });
 </script>
 
@@ -44,7 +77,7 @@ onMounted(() => {
     <div class="class-header bg-white border-bottom shadow-sm">
       <div class="container py-4 px-3 d-flex align-items-center justify-content-between">
         <h2 class="fw-bold text-primary mb-1">{{ classroom.c_name }}</h2>
-        <button class="btn btn-primary" @click="showModal = true">
+        <button class="btn btn-primary" @click="showModalEditClassroom = true">
           <i class="fa fa-cog d-inline-block me-1" aria-hidden="true"></i>
           Setting
         </button>
@@ -54,86 +87,137 @@ onMounted(() => {
     <!-- Tabs nav -->
     <div class="tabs-nav border-bottom bg-white">
       <div class="container d-flex gap-4 px-3 py-2">
-        <div class="tab-item active">Bài tập</div>
-        <div class="tab-item">Mọi người</div>
-        <div class="tab-item">Điểm</div>
+        <div
+          class="tab-item"
+          :class="tab === 'information' ? 'active' : ''"
+          @click="tab = 'information'"
+        >
+          Information
+        </div>
+        <div class="tab-item" :class="tab === 'members' ? 'active' : ''" @click="tab = 'members'">
+          Members
+        </div>
       </div>
     </div>
 
     <EditClassroom
-      v-if="showModal"
+      v-if="showModalEditClassroom"
       @updated="retrieveClassroom(cid)"
-      @close="showModal = false"
+      @close="showModalEditClassroom = false"
       :classroom="classroom"
     />
 
-    <!-- Thông tin lớp học -->
-    <div class="container py-4">
-      <div class="row g-3 mb-3">
-        <div class="card p-3 border">
-          <h5 class="card-title">Classroom Information</h5>
-          <p class="card-text"><strong>Classname: </strong>{{ classroom.c_name }}</p>
-          <p class="card-text"><strong>Code: </strong>{{ classroom.c_code }}</p>
-          <p class="card-text">
-            <strong>Status: </strong>{{ classroom.c_status ? 'Active' : 'Inactive' }}
-          </p>
-          <p class="card-text">
-            <strong>Created at: </strong>{{ formatDate(classroom.c_created_at) }}
-          </p>
-          <p class="card-text"><strong>Assignments: </strong>{{ assignments.length }}</p>
-        </div>
-      </div>
-      <div class="row g-3">
-        <div class="card p-3 border">
-          <h5 class="card-title">Assignments</h5>
-
-          <!-- Assignments list -->
-          <AssignmentStudentList
-            v-if="assignments.length > 0"
-            :assignments="assignments"
-            :role="'teacher'"
-          />
-          <p class="text-muted text-center mt-4" v-else>Chưa có bài tập nào</p>
-        </div>
-      </div>
-      <!-- <div class="row g-3">
-        <div class="col-md-4">
+    <!-- Information tab -->
+    <div v-if="tab === 'information'">
+      <!-- Thông tin lớp học -->
+      <div class="container py-4">
+        <div class="row g-3 mb-3">
           <div class="card p-3 border">
-            <h6 class="fw-semibold mb-1">Mã lớp</h6>
-            <p class="text-primary fw-bold">h4czufvb</p>
+            <h5 class="card-title">Classroom Information</h5>
+            <p class="card-text"><strong>Classname: </strong>{{ classroom.c_name }}</p>
+            <p class="card-text"><strong>Code: </strong>{{ classroom.c_code }}</p>
+            <p class="card-text">
+              <strong>Status: </strong>{{ classroom.c_status ? 'Active' : 'Inactive' }}
+            </p>
+            <p class="card-text">
+              <strong>Created at: </strong>{{ formatDate(classroom.c_created_at) }}
+            </p>
+            <p class="card-text"><strong>Assignments: </strong>{{ assignments.length }}</p>
           </div>
         </div>
 
-        <div class="col-md-4">
+        <CreateAndEditAssignment
+          v-if="showModalAddAssignment"
+          @updated="retrieveAssignments()"
+          @close="showModalAddAssignment = false"
+          :task="'create'"
+        />
+
+        <div class="row g-3">
           <div class="card p-3 border">
-            <h6 class="fw-semibold mb-1">Sắp đến hạn</h6>
-            <p class="text-muted small mb-1">Không có bài tập nào sắp đến hạn</p>
-            <a href="#" class="small">Xem tất cả</a>
+            <div class="d-flex justify-content-between align-items-center m-3">
+              <h5 class="card-title">Assignments</h5>
+              <button class="btn btn-primary" @click="showModalAddAssignment = true">
+                Add assignment
+              </button>
+            </div>
+
+            <!-- Assignments list -->
+            <AssignmentStudentList
+              v-if="assignments.length > 0"
+              :assignments="assignments"
+              :role="'teacher'"
+            />
+            <p class="text-muted text-center mt-4" v-else>Chưa có bài tập nào</p>
           </div>
         </div>
+      </div>
+    </div>
 
-        <div class="col-md-12">
-          <div class="card p-4 border">
-            <div class="d-flex align-items-start gap-2 mb-3">
-              <img
-                src="https://ui-avatars.com/api/?name=Nguyễn+Văn+A"
-                class="rounded-circle"
-                width="36"
-                height="36"
-              />
-              <div class="flex-grow-1">
-                <p class="mb-1 fw-semibold">Nguyễn Văn A</p>
-                <p class="mb-0 text-muted small">Thông báo nội dung nào đó cho lớp học của bạn</p>
+    <!-- Member tab -->
+    <div v-if="tab === 'members'">
+      <div class="container py-4">
+        <div class="row g-3 mb-3">
+          <!-- Member table -->
+          <div class="col-md-8">
+            <div class="card p-3">
+              <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>No.</th>
+                    <th>Full name</th>
+                    <th>Email</th>
+                    <th>Join at</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(member, index) in members"
+                    :class="{ 'table-active': index === selectedMemberIdx }"
+                    :key="member.uid"
+                    @click="selectedMemberIdx = index"
+                  >
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
+                    <td>{{ member.u_email }}</td>
+                    <td>{{ formatDate(member.m_joined_at) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Detail member -->
+          <div v-if="selectedMember" class="col-md-4">
+            <div class="card p-3">
+              <div class="p-1 w-100 d-flex align-items-center justify-content-center">
+                <img
+                  class="img-fluid img-thumbnail"
+                  :src="selectedMember.avatar_url"
+                  alt="avatar"
+                />
+              </div>
+              <div class="p-1">
+                <strong>Name: </strong>
+                {{ selectedMember.u_first_name }} {{ selectedMember.u_last_name }}
+              </div>
+              <div class="p-1">
+                <strong>Email: </strong>
+                {{ selectedMember.u_email }}
+              </div>
+              <div class="p-1">
+                <strong>Join at: </strong>
+                {{ formatDate(selectedMember.m_joined_at) }}
+              </div>
+              <div class="p-1 text-end">
+                <button @click="removeMember(selectedMember.mid)" class="btn btn-danger">
+                  Remove
+                </button>
               </div>
             </div>
-            <p class="text-muted">
-              Đây là nơi bạn giao tiếp với lớp học của mình. Sử dụng bảng tin để thông báo, đăng bài
-              tập và trả lời câu hỏi của học viên.
-            </p>
-            <button class="btn btn-sm btn-outline-secondary">Cài đặt bảng tin</button>
           </div>
         </div>
-      </div> -->
+      </div>
     </div>
   </div>
 </template>

@@ -56,7 +56,6 @@ async function getJoinedClassrooms(req, res, next) {
     };
 
     result = await classroomsService.getClassroomsByUser(uid, limit, page);
-    console.log(result);
 
     return res.json(JSend.success(result));
   } catch (err) {
@@ -174,6 +173,21 @@ async function getMembersInClass(req, res, next) {
   }
 }
 
+async function removeMember(req, res, next) {
+  const { cid, mid } = req.params;
+  try {
+    await classroomsService.removeMember(cid, mid);
+
+    return res.json(JSend.success());
+  } catch (err) {
+    console.log(err);
+    if (err.code && err.message) {
+      return next(new ApiError(err.code, err.message));
+    }
+    return next(new ApiError(500, "Internal Server Error"));
+  }
+}
+
 const getTeacherClassrooms = async (req, res, next) => {
   try {
     const { uid } = req.query;
@@ -232,4 +246,5 @@ module.exports = {
   joinClassroom,
   getMembersInClass,
   getTeacherClassrooms,
+  removeMember,
 };

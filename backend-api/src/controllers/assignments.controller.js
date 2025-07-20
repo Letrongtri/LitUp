@@ -22,7 +22,6 @@ async function createAssignment(req, res, next) {
 async function getAssignments(req, res, next) {
   try {
     const result = await assignmentsService.getAssignments(req.params.cid);
-    console.log(result);
 
     return res.json(JSend.success(result));
   } catch (error) {
