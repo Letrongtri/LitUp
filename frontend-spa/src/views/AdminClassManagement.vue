@@ -1,62 +1,201 @@
 <script setup>
-// UI-only, không xử lý logic
+import MainPagination from '@/components/MainPagination.vue';
+import adminService from '@/services/admin.service';
+import { formatDate } from '@/utils/format';
+import { computed, inject, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+
+const classrooms = ref([]);
+const route = useRoute();
+const router = useRouter();
+const tab = inject('tab');
+
+const totalPages = ref(1);
+const currentPage = computed(() => {
+  const page = Number(route.query?.page);
+  if (Number.isNaN(page) || page < 1) return 1;
+  return page;
+});
+const currentLimit = computed(() => {
+  const limit = Number(route.query?.limit);
+  if (Number.isNaN(limit) || limit < 1) return 10;
+  return limit;
+});
+
+const searchText = ref('');
+const searchableClassrooms = computed(() =>
+  classrooms.value.map((classroom) => {
+    const { c_name, teacher_name } = classroom;
+    return [c_name, teacher_name].join('').toLowerCase();
+  }),
+);
+
+const selectedIndex = ref(-1);
+const selectedClassroom = computed(() => {
+  if (selectedIndex.value < 0) return null;
+  return classrooms.value[selectedIndex.value];
+});
+
+const filteredClassrooms = computed(() => {
+  if (!searchText.value) return classrooms.value;
+  return classrooms.value.filter((classroom, index) =>
+    searchableClassrooms.value[index].includes(searchText.value),
+  );
+});
+
+async function retrieveClassrooms(page) {
+  try {
+    const data = await adminService.getClassroomsByAdmin(page, currentLimit.value);
+    classrooms.value = data.classrooms;
+    totalPages.value = data.metadata.lastPage ?? 1;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function deactivateClassroom(cid) {
+  if (confirm('Do you want to deactivate this classroom?')) {
+    try {
+      await adminService.editClassroom(cid, { c_status: false });
+      selectedClassroom.value.c_status = false;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
+async function activateClassroom(cid) {
+  if (confirm('Do you want to activate this classroom?')) {
+    try {
+      await adminService.editClassroom(cid, { c_status: true });
+      selectedClassroom.value.c_status = true;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
+function changeCurrentPage(page) {
+  router.push({ name: 'admin.classrooms', query: { page, limit: currentLimit.value } });
+}
+
+onMounted(() => {
+  tab.value = 'classrooms';
+});
+
+watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: true });
 </script>
 
 <template>
   <div class="page-container">
-    <div class="page-header">
-      <div class="container">
-        <h1 class="page-title">Quản lý lớp học</h1>
-        <p class="page-subtitle">Xem, chỉnh sửa hoặc xoá lớp học trong hệ thống</p>
-      </div>
-    </div>
-
     <div class="container">
       <div class="content-section">
         <div class="section-header">
-          <h3>Danh sách lớp học</h3>
+          <h3>Classrooms management</h3>
           <div class="search-box">
-            <input type="text" class="form-control" placeholder="Tìm theo tên lớp hoặc giáo viên..." />
+            <input
+              type="text"
+              v-model="searchText"
+              class="form-control"
+              placeholder="Tìm theo tên hoặc email..."
+            />
             <button class="btn btn-primary">Tìm</button>
           </div>
         </div>
 
-        <!-- Bảng lớp học -->
-        <table class="class-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Tên lớp</th>
-              <th>Giáo viên phụ trách</th>
-              <th>Số học sinh</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>C101</td>
-              <td>Lớp Toán 12A1</td>
-              <td>Nguyễn Văn A</td>
-              <td>32</td>
-              <td>
-                <button class="btn btn-sm btn-outline">Xem</button>
-                <button class="btn btn-sm btn-outline">Sửa</button>
-                <button class="btn btn-sm btn-danger">Xoá</button>
-              </td>
-            </tr>
-            <tr>
-              <td>C102</td>
-              <td>Lớp Văn 12B2</td>
-              <td>Trần Thị B</td>
-              <td>28</td>
-              <td>
-                <button class="btn btn-sm btn-outline">Xem</button>
-                <button class="btn btn-sm btn-outline">Sửa</button>
-                <button class="btn btn-sm btn-danger">Xoá</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="row">
+          <div class="col-md-8">
+            <!-- Bảng người dùng -->
+            <table class="user-table table table-bordered table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Class name</th>
+                  <th>Teacher name</th>
+                  <th>Code</th>
+                  <th>Members</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(classroom, index) in filteredClassrooms"
+                  :key="classroom.cid"
+                  :class="{ 'table-active': index === selectedIndex }"
+                  @click="selectedIndex = index"
+                >
+                  <td>{{ classroom.cid }}</td>
+                  <td>{{ classroom.c_name }}</td>
+                  <td>{{ classroom.teacher_name }}</td>
+                  <td>{{ classroom.c_code }}</td>
+                  <td>{{ classroom.member_count }}</td>
+                  <td>{{ classroom.c_status ? 'Active' : 'Inactive' }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="">
+              <MainPagination
+                :total-pages="totalPages"
+                :current-page="currentPage"
+                @update:current-page="changeCurrentPage"
+              />
+            </div>
+          </div>
+
+          <div v-if="selectedClassroom" class="col-md-4">
+            <div class="card p-3">
+              <div class="p-1">
+                <strong>ID: </strong>
+                {{ selectedClassroom.cid }}
+              </div>
+              <div class="p-1">
+                <strong>Classroom name: </strong>
+                {{ selectedClassroom.c_name }}
+              </div>
+              <div class="p-1">
+                <strong>Teacher name: </strong>
+                {{ selectedClassroom.teacher_name }}
+              </div>
+              <div class="p-1">
+                <strong>Teacher ID: </strong>
+                {{ selectedClassroom.uid }}
+              </div>
+              <div class="p-1">
+                <strong>Members: </strong>
+                {{ selectedClassroom.member_count }}
+              </div>
+              <div class="p-1">
+                <strong>Status: </strong>
+                {{ selectedClassroom.c_status ? 'Active' : 'Inactive' }}
+              </div>
+              <div class="p-1">
+                <strong>Created at: </strong>
+                {{ formatDate(selectedClassroom.c_created_at) }}
+              </div>
+              <div class="p-1">
+                <strong>Updated at: </strong>
+                {{ formatDate(selectedClassroom.c_updated_at) }}
+              </div>
+              <div class="p-1 text-end">
+                <button
+                  v-if="selectedClassroom.c_status"
+                  @click="deactivateClassroom(selectedClassroom.cid)"
+                  class="btn btn-danger"
+                >
+                  Deactivate
+                </button>
+                <button
+                  v-else
+                  @click="activateClassroom(selectedClassroom.cid)"
+                  class="btn btn-success"
+                >
+                  Activate
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -91,7 +230,7 @@
   background: white;
   border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-top: 2rem;
 }
 .section-header {
@@ -111,21 +250,21 @@
   border: 1px solid #ccc;
   min-width: 250px;
 }
-.class-table {
+.user-table {
   width: 100%;
   border-collapse: collapse;
 }
-.class-table th,
-.class-table td {
+.user-table th,
+.user-table td {
   padding: 0.75rem;
   border-bottom: 1px solid #eee;
   text-align: left;
 }
-.class-table th {
+.user-table th {
   background-color: #f8f9fa;
   color: #333;
 }
-.class-table td button {
+.user-table td button {
   margin-right: 0.5rem;
 }
 

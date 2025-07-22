@@ -42,7 +42,7 @@ const pages = computed(() => {
 
 <template>
   <nav>
-    <ul class="pagination">
+    <ul class="pagination d-flex justify-content-center">
       <li class="page-item" :class="{ disabled: currentPage == 1 }">
         <a
           role="button"

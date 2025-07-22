@@ -1583,6 +1583,51 @@
         }
       }
     },
+    "/api/admin/assignments": {
+      "get": {
+        "summary": "Get all assignments",
+        "description": "Get list of all assignments for admin management",
+        "operationId": "getAllAssignments",
+        "tags": ["admin"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/limitParam" },
+          { "$ref": "#/components/parameters/pageParam" }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all assignments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "enum": ["success"] },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "assignments": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Assignments"
+                          }
+                        },
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401Unauthorized" },
+          "403": { "$ref": "#/components/responses/403Forbidden" },
+          "500": { "$ref": "#/components/responses/500InternalServerError" }
+        }
+      }
+    },
     "/api/admin/assignments/{aid}": {
       "put": {
         "summary": "Lock/unlock assignment",
@@ -1636,6 +1681,51 @@
           "403": { "$ref": "#/components/responses/403Forbidden" },
           "404": { "$ref": "#/components/responses/404NotFound" },
           "405": { "$ref": "#/components/responses/405MethodNotAllow" },
+          "500": { "$ref": "#/components/responses/500InternalServerError" }
+        }
+      }
+    },
+    "/api/admin/submissions": {
+      "get": {
+        "summary": "Get all submissions",
+        "description": "Get list of all submissions for admin management",
+        "operationId": "getAllSubmissions",
+        "tags": ["admin"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/limitParam" },
+          { "$ref": "#/components/parameters/pageParam" }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all submissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "enum": ["success"] },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "submissions": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Submissions"
+                          }
+                        },
+                        "metadata": {
+                          "$ref": "#/components/schemas/PaginationMetadata"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401Unauthorized" },
+          "403": { "$ref": "#/components/responses/403Forbidden" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
       }

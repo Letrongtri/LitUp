@@ -40,8 +40,6 @@ function classroomsService() {
   }
 
   async function updateClassroom(id, classroom) {
-    console.log(classroom);
-
     return efetch(`${baseUrlTeacher}/${id}`, {
       method: 'PUT',
       headers: {

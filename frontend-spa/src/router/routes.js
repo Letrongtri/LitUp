@@ -1,23 +1,29 @@
+// Common views
+import AuthPage from '@/views/AuthPage.vue';
+import ProfileUser from '@/views/ProfileUser.vue';
+
 // Layout
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import AuthPage from '@/views/AuthPage.vue';
+import AdminLayout from '@/layouts/AdminLayout.vue';
 
-// Views
+// Teacher views
 import TeacherClassrooms from '@/views/TeacherClassrooms.vue';
-import StudentClassrooms from '@/views/StudentClassrooms.vue';
 import TeacherDetailClassroom from '@/views/TeacherDetailClassroom.vue';
 import TeacherDetailAssignment from '@/views/TeacherDetailAssignment.vue';
-import StudentDetailClassroom from '@/views/StudentDetailClassroom.vue';
-import StudentDetailAssignment from '@/views/StudentDetailAssignment.vue';
 import TeacherDetailSubmission from '@/views/TeacherDetailSubmission.vue';
 
-import ProfileUser from '@/views/ProfileUser.vue';
+// Student views
+import StudentClassrooms from '@/views/StudentClassrooms.vue';
+import StudentDetailClassroom from '@/views/StudentDetailClassroom.vue';
+import StudentDetailAssignment from '@/views/StudentDetailAssignment.vue';
 
-import Dashboard from '@/views/Dashboard.vue';
+// Admin views
 import AdminDashboard from '@/views/AdminDashboard.vue';
-import AdminUserManagement from '@/views/AdminUserManagement.vue';
 import AdminClassManagement from '@/views/AdminClassManagement.vue';
+import AdminUserManagement from '@/views/AdminUserManagement.vue';
+import AdminAssignmentManagement from '@/views/AdminAssignmentManagement.vue';
+import AdminSubmissionManagement from '@/views/AdminSubmissionManagement.vue';
 
 // Error page
 import NotFound from '@/views/NotFound.vue';
@@ -29,13 +35,21 @@ const routes = [
     redirect: () => {
       try {
         const user = JSON.parse(localStorage.getItem('user')).user;
-        return user.u_role === 'teacher' ? '/teacher/classrooms' : '/student/classrooms';
+        if (user.u_role === 'admin') return '/admin/dashboard';
+        else if (user.u_role === 'teacher') return '/teacher/classrooms';
+        else if (user.u_role === 'student') return '/student/classrooms';
       } catch (e) {
         return '/auth';
       }
     },
   },
   { path: '/auth', name: 'auth', component: AuthPage, meta: { layout: AuthLayout } },
+  {
+    path: '/users/:uid',
+    name: 'profile',
+    component: ProfileUser,
+    meta: { layout: DefaultLayout },
+  },
   {
     path: '/student/classrooms',
     name: 'student.classrooms',
@@ -47,12 +61,6 @@ const routes = [
     name: 'teacher.classrooms',
     component: TeacherClassrooms,
     meta: { layout: DefaultLayout, role: 'teacher' },
-  },
-  {
-    path: '/users/:uid',
-    name: 'profile',
-    component: ProfileUser,
-    meta: { layout: DefaultLayout },
   },
   {
     path: '/student/classrooms/:cid/',
@@ -84,12 +92,36 @@ const routes = [
     component: TeacherDetailSubmission,
     meta: { layout: DefaultLayout, role: 'teacher' },
   },
-  //   { path: '/dashboard', name: 'dashboard', component: Dashboard },
-  //   { path: '/classrooms/student', name: 'classrooms.student', component: ClassroomStudent },
-  //     path: '/assignments/:aid/submission',
-  //   { path: '/admin/dashboard', name: 'admin.dashboard', component: AdminDashboard },
-  //   { path: '/admin/users', name: 'admin.users', component: AdminUserManagement },
-  //   { path: '/admin/classes', name: 'admin.classes', component: AdminClassManagement },
+  {
+    path: '/admin/dashboard',
+    name: 'admin.dashboard',
+    component: AdminDashboard,
+    meta: { layout: AdminLayout, role: 'admin' },
+  },
+  {
+    path: '/admin/classrooms',
+    name: 'admin.classrooms',
+    component: AdminClassManagement,
+    meta: { layout: AdminLayout, role: 'admin' },
+  },
+  {
+    path: '/admin/users',
+    name: 'admin.users',
+    component: AdminUserManagement,
+    meta: { layout: AdminLayout, role: 'admin' },
+  },
+  {
+    path: '/admin/assignments',
+    name: 'admin.assignments',
+    component: AdminAssignmentManagement,
+    meta: { layout: AdminLayout, role: 'admin' },
+  },
+  {
+    path: '/admin/submissions',
+    name: 'admin.submissions',
+    component: AdminSubmissionManagement,
+    meta: { layout: AdminLayout, role: 'admin' },
+  },
   {
     path: '/403',
     name: 'forbidden',

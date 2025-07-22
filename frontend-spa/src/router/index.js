@@ -7,8 +7,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const userData = localStorage.getItem('user');
-  const user = userData ? JSON.parse(userData) : null;
+  const user = JSON.parse(localStorage.getItem('user'));
 
   // Kiểm tra yêu cầu đăng nhập
   if (!user && !to.path.startsWith('/auth')) {
@@ -16,9 +15,9 @@ router.beforeEach((to, from, next) => {
   }
 
   // Kiểm tra đúng role
-  // if (to.meta.role && user?.u_role !== to.meta.role) {
-  //   return next('/auth'); // hoặc redirect theo role
-  // }
+  if (to.meta.role && user?.user.u_role !== to.meta.role) {
+    return next('/403'); // hoặc redirect theo role
+  }
 
   return next();
 });

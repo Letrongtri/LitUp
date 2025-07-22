@@ -105,7 +105,7 @@ async function gradeSubmission() {
                   class="list-group-item px-3"
                   v-for="(file, index) in submission.attachments"
                   :class="{ active: index === selectedIndex }"
-                  :key="file.id"
+                  :key="file.fid"
                   @click="selectedIndex = index"
                 >
                   {{ file.f_original_name }}
