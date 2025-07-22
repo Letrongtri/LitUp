@@ -53,10 +53,12 @@ async function updateUser(uid, updateData, file) {
     if (!updatedUser) return null;
 
     const userData = readUserData(updateData);
+    updatedUser.avatar_url = "/public/images/blank-profile-picture.png";
 
     if (file) {
       const avatar = await saveFile(file, trx);
       userData.u_avatar_id = avatar.fid;
+      updatedUser.avatar_url = `/public/uploads/${avatar.f_name}`;
     }
 
     // Nếu có avatar cũ → xóa

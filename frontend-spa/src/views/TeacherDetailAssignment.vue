@@ -6,9 +6,11 @@ import assignmentsService from '@/services/assignments.service';
 import classroomsService from '@/services/classrooms.service';
 import { formatDate } from '@/utils/format';
 import { computed, onMounted, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
+const router = useRouter();
+
 const aid = Number(route.params?.aid);
 
 const assignment = ref({});
@@ -91,13 +93,17 @@ const rightColumn = computed(() => {
 
 onMounted(async () => {
   await retrieveAssignment();
-
   await retrieveMembers();
+  await retrieveSubmissions(currentSubmissionPage.value);
 });
 
 watch(currentSubmissionPage, () => retrieveSubmissions(currentSubmissionPage.value), {
   immediate: true,
 });
+
+async function openSubmissionDetailPage(id) {
+  router.push(`/teacher/submissions/${id}`);
+}
 </script>
 
 <template>
@@ -180,13 +186,26 @@ watch(currentSubmissionPage, () => retrieveSubmissions(currentSubmissionPage.val
           <tr v-for="(member, index) in submittedMembersWithSubmission" :key="member.uid">
             <td>{{ index + 1 }}</td>
             <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
-            <td><span class="text-success">Đã nộp</span></td>
-            <td>19-7-2025</td>
-            <td>9</td>
-            <td>2</td>
-            <td>False</td>
             <td>
-              <button class="btn btn-sm btn-outline-secondary">Xem chi tiết</button>
+              <span class="text-success">{{ member.submission.s_status }}</span>
+            </td>
+            <td>{{ formatDate(member.submission.s_submitted_at) }}</td>
+            <td>{{ member.submission.s_grade }}</td>
+            <td>{{ member.submission.attachments.length }}</td>
+            <td>
+              {{
+                new Date(member.submission.s_submitted_at) > new Date(assignment.a_deadline_at)
+                  ? 'True'
+                  : 'False'
+              }}
+            </td>
+            <td>
+              <button
+                class="btn btn-sm btn-outline-secondary"
+                @click="openSubmissionDetailPage(member.submission.sid)"
+              >
+                Xem chi tiết
+              </button>
             </td>
           </tr>
         </tbody>

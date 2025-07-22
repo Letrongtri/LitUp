@@ -10,43 +10,23 @@ function usersService() {
     return data;
   }
 
-  async function getClassroom(id) {
-    return await efetch(`${baseUrl}/${id}`);
-  }
-
-  async function createClassroom(classroom) {
-    return efetch(baseUrl, {
-      method: 'POST',
-      body: classroom,
-    });
-  }
-
-  async function updateClassroom(id, classroom) {
+  async function updateUser(id, formData) {
     return efetch(`${baseUrl}/${id}`, {
       method: 'PUT',
-      body: classroom,
+      body: formData,
     });
   }
-  async function deleteClassroom(id) {
+
+  async function deleteUser(id) {
     return efetch(`${baseUrl}/${id}`, {
       method: 'DELETE',
     });
   }
 
-  async function getClassroomAssignment(cid, page, limit = 10) {
-    let url = `${baseUrl}/${cid}/assignments?page=${page}&limit=${limit}`;
-    const data = await efetch(url);
-
-    return data;
-  }
-
   return {
     getUserById,
-    getClassroom,
-    createClassroom,
-    updateClassroom,
-    deleteClassroom,
-    getClassroomAssignment,
+    updateUser,
+    deleteUser,
   };
 }
 

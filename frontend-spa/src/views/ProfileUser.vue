@@ -1,33 +1,51 @@
 <script setup>
-// import { ref, onMounted } from 'vue';
-// import usersService from '@/services/users.service';
-// import { useRoute, useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import usersService from '@/services/users.service';
+import { useRoute, useRouter } from 'vue-router';
+import EditProfile from '@/components/EditProfile.vue';
 
-// const route = useRoute();
-// const router = useRouter();
+const route = useRoute();
+const router = useRouter();
 
-// const user = ref(null);
-// const error = ref('');
+const myAccount = ref(false);
 
-// onMounted(async () => {
-//   try {
-//     const uid = Number(route.params?.uid);
-//     const profile = await usersService.getUserById(uid);
-//     user.value = profile.user;
-//   } catch (err) {
-//     error.value = 'Lỗi khi tải hồ sơ: ' + err.message;
-//   }
-// });
+const user = ref({});
+const error = ref('');
+const showModal = ref(false);
 
-// function editProfile() {
-//   router.push({ name: 'profile.edit', params: { uid: user.value.u_id } });
-// }
+async function retrieveUser() {
+  try {
+    const uid = Number(route.params?.uid);
+    const profile = await usersService.getUserById(uid);
+    user.value = profile.user;
+  } catch (err) {
+    error.value = 'Lỗi khi tải hồ sơ: ' + err.message;
+  }
+  if (user.value && JSON.parse(localStorage.getItem('user')).user.uid === user.value.uid) {
+    myAccount.value = true;
+  }
+}
 
-// function deleteProfile() {
-//   alert('⚠️ Tính năng xóa chưa được kích hoạt.');
-// }
+onMounted(async () => {
+  await retrieveUser();
+});
+
+async function deleteProfile() {
+  if (confirm('Do you want to delete account?')) {
+    try {
+      const user = JSON.parse(localStorage.getItem('user')).user;
+
+      await usersService.deleteUser(user.uid);
+      localStorage.removeItem('user');
+
+      router.push('/');
+      alert('Your account has been deleted!');
+    } catch (err) {
+      error.value = err.message;
+    }
+  }
+}
 </script>
-
 
 <template>
   <div class="page-container bg-light py-5">
@@ -36,32 +54,39 @@
         <!-- Avatar + Tên -->
         <div class="text-center mb-4">
           <img
-            src="https://ui-avatars.com/api/?name=Nguyen+Van+A&background=0D8ABC&color=fff&size=128"
+            :src="user.avatar_url"
             class="rounded-circle mb-3"
             width="100"
             height="100"
-            alt="Avatar"
+            alt=""
+            style="object-fit: cover"
           />
-          <h3 class="fw-bold text-primary">Nguyễn Văn A</h3>
-          <p class="text-muted mb-0">nguyenvana@example.com</p>
+          <h3 class="fw-bold text-primary">{{ user.u_first_name }} {{ user.u_last_name }}</h3>
+          <p class="text-muted mb-0">{{ user.u_email }}</p>
         </div>
 
         <!-- Thông tin chi tiết -->
         <ul class="list-group list-group-flush mb-4">
-          <li class="list-group-item"><strong>Vai trò:</strong> Giáo viên</li>
+          <li class="list-group-item"><strong>Role: </strong>{{ user.u_role }}</li>
           <li class="list-group-item">
-            <strong>Trạng thái:</strong>
-            <span class="text-success">Đang hoạt động</span>
+            <strong>Status: </strong>
+            <span class="text-success">{{ user.u_status ? 'Active' : 'Inactive' }}</span>
           </li>
-          <li class="list-group-item"><strong>ID người dùng:</strong> 123</li>
         </ul>
 
         <!-- Nút hành động -->
-        <div class="d-flex gap-2 justify-content-center">
-          <button class="btn btn-outline-primary">Chỉnh sửa</button>
-          <button class="btn btn-outline-danger">Xoá hồ sơ</button>
+        <div v-if="myAccount" class="d-flex gap-2 justify-content-center">
+          <button class="btn btn-warning" @click="showModal = true">Edit</button>
+          <button class="btn btn-danger" @click="deleteProfile">Delete</button>
         </div>
       </div>
+
+      <EditProfile
+        v-if="showModal"
+        @updated="retrieveUser"
+        @close="showModal = false"
+        :user="user"
+      />
     </div>
   </div>
 </template>

@@ -190,6 +190,7 @@
                     "format": "password",
                     "writeOnly": true
                   },
+                  "a_status": { "type": "boolean" },
                   "u_avatar_file": {
                     "type": "string",
                     "format": "binary",

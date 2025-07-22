@@ -9,11 +9,10 @@ const props = defineProps({
 });
 
 function goToAssignmentDetail(id) {
-  if (props.role === 'student')
-    router.push({ name: 'student.assignment.detail', params: { aid: id } });
-  else if (props.role === 'teacher')
-    router.push({ name: 'teacher.assignment.detail', params: { aid: id } });
+  if (props.role === 'student') router.push(`/student/assignments/${id}`);
+  else if (props.role === 'teacher') router.push(`/teacher/assignments/${id}`);
 }
+console.log(props.assignments);
 </script>
 
 <template>
@@ -40,7 +39,9 @@ function goToAssignmentDetail(id) {
             <p class="mb-2">
               <strong>Deadline:</strong> {{ formatDate(assignment.a_deadline_at) }}
             </p>
-            <p class="mb-2"><strong>Status:</strong> Hết hạn</p>
+            <p class="mb-2">
+              <strong>Status:</strong> {{ assignment.a_status ? 'Active' : 'Inactive' }}
+            </p>
           </div>
           <div class="col-md-6">
             <p class="mb-2"><strong>Max point: </strong> {{ assignment.a_max_points }}</p>

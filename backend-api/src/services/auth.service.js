@@ -63,6 +63,10 @@ async function loginUser(payload) {
 
   const user = await userRepository().where({ u_email }).first();
 
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
   const isMatch = await bcrypt.compare(inputPassword, user.u_password);
 
   if (!isMatch) {

@@ -31,7 +31,10 @@ module.exports.setup = (app) => {
 
   router
     .route("/:sid")
-    .get(validateRequest(getSubmissionId), submissionsController.getSubmission)
+    .get(
+      validateRequest(getSubmissionId),
+      submissionsController.getSubmissionById
+    )
     .put(
       validateRequest(gradeSubmissionData),
       submissionsController.gradeSubmission

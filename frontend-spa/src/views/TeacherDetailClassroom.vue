@@ -113,8 +113,9 @@ onMounted(() => {
       <div class="container py-4">
         <div class="row g-3 mb-3">
           <div class="card p-3 border">
-            <h5 class="card-title">Classroom Information</h5>
+            <h5 class="card-title mb-3">Classroom Information</h5>
             <p class="card-text"><strong>Classname: </strong>{{ classroom.c_name }}</p>
+            <p class="card-text"><strong>Class ID: </strong>{{ classroom.cid }}</p>
             <p class="card-text"><strong>Code: </strong>{{ classroom.c_code }}</p>
             <p class="card-text">
               <strong>Status: </strong>{{ classroom.c_status ? 'Active' : 'Inactive' }}

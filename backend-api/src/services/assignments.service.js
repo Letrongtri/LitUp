@@ -75,7 +75,8 @@ async function getAssignments(cid) {
       "a_description",
       "a_max_points",
       "a_deadline_at",
-      "a_allow_late_submission"
+      "a_allow_late_submission",
+      "a_status"
     )
     .orderBy("aid", "asc");
 

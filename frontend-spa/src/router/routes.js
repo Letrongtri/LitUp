@@ -10,6 +10,7 @@ import TeacherDetailClassroom from '@/views/TeacherDetailClassroom.vue';
 import TeacherDetailAssignment from '@/views/TeacherDetailAssignment.vue';
 import StudentDetailClassroom from '@/views/StudentDetailClassroom.vue';
 import StudentDetailAssignment from '@/views/StudentDetailAssignment.vue';
+import TeacherDetailSubmission from '@/views/TeacherDetailSubmission.vue';
 
 import ProfileUser from '@/views/ProfileUser.vue';
 
@@ -17,7 +18,6 @@ import Dashboard from '@/views/Dashboard.vue';
 import AdminDashboard from '@/views/AdminDashboard.vue';
 import AdminUserManagement from '@/views/AdminUserManagement.vue';
 import AdminClassManagement from '@/views/AdminClassManagement.vue';
-import JoinedClassDetail from '@/views/JoinedClassDetail.vue';
 
 // Error page
 import NotFound from '@/views/NotFound.vue';
@@ -77,6 +77,12 @@ const routes = [
     name: 'student.assignment.detail',
     component: StudentDetailAssignment,
     meta: { layout: DefaultLayout, role: 'student' },
+  },
+  {
+    path: '/teacher/submissions/:sid',
+    name: 'teacher.submission.detail',
+    component: TeacherDetailSubmission,
+    meta: { layout: DefaultLayout, role: 'teacher' },
   },
   //   { path: '/dashboard', name: 'dashboard', component: Dashboard },
   //   { path: '/classrooms/student', name: 'classrooms.student', component: ClassroomStudent },

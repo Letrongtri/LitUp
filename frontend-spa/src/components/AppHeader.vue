@@ -1,9 +1,10 @@
 <script setup>
+import { eventBus } from '@/eventBus';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-
-const user = JSON.parse(localStorage.getItem('user')).user;
+const user = ref(JSON.parse(localStorage.getItem('user'))?.user || {});
 
 function handleLogout() {
   if (confirm('Do you want to log out?')) {
@@ -19,6 +20,19 @@ function goToProfilePage(uid) {
 function goToHomePage() {
   router.push('/');
 }
+
+// Lắng nghe sự kiện cập nhật profile
+function reloadUser() {
+  user.value = JSON.parse(localStorage.getItem('user'))?.user || {};
+}
+
+onMounted(() => {
+  eventBus.on('profile-updated', reloadUser);
+});
+
+onBeforeUnmount(() => {
+  eventBus.off('profile-updated', reloadUser);
+});
 </script>
 
 <template>
@@ -81,6 +95,7 @@ function goToHomePage() {
               width="32"
               height="32"
               class="rounded-circle me-2 ms-2"
+              style="object-fit: cover"
             />
           </a>
           <ul

@@ -23,11 +23,11 @@ async function updateUser(req, res, next) {
   const { uid } = req.params;
 
   try {
-    const updated = await usersService.updateUser(uid, req.body, req.file);
+    const user = await usersService.updateUser(uid, req.body, req.file);
 
-    if (!updated) return next(new ApiError(404, "User not found"));
+    if (!user) return next(new ApiError(404, "User not found"));
 
-    return res.json(JSend.success({ updated }));
+    return res.json(JSend.success({ user }));
   } catch (error) {
     console.log(error);
     return next(new ApiError(500, "Internal Server Error"));

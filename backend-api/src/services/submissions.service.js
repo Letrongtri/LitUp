@@ -23,6 +23,10 @@ function assignmentRepository() {
   return knex("assignments");
 }
 
+function userRepository() {
+  return knex("users");
+}
+
 function readSubmissionData(payload) {
   return {
     ...(payload.aid ? { aid: payload.aid } : {}),
@@ -58,11 +62,15 @@ async function createSubmission(newSubmission, files) {
     const assignment = await assignmentRepository()
       .transacting(trx)
       .where("aid", submissionData.aid)
-      .select("a_allow_late_submission", "a_deadline_at")
+      .select("a_status", "a_allow_late_submission", "a_deadline_at")
       .first();
 
     if (!assignment) {
       throw new ApiError(404, "Assignment not found");
+    }
+
+    if (!assignment.a_status) {
+      throw new ApiError(400, "Assignment is not active");
     }
 
     const isLate =
@@ -159,9 +167,46 @@ async function getSubmissions(aid, query) {
   };
 }
 
+async function getSubmissionById(sid) {
+  const result = await submissionRepository()
+    .where("sid", sid)
+    .select("*")
+    .first();
+
+  if (!result) return null;
+
+  const assignment = await assignmentRepository()
+    .where("aid", result.aid)
+    .select("a_title", "a_max_points")
+    .first();
+
+  const user = await userRepository()
+    .where("uid", result.uid)
+    .select(knex.raw("CONCAT(u_first_name, ' ', u_last_name) as u_name"))
+    .first();
+
+  const fids = await submissionAttachmentRepository()
+    .where("sid", result.sid)
+    .select("fid");
+
+  if (!fids) return result;
+
+  const fidList = fids.map((f) => f.fid);
+  const attachments = await getAttachments(fidList);
+
+  const submission = {
+    ...assignment,
+    ...user,
+    ...result,
+    attachments,
+  };
+
+  return submission;
+}
+
 async function getSubmission(uid, aid) {
   const result = await submissionRepository()
-    .where({ uid: uid, aid: aid })
+    .where({ uid, aid })
     .select("*")
     .first();
 
@@ -377,6 +422,7 @@ async function gradeSubmission(sid, data) {
 
 module.exports = {
   createSubmission,
+  getSubmissionById,
   getSubmissions,
   getSubmission,
   updateSubmission,

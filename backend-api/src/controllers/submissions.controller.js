@@ -54,6 +54,23 @@ async function getSubmissions(req, res, next) {
   );
 }
 
+async function getSubmissionById(req, res, next) {
+  const { sid } = req.params;
+  try {
+    const submission = await submissionService.getSubmissionById(sid);
+    if (!submission) {
+      return next(new ApiError(404, "Submission not found"));
+    }
+    return res.json(JSend.success({ submission }));
+  } catch (error) {
+    if (error.statusCode)
+      return next(new ApiError(error.statusCode, error.message));
+
+    console.log(error);
+    return next(new ApiError(500, "Internal Server Error"));
+  }
+}
+
 async function getSubmission(req, res, next) {
   const { uid, aid } = req.query;
 
@@ -133,6 +150,7 @@ async function gradeSubmission(req, res, next) {
 module.exports = {
   createSubmission,
   getSubmissions,
+  getSubmissionById,
   getSubmission,
   updateSubmission,
   deleteSubmission,

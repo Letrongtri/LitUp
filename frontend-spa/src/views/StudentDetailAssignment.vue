@@ -184,7 +184,7 @@ function handleFileChange(e) {
                 <p><strong>Grade:</strong> {{ submission.s_grade }}</p>
               </div>
               <div class="col-md-4">
-                <p><strong>Graded at: </strong> {{ submission.s_graded_at }}</p>
+                <p><strong>Graded at: </strong> {{ formatDate(submission.s_graded_at) }}</p>
               </div>
               <div class="col-md-4">
                 <p><strong>Comment: </strong> {{ submission.s_comment }}</p>

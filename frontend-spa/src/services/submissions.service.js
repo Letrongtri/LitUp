@@ -37,11 +37,22 @@ function submissionsService() {
     });
   }
 
+  async function gradeSubmission(sid, data) {
+    return efetch(`${baseUrlTeacher}/${sid}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+  }
+
   return {
     getSubmissionByTeacher,
     getSubmissionByStudent,
     updateSubmission,
     deleteSubmission,
+    gradeSubmission,
   };
 }
 
