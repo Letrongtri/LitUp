@@ -85,10 +85,10 @@ async function deleteAssignment() {
   if (confirm('Do you want to delete this assignment?')) {
     try {
       await assignmentsService.deleteAssignment(props.assignment.aid);
-      message.value = 'Cập nhật lớp học thành công!';
+      message.value = 'Class update successful!';
       router.push(`/teacher/classrooms/${props.assignment.cid}`);
     } catch (err) {
-      error.value = 'Cập nhật thất bại: ' + err.message;
+      error.value = 'Update failed: ' + err.message;
     }
   }
 }

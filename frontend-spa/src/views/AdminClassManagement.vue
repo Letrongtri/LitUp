@@ -97,15 +97,15 @@ watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: tru
               type="text"
               v-model="searchText"
               class="form-control"
-              placeholder="Tìm theo tên hoặc email..."
+              placeholder="Search by name or email..."
             />
-            <button class="btn btn-primary">Tìm</button>
+            <button class="btn btn-primary">Find</button>
           </div>
         </div>
 
         <div class="row">
           <div class="col-md-8">
-            <!-- Bảng người dùng -->
+            <!-- User table -->
             <table class="user-table table table-bordered table-hover align-middle">
               <thead class="table-light">
                 <tr>

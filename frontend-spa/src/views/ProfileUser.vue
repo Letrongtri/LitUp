@@ -51,7 +51,7 @@ async function deleteProfile() {
   <div class="page-container bg-light py-5">
     <div class="container">
       <div class="profile-card bg-white rounded-4 shadow-sm p-4 p-md-5">
-        <!-- Avatar + Tên -->
+        <!-- Avatar + Name -->
         <div class="text-center mb-4">
           <img
             :src="user.avatar_url"
@@ -65,7 +65,7 @@ async function deleteProfile() {
           <p class="text-muted mb-0">{{ user.u_email }}</p>
         </div>
 
-        <!-- Thông tin chi tiết -->
+        <!-- Details -->
         <ul class="list-group list-group-flush mb-4">
           <li class="list-group-item"><strong>Role: </strong>{{ user.u_role }}</li>
           <li class="list-group-item">
@@ -74,7 +74,7 @@ async function deleteProfile() {
           </li>
         </ul>
 
-        <!-- Nút hành động -->
+       <!-- Action button -->
         <div v-if="myAccount" class="d-flex gap-2 justify-content-center">
           <button class="btn btn-warning" @click="showModal = true">Edit</button>
           <button class="btn btn-danger" @click="deleteProfile">Delete</button>

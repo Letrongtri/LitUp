@@ -59,7 +59,7 @@ function changeCurrentPage(page) {
 
 function dowloadFile(attachment) {
   if (!attachment) {
-    console.error('Không tìm thấy tệp.');
+    console.error('File not found.');
     return;
   }
 
@@ -90,9 +90,9 @@ watch(currentPage, () => retrieveSubmissions(currentPage.value), { immediate: tr
               type="text"
               v-model="searchText"
               class="form-control"
-              placeholder="Tìm theo tên hoặc email..."
+              placeholder="Search by name or email..."
             />
-            <button class="btn btn-primary">Tìm</button>
+            <button class="btn btn-primary">Find</button>
           </div>
         </div>
 

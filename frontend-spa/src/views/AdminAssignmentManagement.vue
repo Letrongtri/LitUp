@@ -81,7 +81,7 @@ function changeCurrentPage(page) {
 
 function dowloadFile(attachment) {
   if (!attachment) {
-    console.error('Không tìm thấy tệp.');
+    console.error('File not found.');
     return;
   }
 

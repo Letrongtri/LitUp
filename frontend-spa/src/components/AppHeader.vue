@@ -21,7 +21,7 @@ function goToHomePage() {
   router.push('/');
 }
 
-// Lắng nghe sự kiện cập nhật profile
+// Listen for profile update event
 function reloadUser() {
   user.value = JSON.parse(localStorage.getItem('user'))?.user || {};
 }

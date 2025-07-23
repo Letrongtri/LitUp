@@ -29,12 +29,12 @@ async function updateClassroom() {
       c_name: className.value,
       c_status: status.value,
     });
-    message.value = 'Cập nhật lớp học thành công!';
+    message.value = 'Class update successful!';
 
     emit('updated');
     emit('close');
   } catch (err) {
-    error.value = 'Cập nhật thất bại: ' + err.message;
+    error.value = 'Update failed: ' + err.message;
   } finally {
     updating.value = false;
   }
@@ -46,10 +46,10 @@ async function deleteClassroom() {
   if (confirm('Do you want to delete this classroom?')) {
     try {
       await classroomsService.deleteClassroom(cid);
-      message.value = 'Cập nhật lớp học thành công!';
+      message.value = 'Class update successful!';
       router.push('/teacher/classrooms');
     } catch (err) {
-      error.value = 'Cập nhật thất bại: ' + err.message;
+      error.value = 'Update failed: ' + err.message;
     }
   }
 }

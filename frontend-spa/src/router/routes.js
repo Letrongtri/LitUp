@@ -129,7 +129,7 @@ const routes = [
     meta: { layout: DefaultLayout },
   },
   {
-    path: '/:pathMatch(.*)*', // bắt mọi route không khớp
+    path: '/:pathMatch(.*)*', // catch any mismatched routes
     name: 'not-found',
     component: NotFound,
     meta: { layout: DefaultLayout },

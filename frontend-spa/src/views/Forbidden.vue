@@ -1,8 +1,8 @@
 <template>
   <div class="error-page">
     <h1>403</h1>
-    <p>Bạn không có quyền truy cập trang này.</p>
-    <router-link to="/" class="btn btn-primary">Về trang chủ</router-link>
+    <p>You do not have permission to access this page.</p>
+    <router-link to="/" class="btn btn-primary">Back to home page</router-link>
   </div>
 </template>
 

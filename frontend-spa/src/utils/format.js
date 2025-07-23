@@ -9,7 +9,7 @@ export function formatDate(dateStr) {
 export function formatDateToDateTimeLocal(dateStr) {
   const date = new Date(dateStr);
 
-  // Format thành chuỗi YYYY-MM-DDTHH:MM (giờ local)
+  // Format into string YYYY-MM-DDTHH:MM (local time)
   const formatted =
     date.getFullYear() +
     '-' +

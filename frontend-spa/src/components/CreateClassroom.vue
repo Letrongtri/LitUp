@@ -20,12 +20,12 @@ async function handleCreateClassroom() {
 
   try {
     const uid = JSON.parse(localStorage.getItem('user')).user.uid;
-    if (!uid) throw new Error('Không tìm thấy UID');
+    if (!uid) throw new Error('UID not found');
 
     const classroom = { uid, c_name: className.value.trim() };
 
     await classroomsService.createClassroom(classroom);
-    message.value = 'Tạo lớp học thành công!';
+    message.value = 'Create a successful class!';
     className.value = '';
 
     emit('created');
@@ -40,7 +40,7 @@ async function handleCreateClassroom() {
 
 <template>
   <div class="form-box bg-white shadow rounded p-4 p-md-5">
-    <h2 class="mb-4 text-primary fw-bold">Tạo lớp học mới</h2>
+    <h2 class="mb-4 text-primary fw-bold">Create a new class</h2>
 
     <div v-if="error" class="alert alert-danger">{{ error }}</div>
     <div v-if="message" class="alert alert-success">{{ message }}</div>
@@ -53,7 +53,7 @@ async function handleCreateClassroom() {
           type="text"
           v-model="className"
           class="form-control"
-          placeholder="VD: Toán 12A3, Lập trình Web 1..."
+          placeholder="Example: Math 12A3, Web Programming 1..."
           required
         />
       </div>

@@ -53,7 +53,7 @@ async function retrieveStatistics() {
       const colors = ['#66BB6A', '#FFA726'];
       statistics.value.trendData.datasets.forEach((dataset, i) => {
         dataset.borderColor = colors[i];
-        dataset.backgroundColor = `${colors[i]}33`; // thêm độ trong suốt
+        dataset.backgroundColor = `${colors[i]}33`; // add transparency
         dataset.fill = true;
         dataset.tension = 0.3;
         dataset.pointRadius = 4;
@@ -72,44 +72,44 @@ onMounted(async () => {
 
 <template>
   <div class="container">
-    <!-- Tổng quan -->
+    <!-- Overview -->
     <div class="overview-grid">
       <div class="overview-card">
         <h3>Users</h3>
         <p class="count">{{ statistics.totalUsers }}</p>
-        <p class="desc">Tổng số tài khoản</p>
+        <p class="desc">Total number of accounts</p>
       </div>
       <div class="overview-card">
         <h3>Classrooms</h3>
         <p class="count">{{ statistics.totalClassrooms }}</p>
-        <p class="desc">Lớp đang hoạt động</p>
+        <p class="desc">Class is active</p>
       </div>
       <div class="overview-card">
         <h3>Assignments</h3>
         <p class="count">{{ statistics.totalAssignments }}</p>
-        <p class="desc">Tổng số bài được giao</p>
+        <p class="desc">Total number of assignments</p>
       </div>
       <div class="overview-card">
         <h3>Submissions</h3>
         <p class="count">{{ statistics.totalSubmissions }}</p>
-        <p class="desc">Tổng số bài đã nộp</p>
+        <p class="desc">Total number of submissions</p>
       </div>
     </div>
 
-    <!-- Placeholder cho biểu đồ (nếu cần sau này) -->
+    <!-- Placeholder for the chart (if needed later) -->
     <div class="content-section">
-      <h3 class="section-title">Thống kê chi tiết</h3>
+      <h3 class="section-title">Detailed statistics</h3>
       <div class="charts-grid">
         <div class="chart-box">
-          <h4>Phân loại người dùng</h4>
+          <h4>User classification</h4>
           <Doughnut v-if="statistics.userRolesData" :data="statistics.userRolesData" />
         </div>
         <div class="chart-box">
-          <h4>Số bài nộp theo tháng</h4>
+          <h4>Number of submissions per month</h4>
           <Bar v-if="statistics.submissionsData" :data="statistics.submissionsData" />
         </div>
         <div class="chart-box full">
-          <h4>Xu hướng bài tập mới</h4>
+          <h4>New exercise trends</h4>
           <Line v-if="statistics.trendData" :data="statistics.trendData" />
         </div>
       </div>

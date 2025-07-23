@@ -73,7 +73,7 @@ onMounted(() => {
 
 <template>
   <div class="page-container bg-light">
-    <!-- Banner lớp học -->
+    <!-- Class Banner -->
     <div class="class-header bg-white border-bottom shadow-sm">
       <div class="container py-4 px-3 d-flex align-items-center justify-content-between">
         <h2 class="fw-bold text-primary mb-1">{{ classroom.c_name }}</h2>
@@ -109,7 +109,7 @@ onMounted(() => {
 
     <!-- Information tab -->
     <div v-if="tab === 'information'">
-      <!-- Thông tin lớp học -->
+      <!-- Class Information -->
       <div class="container py-4">
         <div class="row g-3 mb-3">
           <div class="card p-3 border">
@@ -149,7 +149,7 @@ onMounted(() => {
               :assignments="assignments"
               :role="'teacher'"
             />
-            <p class="text-muted text-center mt-4" v-else>Chưa có bài tập nào</p>
+            <p class="text-muted text-center mt-4" v-else>No exercises yet</p>
           </div>
         </div>
       </div>

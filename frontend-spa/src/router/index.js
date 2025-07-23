@@ -9,14 +9,14 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const user = JSON.parse(localStorage.getItem('user'));
 
-  // Kiểm tra yêu cầu đăng nhập
+  // Check login request
   if (!user && !to.path.startsWith('/auth')) {
     return next('/auth');
   }
 
-  // Kiểm tra đúng role
+ // Check correct role
   if (to.meta.role && user?.user.u_role !== to.meta.role) {
-    return next('/403'); // hoặc redirect theo role
+    return next('/403'); // or redirect by role
   }
 
   return next();

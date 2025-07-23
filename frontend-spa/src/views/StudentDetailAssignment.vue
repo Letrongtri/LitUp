@@ -24,7 +24,7 @@ async function retrieveAssignment() {
     const result = await assignmentsService.getAssignment(aid);
     assignment.value = result.assignment;
   } catch (err) {
-    error.value = 'Không tải được bài tập: ' + err.message;
+    error.value = 'Unable to download exercise: ' + err.message;
   }
 }
 

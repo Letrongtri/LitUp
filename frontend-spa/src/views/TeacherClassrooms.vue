@@ -64,8 +64,8 @@ function goToDetailClassroomPage(cls) {
       <div class="content-section">
         <div class="row">
           <div class="col-lg-9 col-sm-12">
-            <h1 class="page-title">Lớp học của bạn</h1>
-            <p class="page-subtitle">Quản lý lớp học và bài tập</p>
+            <h1 class="page-title">Your classroom</h1>
+            <p class="page-subtitle">Classroom and assignment management</p>
           </div>
           <div class="col-lg-3 col-sm-12 d-flex justify-content-end align-items-center">
             <button class="btn btn-primary" @click="showModal = true">Create Classroom</button>
@@ -78,12 +78,12 @@ function goToDetailClassroomPage(cls) {
 
     <div class="container">
       <!-- Error Alert -->
-      <div v-if="error" class="alert alert-danger mb-4"><strong>Lỗi:</strong> {{ error }}</div>
+      <div v-if="error" class="alert alert-danger mb-4"><strong>Error:</strong> {{ error }}</div>
 
       <!-- Classrooms List -->
       <div class="content-section">
         <div class="section-header d-flex justify-content-between">
-          <h3>Danh sách lớp học</h3>
+          <h3>List of classroom</h3>
           <div class="input-group w-auto">
             <input
               type="text"
@@ -110,7 +110,7 @@ function goToDetailClassroomPage(cls) {
             </div>
           </div>
         </div>
-        <h4 v-else>Bạn chưa tạo lớp</h4>
+        <h4 v-else>You have not created a class yet</h4>
 
         <div class="mt-5 d-flex flex-wrap justify-content-center align-items-center">
           <MainPagination

@@ -24,7 +24,7 @@ async function handleJoinClassroom() {
 
   try {
     const uid = JSON.parse(localStorage.getItem('user')).user.uid;
-    if (!uid) throw new Error('Không tìm thấy UID');
+    if (!uid) throw new Error('UID not found');
 
     const joinData = { uid, c_code: classCode.value };
 

@@ -108,7 +108,7 @@ async function openSubmissionDetailPage(id) {
 
 <template>
   <div class="container py-5">
-    <!-- Thông tin bài tập -->
+    <!-- Exercise information -->
     <div class="bg-white p-4 rounded shadow-sm mb-4">
       <div class="row">
         <div class="col-9">
@@ -166,9 +166,9 @@ async function openSubmissionDetailPage(id) {
       :task="'update'"
     />
 
-    <!-- Danh sách bài nộp -->
+    <!-- List of submissions -->
     <div class="bg-white p-4 rounded shadow-sm my-4">
-      <h4 class="mb-3 text-dark">Danh sách bài nộp</h4>
+      <h4 class="mb-3 text-dark">List of submissions</h4>
       <table class="table table-bordered table-hover align-middle">
         <thead class="table-light">
           <tr>
@@ -222,7 +222,7 @@ async function openSubmissionDetailPage(id) {
     </div>
 
     <div class="bg-white p-4 rounded shadow-sm my-4">
-      <h4 class="mb-3 text-dark">Danh sách chưa nộp</h4>
+      <h4 class="mb-3 text-dark">Unsubmitted list</h4>
       <div class="row">
         <div class="col-md-6">
           <table class="table table-bordered table-hover align-middle">

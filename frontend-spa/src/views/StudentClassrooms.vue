@@ -59,8 +59,8 @@ watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: tru
       <div class="content-section">
         <div class="row">
           <div class="col-lg-9 col-sm-12">
-            <h1 class="page-title">Lớp học đã tham gia</h1>
-            <p class="page-subtitle">Tìm kiếm và xem chi tiết lớp học</p>
+            <h1 class="page-title">Classes attended</h1>
+            <p class="page-subtitle">Search and view class details</p>
           </div>
           <div class="col-lg-3 col-sm-12 d-flex justify-content-end align-items-center">
             <button class="btn btn-primary" @click="showModal = true">Join Classroom</button>
@@ -72,10 +72,10 @@ watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: tru
     <JoinClassroom v-if="showModal" @created="retrieveClassrooms(1)" @close="showModal = false" />
 
     <div class="container">
-      <!-- Thanh tìm kiếm -->
+      <!-- Search bar -->
       <div class="content-section">
         <div class="section-header d-flex justify-content-between">
-          <h3>Danh sách lớp học</h3>
+          <h3>List of classes</h3>
           <div class="input-group w-auto">
             <input
               type="text"
@@ -94,7 +94,7 @@ watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: tru
           :classrooms="filteredClassrooms"
         />
 
-        <h4 v-else>Bạn chưa tham gia lớp nào</h4>
+        <h4 v-else>You have not attended any classes yet.</h4>
 
         <div class="mt-5 d-flex flex-wrap justify-content-center align-items-center">
           <MainPagination

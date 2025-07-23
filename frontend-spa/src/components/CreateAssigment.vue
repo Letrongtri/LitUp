@@ -32,49 +32,49 @@ async function submit() {
     }
 
     await api.createAssignmentWithFiles(cid, formData);
-    message.value = 'Tạo bài tập thành công!';
+    message.value = 'Created exercise successfully!';
   } catch (err) {
-    error.value = 'Tạo bài tập thất bại: ' + err.message;
+    error.value = 'Create failed exercise: ' + err.message;
   }
 }
 </script>
 
 <template>
   <div class="form-box shadow bg-white rounded p-4 p-md-5">
-    <h2 class="mb-4 text-primary fw-bold">Tạo bài tập mới</h2>
+    <h2 class="mb-4 text-primary fw-bold">Create new exercise</h2>
 
     <div v-if="error" class="alert alert-danger">{{ error }}</div>
     <div v-if="message" class="alert alert-success">{{ message }}</div>
 
     <form @submit.prevent="submit" enctype="multipart/form-data">
       <div class="mb-3">
-        <label class="form-label fw-semibold">Tiêu đề *</label>
+        <label class="form-label fw-semibold">Title *</label>
         <input v-model="title" type="text" class="form-control" required />
       </div>
 
       <div class="mb-3">
-        <label class="form-label fw-semibold">Mô tả</label>
+        <label class="form-label fw-semibold">Description</label>
         <textarea v-model="description" class="form-control" rows="4"></textarea>
       </div>
 
       <div class="row g-3 mb-3">
         <div class="col-md-6">
-          <label class="form-label fw-semibold">Điểm tối đa *</label>
+          <label class="form-label fw-semibold">Maximum score *</label>
           <input v-model="maxPoints" type="number" class="form-control" required />
         </div>
         <div class="col-md-6">
-          <label class="form-label fw-semibold">Hạn nộp</label>
+          <label class="form-label fw-semibold">Submission deadline</label>
           <input v-model="deadline" type="date" class="form-control" />
         </div>
       </div>
 
       <div class="form-check form-switch mb-3">
         <input v-model="allowLate" type="checkbox" class="form-check-input" id="allowLate" />
-        <label class="form-check-label" for="allowLate">Cho phép nộp muộn</label>
+        <label class="form-check-label" for="allowLate">Late submission is allowed</label>
       </div>
 
       <div class="mb-4">
-        <label class="form-label fw-semibold">File đính kèm</label>
+        <label class="form-label fw-semibold">Attached files</label>
         <input
           type="file"
           multiple
@@ -83,7 +83,7 @@ async function submit() {
         />
       </div>
 
-      <button type="submit" class="btn btn-primary px-4 py-2">Tạo bài tập</button>
+      <button type="submit" class="btn btn-primary px-4 py-2">Create exercises</button>
     </form>
   </div>
 </template>

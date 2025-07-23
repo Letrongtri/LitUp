@@ -75,7 +75,7 @@ async function gradeSubmission() {
         </div>
 
         <div class="d-flex flex-column flex-md-row gap-4" style="height: calc(100vh - 150px)">
-          <!-- Bên trái: File báo cáo -->
+          <!-- Left: Report file -->
           <div class="flex-fill">
             <iframe
               v-if="selectedFile"
@@ -86,13 +86,13 @@ async function gradeSubmission() {
             ></iframe>
           </div>
 
-          <!-- Bên phải: Chi tiết và nhận xét -->
+          <!-- Right: Details and comments -->
           <div class="flex-fill" style="max-width: 350px">
-            <h6 class="fw-semibold">Thông tin sinh viên</h6>
+            <h6 class="fw-semibold">Student information</h6>
             <ul class="list-unstyled small">
-              <li><strong>Họ tên:</strong> {{ submission.u_name }}</li>
-              <li><strong>Trạng thái:</strong> {{ submission.s_status }}</li>
-              <li><strong>Ngày nộp:</strong> {{ formatDate(submission.s_submitted_at) }}</li>
+              <li><strong>Full name:</strong> {{ submission.u_name }}</li>
+              <li><strong>Status:</strong> {{ submission.s_status }}</li>
+              <li><strong>Date of submission:</strong> {{ formatDate(submission.s_submitted_at) }}</li>
             </ul>
 
             <hr />

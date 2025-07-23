@@ -1,8 +1,8 @@
 <template>
   <div class="error-page">
     <h1>404</h1>
-    <p>Không tìm thấy trang bạn yêu cầu.</p>
-    <router-link to="/" class="btn btn-primary">Về trang chủ</router-link>
+    <p>The page you requested was not found.</p>
+    <router-link to="/" class="btn btn-primary">Back to home page</router-link>
   </div>
 </template>
 

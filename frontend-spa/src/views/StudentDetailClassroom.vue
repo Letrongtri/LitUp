@@ -83,7 +83,7 @@ onMounted(async () => {
       </div> -->
 
       <AssignmentList v-if="assignments.length > 0" :assignments="assignments" :role="'student'" />
-      <p class="text-muted text-center py-3 mb-0" v-else>Chưa có bài tập nào</p>
+      <p class="text-muted text-center py-3 mb-0" v-else>No exercises yet</p>
     </div>
   </div>
 </template>

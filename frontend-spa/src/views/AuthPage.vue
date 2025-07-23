@@ -17,8 +17,7 @@ const successMsg = ref('');
       <div class="welcome-text">
         <h1>Welcome to LitUp!</h1>
         <p>
-          Nền tảng học tập trực tuyến giúp bạn tham gia lớp học, theo dõi bài tập, và phát triển mỗi
-          ngày.
+        Online learning platform that helps you take classes, track assignments, and grow every day.
         </p>
       </div>
     </div>
