@@ -130,7 +130,7 @@ async function gradeSubmission() {
               <div class="mb-3">
                 <label class="form-label fw-semibold m-0 me-1">Equivalent: </label>
                 <span>
-                  {{ (grade) / submission.a_max_points }}/{{ submission.a_max_points }}
+                  {{ ((grade) * submission.a_max_points) / (100) }} /{{ 10 }}
                 </span>
               </div>
 
