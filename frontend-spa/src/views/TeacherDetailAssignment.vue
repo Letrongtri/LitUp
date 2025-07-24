@@ -204,7 +204,7 @@ async function openSubmissionDetailPage(id) {
                   class="btn btn-sm btn-outline-secondary"
                   @click="openSubmissionDetailPage(member.submission.sid)"
                 >
-                  Xem chi tiết
+                  View Detail
                 </button>
               </td>
             </tr>
