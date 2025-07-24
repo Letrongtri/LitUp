@@ -97,7 +97,7 @@ watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: tru
               type="text"
               v-model="searchText"
               class="form-control"
-              placeholder="Search by name or email..."
+              placeholder="Search by name or code..."
             />
             <button class="btn btn-primary">Find</button>
           </div>

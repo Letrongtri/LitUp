@@ -112,7 +112,7 @@ watch(currentPage, () => retrieveAssignments(currentPage.value), { immediate: tr
               type="text"
               v-model="searchText"
               class="form-control"
-              placeholder="Tìm theo tên hoặc email..."
+              placeholder="Search by ID or Title... "
             />
             <button class="btn btn-primary">Tìm</button>
           </div>

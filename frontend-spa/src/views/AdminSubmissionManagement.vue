@@ -90,7 +90,7 @@ watch(currentPage, () => retrieveSubmissions(currentPage.value), { immediate: tr
               type="text"
               v-model="searchText"
               class="form-control"
-              placeholder="Search by name or email..."
+              placeholder="Search by ID or UserID..."
             />
             <button class="btn btn-primary">Find</button>
           </div>

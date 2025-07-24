@@ -11,7 +11,8 @@ provide('tab', tab);
 
 function goToDashboardPage() {
   if (route.name === 'admin.dashboard') return;
-  //   tab.value = 'overview';
+  //
+  tab.value = 'overview';
   router.push('/admin/dashboard');
 }
 
@@ -42,8 +43,8 @@ function goToSubmissionsManagementPage() {
     <div class="page-container">
       <div class="page-header">
         <div class="container">
-          <h1 class="page-title">Bảng điều khiển quản trị</h1>
-          <p class="page-subtitle">Tổng quan hoạt động hệ thống lớp học</p>
+          <h1 class="page-title">Admin Panel</h1>
+          <p class="page-subtitle">Overview of classroom system operations</p>
         </div>
       </div>
 
@@ -99,25 +100,29 @@ function goToSubmissionsManagementPage() {
   background-color: #f5f5f5;
   min-height: 100vh;
 }
+
 .page-header {
   background: white;
   border-bottom: 1px solid #e0e0e0;
   padding: 2rem 0;
 }
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
 }
+
 .page-title {
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #2c3e50;
   margin-bottom: 0.5rem;
 }
+
 .page-subtitle {
-  font-size: 1.1rem;
-  color: #7f8c8d;
+  font-size: 1.2rem;
+  color: #666;
 }
 
 .tabs-nav {
@@ -128,9 +133,10 @@ function goToSubmissionsManagementPage() {
 .tab-item {
   padding: 0.5rem 1rem;
   cursor: pointer;
-  border-radius: 20px;
+  border-radius: 0.375rem;
   color: #444;
   transition: background 0.2s;
+  font-size: 1rem;
 }
 
 .tab-item:hover {
