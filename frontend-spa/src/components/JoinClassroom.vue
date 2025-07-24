@@ -90,7 +90,7 @@ watch(classId, () => getClassInfo(classId.value));
           type="text"
           v-model="classCode"
           class="form-control"
-          placeholder="VD: ABC123"
+          placeholder="Ex: ABC123"
           required
         />
       </div>
