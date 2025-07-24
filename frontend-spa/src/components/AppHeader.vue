@@ -1,7 +1,44 @@
+<script setup>
+import { eventBus } from '@/eventBus';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const user = ref(JSON.parse(localStorage.getItem('user'))?.user || {});
+
+function handleLogout() {
+  if (confirm('Do you want to log out?')) {
+    localStorage.removeItem('user');
+    router.push('/auth');
+  }
+}
+
+function goToProfilePage(uid) {
+  router.push({ name: 'profile', params: { uid } });
+}
+
+function goToHomePage() {
+  router.push('/');
+}
+
+// Listen for profile update event
+function reloadUser() {
+  user.value = JSON.parse(localStorage.getItem('user'))?.user || {};
+}
+
+onMounted(() => {
+  eventBus.on('profile-updated', reloadUser);
+});
+
+onBeforeUnmount(() => {
+  eventBus.off('profile-updated', reloadUser);
+});
+</script>
+
 <template>
   <nav class="navbar navbar-expand-lg bg-body-tertiary px-3">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">LitUp!</a>
+      <a class="navbar-brand" href="" @click="goToHomePage">LitUp!</a>
       <button
         class="navbar-toggler"
         type="button"
@@ -42,11 +79,44 @@
             <a class="nav-link disabled" aria-disabled="true">Disabled</a>
           </li>
         </ul>
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
+
+        <div class="dropdown d-flex justify-content-end gap-3" style="max-width: 300px">
+          <a
+            class="d-flex align-items-center link-dark text-decoration-none"
+            id="dropdownUser2"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            style="cursor: pointer"
+          >
+            <strong class="dropdown-toggle">{{ user.u_first_name }} {{ user.u_last_name }}</strong>
+            <img
+              :src="`http://localhost:3000${user.avatar_url}`"
+              :alt="user.u_first_name + ' ' + user.u_last_name"
+              width="32"
+              height="32"
+              class="rounded-circle me-2 ms-2"
+              style="object-fit: cover"
+            />
+          </a>
+          <ul
+            class="dropdown-menu text-small shadow"
+            aria-labelledby="dropdownUser2"
+            style="left: auto; right: 0"
+          >
+            <li><a class="dropdown-item" href="#">New project...</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" @click="goToProfilePage(user.uid)">Profile</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" @click="handleLogout">Sign out</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </nav>
 </template>
+
+<style scoped>
+.navbar-brand {
+  font-weight: bold;
+}
+</style>

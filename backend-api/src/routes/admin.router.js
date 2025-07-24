@@ -8,37 +8,26 @@ const { validateRequest } = require("../middlewares/validator.middleware");
 const router = express.Router();
 
 // Zod schemas
-const getClassroomId = z.object({
+const toggleClassroomStatusBody = z.object({
   input: z.object({
-    cid: z.coerce.number().nonnegative()
-  })
-});
-
-const getUserId = z.object({
-  input: z.object({
-    uid: z.coerce.number().nonnegative()
-  })
-});
-
-const getAssignmentId = z.object({
-  input: z.object({
-    aid: z.coerce.number().nonnegative()
-  })
+    cid: z.coerce.number().nonnegative(),
+    c_status: z.boolean(),
+  }),
 });
 
 const toggleUserStatusBody = z.object({
   input: z.object({
-    u_status: z.boolean()
-  })
+    uid: z.coerce.number().nonnegative(),
+    u_status: z.boolean(),
+  }),
 });
-
 
 const toggleAssigmentStatusBody = z.object({
   input: z.object({
-    a_status: z.boolean()
-  })
+    aid: z.coerce.number().nonnegative(),
+    a_status: z.boolean(),
+  }),
 });
-
 
 module.exports.setup = (app) => {
   app.use("/api/admin", router);
@@ -55,14 +44,14 @@ module.exports.setup = (app) => {
     .get(adminController.getAllUsers)
     .all(allowedMethods(["GET"]));
 
-    router
+  router
     .route("/users/:uid")
     .put(
-      validateRequest(getUserId),              
-      validateRequest(toggleUserStatusBody),   
+      validateRequest(toggleUserStatusBody),
       adminController.toggleUserStatus
     )
     .all(allowedMethods(["PUT"]));
+
   // Classrooms
   router
     .route("/classrooms")
@@ -71,16 +60,29 @@ module.exports.setup = (app) => {
 
   router
     .route("/classrooms/:cid")
-    .put(validateRequest(getClassroomId), adminController.toggleClassroomStatus)
+    .put(
+      validateRequest(toggleClassroomStatusBody),
+      adminController.toggleClassroomStatus
+    )
     .all(allowedMethods(["PUT"]));
 
   // Assignments
   router
-  .route("/assignments/:aid")
-  .put(
-    validateRequest(getAssignmentId),              
-    validateRequest(toggleAssigmentStatusBody),   
-    adminController.toggleAssignmentStatus
-  )
-  .all(allowedMethods(["PUT"]));
+    .route("/assignments")
+    .get(adminController.getAllAssignments)
+    .all(allowedMethods(["GET"]));
+
+  router
+    .route("/assignments/:aid")
+    .put(
+      validateRequest(toggleAssigmentStatusBody),
+      adminController.toggleAssignmentStatus
+    )
+    .all(allowedMethods(["PUT"]));
+
+  // Submissions
+  router
+    .route("/submissions")
+    .get(adminController.getAllSubmissions)
+    .all(allowedMethods(["GET"]));
 };

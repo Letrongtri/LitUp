@@ -19,11 +19,7 @@ const { assignmentSchema } = require("../schemas/assignment.schemas");
 
 const router = express.Router();
 
-/**
- * Get list of classroom student has joined
- * query: ?uid=15&limit=10&page=2
- */
-const getJoinedClassroomData = z.object({
+const getCreatedClassroomsData = z.object({
   uid: z.coerce.number().nonnegative().optional(),
   limit: z.coerce.number().nonnegative().optional(),
   page: z.coerce.number().nonnegative().optional(),
@@ -32,15 +28,6 @@ const getJoinedClassroomData = z.object({
 /** Teacher create a new classroom */
 const createClassroomData = z.object({
   input: classroomSchema.pick({ c_name: true, uid: true }).strict(),
-});
-
-/** Student joins classroom */
-const joinClassroomData = z.object({
-  input: z.object({
-    cid: z.coerce.number().nonnegative(),
-    c_code: z.string().length(6),
-    uid: z.coerce.number().nonnegative(),
-  }),
 });
 
 /** Get classroom id */
@@ -65,6 +52,14 @@ const updateClassroomData = z.object({
     ),
 });
 
+/** Get classroom id */
+const getDeleteMemberData = z.object({
+  input: z.object({
+    cid: z.coerce.number().nonnegative(),
+    mid: z.coerce.number().nonnegative(),
+  }),
+});
+
 /** Teacher create a new assignment */
 const createAssignmentData = z.object({
   input: assignmentSchema
@@ -76,41 +71,23 @@ const createAssignmentData = z.object({
 const getAssignmentsData = z.object({
   input: z.object({
     cid: z.coerce.number().nonnegative(),
-    page: z.coerce.number().nonnegative(),
-    limit: z.coerce.number().nonnegative(),
   }),
 });
 
-const getTeacherClassroomQuery = z.object({
-  input: z.object ({
-    uid: z.coerce.number().nonnegative(),
-    role: z.literal("teacher"),
-    limit: z.coerce.number().optional(),
-    page: z.coerce.number().optional()
-  })
-});
-
-
-
 module.exports.setup = (app) => {
-  app.use("/api/classrooms", router);
-
-  router
-  .route("/teacher")
-  .get(validateRequest(getTeacherClassroomQuery), classroomsController.getTeacherClassrooms)
-  .all(allowedMethods(["GET"]));
+  app.use("/api/teacher/classrooms", router);
 
   router
     .route("/")
+    .get(
+      validateRequest(getCreatedClassroomsData),
+      classroomsController.getTeacherClassrooms
+    )
     .post(
       validateRequest(createClassroomData),
       classroomsController.createClassroom
     )
-    .get(
-      validateRequest(getJoinedClassroomData),
-      classroomsController.getJoinedClassrooms
-    )
-    .all(allowedMethods(["POST", "GET"]));
+    .all(allowedMethods(["GET", "POST"]));
 
   router
     .route("/:cid")
@@ -126,20 +103,20 @@ module.exports.setup = (app) => {
     .all(allowedMethods(["GET", "PUT", "DELETE"]));
 
   router
-    .route("/:cid/join")
-    .post(
-      validateRequest(joinClassroomData),
-      classroomsController.joinClassroom
-    )
-    .all(allowedMethods(["POST"]));
-
-  router
     .route("/:cid/members")
     .get(
       validateRequest(getClassroomId),
       classroomsController.getMembersInClass
     )
     .all(allowedMethods(["GET"]));
+
+  router
+    .route("/:cid/members/:mid")
+    .delete(
+      validateRequest(getDeleteMemberData),
+      classroomsController.removeMember
+    )
+    .all(allowedMethods(["DELETE"]));
 
   router
     .route("/:cid/assignments")
@@ -152,5 +129,4 @@ module.exports.setup = (app) => {
       assignmentsController.getAssignments
     )
     .all(allowedMethods(["POST", "GET"]));
-  
 };

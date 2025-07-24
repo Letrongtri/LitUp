@@ -12,6 +12,10 @@ function userRepository() {
   return knex("users");
 }
 
+function attachmentRepository() {
+  return knex("attachments");
+}
+
 function readClassroomData(payload) {
   return {
     ...(payload.uid && { uid: payload.uid }),
@@ -55,7 +59,41 @@ async function createClassroom(payload) {
 }
 
 async function getClassroomById(cid) {
-  return classroomRepository().where("cid", cid).select("*").first();
+  return await knex("classrooms as c")
+    .join("users as u", "c.uid", "u.uid")
+    .where("c.cid", cid)
+    .select(
+      "c.*",
+      knex.raw("concat(u_first_name, ' ', u_last_name) as teacher_name")
+    )
+    .first();
+}
+
+async function getClassroomDetailByStudent(cid) {
+  const data = await knex("classrooms as c")
+    .join("users as u", "c.uid", "u.uid")
+    .where("c.cid", cid)
+    .select(
+      "cid",
+      "c_name",
+      "c_created_at",
+      knex.raw("concat(u_first_name, ' ', u_last_name) as teacher_name"),
+      "u_avatar_id"
+    )
+    .first();
+
+  const avatar = data.u_avatar_id
+    ? await attachmentRepository().where("fid", data.u_avatar_id).first()
+    : null;
+
+  const DEFAULT_AVATAR = "/public/images/blank-profile-picture.png";
+
+  return {
+    ...data,
+    teacher_avatar_url: avatar
+      ? `/public/uploads/${avatar.f_name}`
+      : DEFAULT_AVATAR,
+  };
 }
 
 async function updateClassroom(cid, updateData) {
@@ -108,7 +146,6 @@ async function deleteClassroom(cid) {
       .transacting(trx)
       .where("cid", cid)
       .select(knex.raw("COUNT(mid) OVER() AS count_member"));
-    console.log(countMember);
 
     if (countMember.count_member && countMember.count_member != 0) {
       return {
@@ -132,18 +169,10 @@ async function getClassroomsByUser(uid, limit, page) {
 
   const results = await knex("classrooms as c")
     .join("members as m", "c.cid", "m.cid")
+    .join("users as u", "u.uid", "c.uid")
     .where("m.uid", uid)
     .andWhere("m.m_status", true)
-    .select(
-      knex.raw("COUNT(c.cid) OVER() AS record_count"),
-      "c.cid",
-      "c.uid",
-      "c.c_name",
-      "c.c_status",
-      "c.c_created_at",
-      "c.c_updated_at"
-    )
-    .orderBy("c.cid")
+    .select("c.*")
     .limit(limit)
     .offset((page - 1) * limit);
 
@@ -179,7 +208,7 @@ async function joinClassroomByCode(cid, uid, c_code) {
 }
 
 async function getMemberByClassId(cid) {
-  return knex("members as m")
+  const users = await knex("members as m")
     .join("users as u", "m.uid", "u.uid")
     .where("m.cid", cid)
     .andWhere("m.m_status", true)
@@ -188,8 +217,38 @@ async function getMemberByClassId(cid) {
       "u.u_first_name",
       "u.u_last_name",
       "u.u_email",
+      "u.u_avatar_id",
+      "m.mid",
       "m.m_joined_at"
     );
+
+  const DEFAULT_AVATAR = "/public/images/blank-profile-picture.png";
+
+  for (const user of users) {
+    const avatar = user.u_avatar_id
+      ? await attachmentRepository().where("fid", user.u_avatar_id).first()
+      : null;
+
+    user.avatar_url = avatar ? `public/uploads/${avatar}` : DEFAULT_AVATAR;
+  }
+
+  return users;
+}
+
+async function removeMember(cid, mid) {
+  const trx = await knex.transaction();
+
+  try {
+    await memberRepository()
+      .transacting(trx)
+      .where({ cid: cid, mid: mid })
+      .del();
+
+    await trx.commit();
+  } catch (error) {
+    await trx.rollback();
+    throw error;
+  }
 }
 
 async function getClassroomsByTeacher(uid, limit = 10, page = 1) {
@@ -197,21 +256,27 @@ async function getClassroomsByTeacher(uid, limit = 10, page = 1) {
   const teacher = await knex("users").where({ uid, u_role: "teacher" }).first();
   if (!teacher) return [];
 
-  return knex("classrooms")
-    .where({ uid })
-    .andWhere("u_role", "teacher")
+  const data = await knex("classrooms as c")
+    .leftJoin("members as m", "c.cid", "m.cid")
+    .where({ "c.uid": uid })
+    .groupBy("c.cid")
+    .select("c.*", knex.raw("COUNT(m.mid) as student_count"))
     .limit(limit)
     .offset((page - 1) * limit)
-    .orderBy("cid", "desc");
+    .orderBy("c.cid", "desc");
+
+  return data;
 }
 
 module.exports = {
   createClassroom,
   getClassroomById,
+  getClassroomDetailByStudent,
   updateClassroom,
   deleteClassroom,
   getClassroomsByUser,
   joinClassroomByCode,
   getMemberByClassId,
   getClassroomsByTeacher,
+  removeMember,
 };

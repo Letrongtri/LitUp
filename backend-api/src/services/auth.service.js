@@ -15,6 +15,10 @@ function userRepository() {
   return knex("users");
 }
 
+function attachmentRepository() {
+  return knex("attachments");
+}
+
 // Define functions for accessing the database
 
 /**
@@ -59,14 +63,26 @@ async function loginUser(payload) {
 
   const user = await userRepository().where({ u_email }).first();
 
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
   const isMatch = await bcrypt.compare(inputPassword, user.u_password);
-  console.log(inputPassword, user.u_password)
-  console.log(isMatch)
+
   if (!isMatch) {
     throw new ApiError(401, "Invalid credentials");
   }
 
-  return { user };
+  const avatar = user.u_avatar_id
+    ? await attachmentRepository().where("fid", user.u_avatar_id).first()
+    : null;
+
+  const DEFAULT_AVATAR = "/public/images/blank-profile-picture.png";
+
+  return {
+    ...user,
+    avatar_url: avatar ? `/public/uploads/${avatar.f_name}` : DEFAULT_AVATAR,
+  };
 }
 
 module.exports = {

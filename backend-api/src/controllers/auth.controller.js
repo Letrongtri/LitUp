@@ -13,6 +13,9 @@ async function register(req, res, next) {
       .set({ Location: `${req.baseUrl}/${user.uid}` })
       .json(JSend.success({ user }));
   } catch (error) {
+    if (error.statusCode)
+      return next(new ApiError(error.statusCode, error.message));
+
     console.log(error);
     return next(new ApiError(500, "Internal Server Error"));
   }
@@ -26,6 +29,8 @@ async function login(req, res, next) {
 
     return res.json(JSend.success({ user }));
   } catch (error) {
+    if (error.statusCode)
+      return next(new ApiError(error.statusCode, error.message));
     console.log(error);
     return next(new ApiError(500, "Internal Server Error"));
   }

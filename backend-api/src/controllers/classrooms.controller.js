@@ -1,7 +1,7 @@
 const classroomsService = require("../services/classrooms.service");
+const usersService = require("../services/users.service");
 const ApiError = require("../api-error");
 const JSend = require("../jsend");
-const knex = require("../database/knex");
 
 async function createClassroom(req, res, next) {
   try {
@@ -18,7 +18,7 @@ async function createClassroom(req, res, next) {
     return res
       .status(201)
       .set({
-        Locarion: `${req.baseUrl}/${classroom.cid}}`,
+        Location: `${req.baseUrl}/${classroom.cid}`, // fix typo "Locarion" -> "Location" và dư dấu "}"
       })
       .json(
         JSend.success({
@@ -33,24 +33,29 @@ async function createClassroom(req, res, next) {
 
 async function getJoinedClassrooms(req, res, next) {
   try {
-    const { uid, limit = 10, page = 1 } = req.query;
+    const { uid } = req.query;
+    let limit = Number(req.query.limit);
+    let page = Number(req.query.page);
 
     if (!uid) {
       return next(new ApiError(400, "uid is required"));
     }
 
-    // let result = {
-    //   classrooms: [],
-    //   metadata: {
-    //     totalRecords: 0,
-    //     firstPage: 1,
-    //     lastPage: 1,
-    //     page: 1,
-    //     limit: 5,
-    //   },
-    // };
+    if (isNaN(page) || page < 1) page = 1;
+    if (isNaN(limit) || limit < 1) limit = 10;
 
-    let result = await classroomsService.getClassroomsByUser(uid, limit, page);
+    let result = {
+      classrooms: [],
+      metadata: {
+        totalRecords: 0,
+        firstPage: 1,
+        lastPage: 1,
+        page: 1,
+        limit: 5,
+      },
+    };
+
+    result = await classroomsService.getClassroomsByUser(uid, limit, page);
 
     return res.json(JSend.success(result));
   } catch (err) {
@@ -64,6 +69,22 @@ async function getClassroom(req, res, next) {
 
   try {
     const classroom = await classroomsService.getClassroomById(cid);
+    if (!classroom) {
+      return next(new ApiError(404, "Classroom not found"));
+    }
+
+    return res.json(JSend.success({ classroom }));
+  } catch (err) {
+    console.log(err);
+    return next(new ApiError(500, "Internal Server Error"));
+  }
+}
+
+async function getClassroomDetailByStudent(req, res, next) {
+  const { cid } = req.params;
+
+  try {
+    const classroom = await classroomsService.getClassroomDetailByStudent(cid);
     if (!classroom) {
       return next(new ApiError(404, "Classroom not found"));
     }
@@ -168,11 +189,32 @@ async function getMembersInClass(req, res, next) {
   }
 }
 
+async function removeMember(req, res, next) {
+  const { cid, mid } = req.params;
+  try {
+    await classroomsService.removeMember(cid, mid);
+
+    return res.json(JSend.success());
+  } catch (err) {
+    console.log(err);
+    if (err.code && err.message) {
+      return next(new ApiError(err.code, err.message));
+    }
+    return next(new ApiError(500, "Internal Server Error"));
+  }
+}
+
 const getTeacherClassrooms = async (req, res, next) => {
   try {
-    const { uid, limit = 10, page = 1 } = req.query;
+    const { uid } = req.query;
 
-    const user = await knex("users").where("uid", uid).first();
+    let page = Number(req.query.page);
+    let limit = Number(req.query.limit);
+
+    if (isNaN(page) || page < 1) page = 1;
+    if (isNaN(limit) || limit < 1) limit = 10;
+
+    const user = await usersService.getUserById(uid);
 
     if (!user) {
       return res.status(404).json({
@@ -188,21 +230,20 @@ const getTeacherClassrooms = async (req, res, next) => {
       });
     }
 
-    const offset = (page - 1) * limit;
-
-    const classrooms = await knex("classrooms")
-      .where("uid", uid)
-      .limit(limit)
-      .offset(offset);
+    const classrooms = await classroomsService.getClassroomsByTeacher(
+      uid,
+      limit,
+      page
+    );
 
     return res.json({
       status: "success",
       data: {
         classrooms,
         metadata: {
-          page: Number(page),
-          limit: Number(limit),
-          total: classrooms.length, // Nếu bạn muốn total thật thì cần count
+          page,
+          limit,
+          total: classrooms.length,
         },
       },
     });
@@ -216,9 +257,11 @@ module.exports = {
   createClassroom,
   getJoinedClassrooms,
   getClassroom,
+  getClassroomDetailByStudent,
   updateClassroom,
   deleteClassroom,
   joinClassroom,
   getMembersInClass,
   getTeacherClassrooms,
+  removeMember,
 };

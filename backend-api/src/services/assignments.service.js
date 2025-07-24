@@ -4,7 +4,6 @@ const {
   deleteFileByPath,
   getAttachments,
 } = require("./attachments.service");
-const Paginator = require("./paginator");
 
 function assignmentRepository() {
   return knex("assignments");
@@ -67,26 +66,19 @@ async function createAssignment(newAssignment, files) {
   }
 }
 
-async function getAssignments(cid, query) {
-  const { page = 1, limit = 5 } = query;
-  const paginator = new Paginator(page, limit);
-
+async function getAssignments(cid) {
   const results = await assignmentRepository()
     .where("cid", cid)
     .select(
-      knex.raw("COUNT(aid) OVER() AS record_count"),
       "aid",
       "a_title",
       "a_description",
       "a_max_points",
       "a_deadline_at",
-      "a_allow_late_submission"
+      "a_allow_late_submission",
+      "a_status"
     )
-    .orderBy("aid", "asc")
-    .limit(paginator.limit)
-    .offset(paginator.offset);
-
-  const totalRecords = results[0]?.record_count ?? 0;
+    .orderBy("aid", "asc");
 
   const aids = results.map((r) => r.aid);
 
@@ -114,17 +106,13 @@ async function getAssignments(cid, query) {
   }
 
   const assignments = results.map((assignment) => {
-    assignment.record_count = undefined;
     return {
       ...assignment,
       attachments: assignmentMap[assignment.aid] || [],
     };
   });
 
-  return {
-    metadata: paginator.getMetadata(totalRecords),
-    assignments,
-  };
+  return assignments;
 }
 
 async function getAssignment(aid) {

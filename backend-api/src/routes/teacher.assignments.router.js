@@ -11,7 +11,6 @@ const { filesUpload } = require("../middlewares/files-upload.middleware");
 
 // schema
 const { partialAssignmentSchema } = require("../schemas/assignment.schemas");
-const { submissionSchema } = require("../schemas/submission.schemas");
 
 const router = express.Router();
 
@@ -54,13 +53,6 @@ const updateAssignmentData = z.object({
     ),
 });
 
-/** Student create a new submission */
-const createSubmissionData = z.object({
-  input: submissionSchema
-    .pick({ aid: true, uid: true, attachments: true })
-    .strict(),
-});
-
 /** Teacher get assignment submissions */
 const getSubmissionParams = z.object({
   input: z
@@ -73,15 +65,7 @@ const getSubmissionParams = z.object({
 });
 
 module.exports.setup = (app) => {
-  app.use("/api/assignments", router);
-
-  router
-    .route("/:aid/submit")
-    .post(
-      [filesUpload, validateRequest(createSubmissionData)],
-      submissionsController.createSubmission
-    )
-    .all(allowedMethods(["POST"]));
+  app.use("/api/teacher/assignments", router);
 
   router
     .route("/:aid/submissions")

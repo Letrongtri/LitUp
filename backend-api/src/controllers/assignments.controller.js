@@ -20,30 +20,14 @@ async function createAssignment(req, res, next) {
 }
 
 async function getAssignments(req, res, next) {
-  let result = {
-    assignments: [],
-    metadata: {
-      totalRecord: 0,
-      firstPage: 1,
-      lastPage: 1,
-      page: 1,
-      limit: 5,
-    },
-  };
-
   try {
-    result = await assignmentsService.getAssignments(req.params.cid, req.query);
+    const result = await assignmentsService.getAssignments(req.params.cid);
+
+    return res.json(JSend.success(result));
   } catch (error) {
     console.log(error);
     return next(new ApiError(500, "Internal Server Error"));
   }
-
-  return res.json(
-    JSend.success({
-      assignments: result.assignments,
-      metadata: result.metadata,
-    })
-  );
 }
 
 async function getAssignment(req, res, next) {

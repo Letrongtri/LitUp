@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps({
   totalPages: {
@@ -14,34 +14,35 @@ const props = defineProps({
     type: Number,
     default: 1,
   },
-})
+});
 
-const $emit = defineEmits(['update:currentPage'])
+const $emit = defineEmits(['update:currentPage']);
+
 const pages = computed(() => {
-  const pages = []
-  const half = Math.floor(props.length / 2)
-  let start = props.currentPage - half
-  let end = props.currentPage + half
+  const pages = [];
+  const half = Math.floor(props.length / 2);
+  let start = props.currentPage - half;
+  let end = props.currentPage + half;
   if (start <= 0) {
-    start = 1
-    end = props.length
+    start = 1;
+    end = props.length;
   }
 
   if (end > props.totalPages) {
-    end = props.totalPages
-    start = end - props.length + 1
-    if (start <= 0) start = 1
+    end = props.totalPages;
+    start = end - props.length + 1;
+    if (start <= 0) start = 1;
   }
   for (let i = start; i <= end; i++) {
-    pages.push(i)
+    pages.push(i);
   }
-  return pages
-})
+  return pages;
+});
 </script>
 
 <template>
   <nav>
-    <ul class="pagination">
+    <ul class="pagination d-flex justify-content-center">
       <li class="page-item" :class="{ disabled: currentPage == 1 }">
         <a
           role="button"
