@@ -37,7 +37,7 @@ const filteredClassrooms = computed(() => {
 async function retrieveClassrooms(page) {
   try {
     const data = await classroomsService.getClassrooms(page);
-
+    
     totalPages.value = data.metadata.lastPage ?? 1;
     classrooms.value = data.classrooms;
   } catch (error) {
@@ -54,16 +54,19 @@ watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: tru
 
 <template>
   <div class="page-container">
-    <!-- Header -->
-    <div class="container">
-      <div class="content-section">
-        <div class="row">
+    <!-- Enhanced Header Banner -->
+    <div class="class-header bg-white border-bottom shadow-sm">
+      <div class="container py-4 px-3">
+        <div class="row align-items-center">
           <div class="col-lg-9 col-sm-12">
-            <h1 class="page-title">Classes attended</h1>
-            <p class="page-subtitle">Search and view class details</p>
+            <h2 class="fw-bold text-primary mb-2">Classes attended</h2>
+            <p class="page-subtitle mb-0">Search and view class details</p>
           </div>
-          <div class="col-lg-3 col-sm-12 d-flex justify-content-end align-items-center">
-            <button class="btn btn-primary" @click="showModal = true">Join Classroom</button>
+          <div class="col-lg-3 col-sm-12 d-flex justify-content-end align-items-center mt-3 mt-lg-0">
+            <button class="btn btn-primary" @click="showModal = true">
+              <i class="fa fa-plus me-2" aria-hidden="true"></i>
+              Join Classroom
+            </button>
           </div>
         </div>
       </div>
@@ -108,3 +111,4 @@ watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: tru
     </div>
   </div>
 </template>
+

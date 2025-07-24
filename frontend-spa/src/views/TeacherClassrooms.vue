@@ -59,16 +59,19 @@ function goToDetailClassroomPage(cls) {
 
 <template>
   <div class="page-container">
-    <!-- Header -->
-    <div class="container">
-      <div class="content-section">
-        <div class="row">
+    <!-- Enhanced Header Banner -->
+    <div class="class-header bg-white border-bottom shadow-sm">
+      <div class="container py-4 px-3">
+        <div class="row align-items-center">
           <div class="col-lg-9 col-sm-12">
-            <h1 class="page-title">Your classroom</h1>
-            <p class="page-subtitle">Classroom and assignment management</p>
+            <h2 class="fw-bold text-primary mb-2">Your classroom</h2>
+            <p class="page-subtitle mb-0">Classroom and assignment management</p>
           </div>
-          <div class="col-lg-3 col-sm-12 d-flex justify-content-end align-items-center">
-            <button class="btn btn-primary" @click="showModal = true">Create Classroom</button>
+          <div class="col-lg-3 col-sm-12 d-flex justify-content-end align-items-center mt-3 mt-lg-0">
+            <button class="btn btn-primary" @click="showModal = true">
+              <i class="fa fa-plus me-2" aria-hidden="true"></i>
+              Create Classroom
+            </button>
           </div>
         </div>
       </div>
@@ -128,32 +131,33 @@ function goToDetailClassroomPage(cls) {
 <style scoped>
 .page-container {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #f5f6f9;
 }
 
-.page-header {
-  background: white;
+/* Enhanced Header Banner - similar to Tin11 style */
+.class-header {
+  background: #fff;
   border-bottom: 1px solid #e0e0e0;
-  padding: 2rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.class-header h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #007bff;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: #6c757d;
+  font-size: 1.1rem;
+  margin: 0;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
-}
-
-.page-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #2c3e50;
-  margin: 0 0 0.5rem 0;
-}
-
-.page-subtitle {
-  color: #666;
-  margin: 0;
-  font-size: 1.2rem;
 }
 
 .content-section {
@@ -328,7 +332,6 @@ h4 {
   color: #888;
 }
 
-/* Buttons - Đồng bộ bo góc */
 .btn {
   padding: 0.5rem 1rem;
   border: none;
@@ -396,7 +399,7 @@ h4 {
   color: #721c24;
 }
 
-/* Input controls - Đồng bộ bo góc */
+/* Input controls */
 .form-control {
   border-radius: 0.375rem;
   font-size: 1rem;
@@ -422,6 +425,10 @@ h4 {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .class-header h2 {
+    font-size: 1.8rem;
+  }
+  
   .section-header {
     flex-direction: column;
     align-items: flex-start;

@@ -105,56 +105,16 @@ async function openSubmissionDetailPage(id) {
   router.push(`/teacher/submissions/${id}`);
 }
 </script>
-
 <template>
-  <div class="container py-5">
-    <!-- Exercise information -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4">
-      <div class="row">
-        <div class="col-9">
-          <h4 class="mb-3 text-primary fw-bold">{{ assignment.a_title }}</h4>
-        </div>
-        <div class="col-3 text-end">
-          <button class="btn btn-primary" @click="showModal = true">
-            <i class="fa fa-cog d-inline-block me-1" aria-hidden="true"></i>
-            Setting
-          </button>
-        </div>
-      </div>
-      <div class="row mt-4">
-        <div class="col-4">
-          <p><strong>Created at: </strong> {{ formatDate(assignment.a_created_at) }}</p>
-        </div>
-        <div class="col-4">
-          <p><strong>Deadline at: </strong> {{ formatDate(assignment.a_deadline_at) }}</p>
-        </div>
-        <div class="col-4">
-          <p><strong>Max points: </strong> {{ assignment.a_max_points }}</p>
-        </div>
-        <div class="col-4">
-          <p><strong>Allow late submission: </strong> {{ assignment.a_allow_late_submission }}</p>
-        </div>
-        <div class="col-4">
-          <p>
-            <strong>Status: </strong>
-            <span class="text-success" v-if="assignment.a_status">Active</span>
-            <span class="text-danger" v-else>Inactive</span>
-          </p>
-        </div>
-        <div class="col-4">
-          <p><strong>Total submissions: </strong> {{ submittedMembersWithSubmission.length }}</p>
-        </div>
-        <div class="col-4">
-          <p><strong>Not yet submitted: </strong> {{ notSubmittedMembers.length }}</p>
-        </div>
-        <div class="col-4">
-          <p><strong>Average scores: </strong> {{ avgGrade }}</p>
-        </div>
-      </div>
-      <div class="row">
-        <p><strong>Description: </strong> {{ assignment.a_description }}</p>
-        <p><strong>Attachments: </strong>{{ attachments.length }}</p>
-        <AttachmentList v-if="attachments" :attachments="attachments" />
+  <div class="page-container bg-light">
+    <!-- Assignment Header - giống như class header -->
+    <div class="class-header bg-white border-bottom shadow-sm">
+      <div class="container py-4 px-3 d-flex align-items-center justify-content-between">
+        <h2 class="fw-bold text-primary mb-1">{{ assignment.a_title }}</h2>
+        <button class="btn btn-primary" @click="showModal = true">
+          <i class="fa fa-cog d-inline-block me-1" aria-hidden="true"></i>
+          Setting
+        </button>
       </div>
     </div>
 
@@ -166,98 +126,152 @@ async function openSubmissionDetailPage(id) {
       :task="'update'"
     />
 
-    <!-- List of submissions -->
-    <div class="bg-white p-4 rounded shadow-sm my-4">
-      <h4 class="mb-3 text-dark">List of submissions</h4>
-      <table class="table table-bordered table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th>No.</th>
-            <th>Full name</th>
-            <th>Status</th>
-            <th>Submited Date</th>
-            <th>Mark</th>
-            <th>Attachments</th>
-            <th>Late</th>
-            <th>Detail</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(member, index) in submittedMembersWithSubmission" :key="member.uid">
-            <td>{{ index + 1 }}</td>
-            <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
-            <td>
-              <span class="text-success">{{ member.submission.s_status }}</span>
-            </td>
-            <td>{{ formatDate(member.submission.s_submitted_at) }}</td>
-            <td>{{ member.submission.s_grade }}</td>
-            <td>{{ member.submission.attachments.length }}</td>
-            <td>
-              {{
-                new Date(member.submission.s_submitted_at) > new Date(assignment.a_deadline_at)
-                  ? 'True'
-                  : 'False'
-              }}
-            </td>
-            <td>
-              <button
-                class="btn btn-sm btn-outline-secondary"
-                @click="openSubmissionDetailPage(member.submission.sid)"
-              >
-                Xem chi tiết
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="d-flex justify-content-center">
-        <MainPagination
-          v-if="submittedMembersWithSubmission.length > 0"
-          :total-pages="totalSubmissionPage"
-          :current-page="1"
-          @update:current-page="changeCurrentPage"
-        />
-      </div>
-    </div>
-
-    <div class="bg-white p-4 rounded shadow-sm my-4">
-      <h4 class="mb-3 text-dark">Unsubmitted list</h4>
-      <div class="row">
-        <div class="col-md-6">
-          <table class="table table-bordered table-hover align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>No.</th>
-                <th>Full name</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(member, index) in leftColumn" :key="member.uid">
-                <td>{{ index + 1 }}</td>
-                <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
-              </tr>
-            </tbody>
-          </table>
+    <div class="container py-5">
+      <!-- Exercise information -->
+      <div class="bg-white p-4 rounded shadow-sm mb-4">
+        <div class="row mt-4">
+          <div class="col-4">
+            <p><strong>Created at: </strong> {{ formatDate(assignment.a_created_at) }}</p>
+          </div>
+          <div class="col-4">
+            <p><strong>Deadline at: </strong> {{ formatDate(assignment.a_deadline_at) }}</p>
+          </div>
+          <div class="col-4">
+            <p><strong>Max points: </strong> {{ assignment.a_max_points }}</p>
+          </div>
+          <div class="col-4">
+            <p><strong>Allow late submission: </strong> {{ assignment.a_allow_late_submission }}</p>
+          </div>
+          <div class="col-4">
+            <p>
+              <strong>Status: </strong>
+              <span class="text-success" v-if="assignment.a_status">Active</span>
+              <span class="text-danger" v-else>Inactive</span>
+            </p>
+          </div>
+          <div class="col-4">
+            <p><strong>Total submissions: </strong> {{ submittedMembersWithSubmission.length }}</p>
+          </div>
+          <div class="col-4">
+            <p><strong>Not yet submitted: </strong> {{ notSubmittedMembers.length }}</p>
+          </div>
+          <div class="col-4">
+            <p><strong>Average scores: </strong> {{ avgGrade }}</p>
+          </div>
         </div>
+        <div class="row">
+          <p><strong>Description: </strong> {{ assignment.a_description }}</p>
+          <p><strong>Attachments: </strong>{{ attachments.length }}</p>
+          <AttachmentList v-if="attachments" :attachments="attachments" />
+        </div>
+      </div>
 
-        <div class="col-md-6">
-          <table class="table table-bordered table-hover align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>No.</th>
-                <th>Full name</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(member, index) in rightColumn" :key="member.uid">
-                <td>{{ index + leftColumn.length + 1 }}</td>
-                <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- List of submissions -->
+      <div class="bg-white p-4 rounded shadow-sm my-4">
+        <h4 class="mb-3 text-dark">List of submissions</h4>
+        <table class="table table-bordered table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>No.</th>
+              <th>Full name</th>
+              <th>Status</th>
+              <th>Submited Date</th>
+              <th>Mark</th>
+              <th>Attachments</th>
+              <th>Late</th>
+              <th>Detail</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(member, index) in submittedMembersWithSubmission" :key="member.uid">
+              <td>{{ index + 1 }}</td>
+              <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
+              <td>
+                <span class="text-success">{{ member.submission.s_status }}</span>
+              </td>
+              <td>{{ formatDate(member.submission.s_submitted_at) }}</td>
+              <td>{{ member.submission.s_grade }}</td>
+              <td>{{ member.submission.attachments.length }}</td>
+              <td>
+                {{
+                  new Date(member.submission.s_submitted_at) > new Date(assignment.a_deadline_at)
+                    ? 'True'
+                    : 'False'
+                }}
+              </td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  @click="openSubmissionDetailPage(member.submission.sid)"
+                >
+                  Xem chi tiết
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="d-flex justify-content-center">
+          <MainPagination
+            v-if="submittedMembersWithSubmission.length > 0"
+            :total-pages="totalSubmissionPage"
+            :current-page="1"
+            @update:current-page="changeCurrentPage"
+          />
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded shadow-sm my-4">
+        <h4 class="mb-3 text-dark">Unsubmitted list</h4>
+        <div class="row">
+          <div class="col-md-6">
+            <table class="table table-bordered table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>No.</th>
+                  <th>Full name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(member, index) in leftColumn" :key="member.uid">
+                  <td>{{ index + 1 }}</td>
+                  <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="col-md-6">
+            <table class="table table-bordered table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>No.</th>
+                  <th>Full name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(member, index) in rightColumn" :key="member.uid">
+                  <td>{{ index + leftColumn.length + 1 }}</td>
+                  <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+
+
+<style scoped>
+.page-container {
+  background-color: #f5f6f9;
+  min-height: 100vh;
+}
+
+.class-header {
+  background: #fff;
+}
+</style>

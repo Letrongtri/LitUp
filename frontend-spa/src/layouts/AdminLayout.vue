@@ -116,13 +116,13 @@ function goToSubmissionsManagementPage() {
 .page-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: #007bff; 
   margin-bottom: 0.5rem;
 }
 
 .page-subtitle {
   font-size: 1.2rem;
-  color: #666;
+  color: #343a40; 
 }
 
 .tabs-nav {
