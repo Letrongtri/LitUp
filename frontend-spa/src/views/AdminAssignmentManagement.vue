@@ -114,7 +114,7 @@ watch(currentPage, () => retrieveAssignments(currentPage.value), { immediate: tr
               class="form-control"
               placeholder="Search by ID or Title... "
             />
-            <button class="btn btn-primary">Tìm</button>
+            <button class="btn btn-primary">Find</button>
           </div>
         </div>
 
