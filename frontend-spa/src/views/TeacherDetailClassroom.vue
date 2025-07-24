@@ -112,7 +112,7 @@ onMounted(() => {
       <!-- Class Information -->
       <div class="container py-4">
         <div class="row g-3 mb-3">
-          <div class="card p-3 border">
+          <div class="card rounded shadow p-3 border">
             <h5 class="card-title mb-3">Classroom Information</h5>
             <p class="card-text"><strong>Classname: </strong>{{ classroom.c_name }}</p>
             <p class="card-text"><strong>Class ID: </strong>{{ classroom.cid }}</p>
@@ -135,7 +135,7 @@ onMounted(() => {
         />
 
         <div class="row g-3">
-          <div class="card p-3 border">
+          <div class="card rounded shadow p-3 border">
             <div class="d-flex justify-content-between align-items-center m-3">
               <h5 class="card-title">Assignments</h5>
               <button class="btn btn-primary" @click="showModalAddAssignment = true">
@@ -161,7 +161,7 @@ onMounted(() => {
         <div class="row g-3 mb-3">
           <!-- Member table -->
           <div class="col-md-8">
-            <div class="card p-3">
+            <div class="card rounded shadow p-3">
               <table class="table table-bordered table-hover align-middle">
                 <thead class="table-light">
                   <tr>
@@ -190,7 +190,7 @@ onMounted(() => {
 
           <!-- Detail member -->
           <div v-if="selectedMember" class="col-md-4">
-            <div class="card p-3">
+            <div class="card rounded shadow p-3">
               <div class="p-1 w-100 d-flex align-items-center justify-content-center">
                 <img
                   class="img-fluid img-thumbnail"
@@ -226,7 +226,7 @@ onMounted(() => {
 <style scoped>
 .content-section {
   background: white;
-  border-radius: 8px;
+  border-radius: 0.375rem; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin: 2rem 0;
   padding: 2rem;
@@ -249,7 +249,7 @@ onMounted(() => {
 .tab-item {
   padding: 0.5rem 1rem;
   cursor: pointer;
-  border-radius: 20px;
+  border-radius: 0.375rem; 
   color: #444;
   transition: background 0.2s;
 }
@@ -264,11 +264,24 @@ onMounted(() => {
 }
 
 .card {
-  border-radius: 12px;
+  border-radius: 0.375rem !important; 
   background-color: #fff;
 }
 
 .card h6 {
   font-size: 1rem;
+}
+
+.btn {
+  border-radius: 0.375rem; 
+}
+
+.img-thumbnail {
+  border-radius: 0.375rem; 
+}
+
+.table {
+  border-radius: 0.375rem;
+  overflow: hidden;
 }
 </style>

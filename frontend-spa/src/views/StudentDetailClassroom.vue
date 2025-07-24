@@ -36,6 +36,7 @@ onMounted(async () => {
   await retrieveAsignments(cid);
 });
 </script>
+
 <template>
   <div class="page-container bg-light">
     <div class="class-header bg-white border-bottom shadow-sm">
@@ -51,7 +52,7 @@ onMounted(async () => {
     <div class="container py-4">
       <!-- <div
         v-if="assignments.length > 0"
-        class="assignment-section bg-white shadow-sm rounded-4 border table-hover"
+        class="assignment-section bg-white shadow-sm rounded border table-hover"
       >
         <div
           v-for="assignment in assignments"
@@ -106,7 +107,7 @@ onMounted(async () => {
 .tab-item {
   padding: 0.5rem 1rem;
   cursor: pointer;
-  border-radius: 20px;
+  border-radius: 0.375rem; 
   color: #444;
   transition: background 0.2s;
 }
@@ -118,5 +119,32 @@ onMounted(async () => {
 .tab-item.active {
   background: #e7f1ff;
   color: #007bff;
+}
+
+.assignment-section {
+  border-radius: 0.375rem !important; 
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.class-header p,
+.assignment-item p {
+  font-size: 1.05rem;
+}
+
+.assignment-item h5 {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.assignment-item strong {
+  font-size: 1.05rem;
+}
+
+.text-muted {
+  font-size: 1rem;
 }
 </style>

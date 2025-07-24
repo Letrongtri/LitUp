@@ -2,7 +2,7 @@
   <div class="error-page">
     <h1>404</h1>
     <p>The page you requested was not found.</p>
-    <router-link to="/" class="btn btn-primary">Back to home page</router-link>
+    <router-link to="/" class="btn btn-primary">Về trang chủ</router-link>
   </div>
 </template>
 
@@ -15,12 +15,19 @@
   justify-content: center;
   text-align: center;
 }
+
 h1 {
-  font-size: 5rem;
+  font-size: 8rem;
   color: #dc3545;
 }
+
 p {
-  font-size: 1.2rem;
-  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.btn {
+  font-size: 1.5rem;
+  padding: 1rem 2rem;
 }
 </style>

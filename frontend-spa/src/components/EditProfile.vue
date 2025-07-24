@@ -162,7 +162,9 @@ function handleFileChange(e) {
         <button type="button" @click="emit('close')" class="btn btn-secondary px-4 py-2 me-3">
           Cancel
         </button>
-        <button type="submit" :disabled="updating" class="btn btn-warning w-100 mb-3">Edit</button>
+        <button type="submit" :disabled="updating" class="btn btn-warning px-4 py-2">
+          Edit
+        </button>
       </div>
     </form>
   </div>

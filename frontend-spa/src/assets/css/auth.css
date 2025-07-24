@@ -2,28 +2,33 @@
   display: flex;
   min-height: 100vh;
   font-family: 'Poppins', sans-serif;
+  background-color: #eef1f5;
 }
 
-/* Left section */
 .auth-left {
   width: 50%;
   background: linear-gradient(135deg, #6a11cb, #2575fc);
   color: white;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: 60px;
+  text-align: center;
+  border-radius: 0;
 }
 
 .welcome-text h1 {
-  font-size: 2.8rem;
-  font-weight: 700;
-  margin-bottom: 15px;
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  line-height: 1.2;
 }
 
 .welcome-text p {
-  font-size: 1.1rem;
-  opacity: 0.9;
+  font-size: 1.15rem;
+  opacity: 0.95;
+  max-width: 400px;
 }
 
 /* Right section */
@@ -33,15 +38,39 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 60px 20px;
 }
+
 
 .form-box {
   width: 100%;
-  max-width: 380px;
+  max-width: 420px;
   background: white;
-  padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.form-box:hover {
+  transform: translateY(-3px);
+}
+
+/* Input fields */
+input.form-control,
+select.form-select {
+  border-radius: 12px;
+  border: 1px solid #ced4da;
+  padding: 10px 14px;
+  font-size: 1rem;
+  transition: border 0.2s ease;
+}
+
+input.form-control:focus,
+select.form-select:focus {
+  border-color: #6a11cb;
+  box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2);
+  outline: none;
 }
 
 /* Gradient button */
@@ -50,21 +79,25 @@
   border: none;
   color: white;
   font-weight: 600;
-  border-radius: 8px;
-  padding: 10px 0;
-  transition: background 0.3s ease;
+  border-radius: 12px;
+  padding: 12px 0;
+  width: 100%;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(106, 17, 203, 0.3);
 }
 
 .btn-gradient:hover {
-  background: linear-gradient(to right, #5b0bcc, #1f63e1);
+  background: linear-gradient(to right, #5310c7, #1c5fd9);
+  box-shadow: 0 6px 18px rgba(106, 17, 203, 0.4);
 }
 
-input.form-control,
-select.form-select {
-  border-radius: 10px;
-}
-
+/* Alert messages */
 .alert {
-  border-radius: 8px;
-  font-size: 0.9rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  padding: 12px;
+  margin-top: 15px;
+  box-shadow: 0 2px 10px rgba(255, 0, 0, 0.08);
 }

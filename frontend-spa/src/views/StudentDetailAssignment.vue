@@ -323,4 +323,27 @@ function handleFileChange(e) {
 p {
   margin: 0;
 }
+
+h2 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.card-title,
+h5 {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+p,
+strong,
+label,
+.alert {
+  font-size: 1.05rem;
+}
+
+button {
+  font-size: 1rem;
+}
+
 </style>

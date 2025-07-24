@@ -145,20 +145,20 @@ function goToDetailClassroomPage(cls) {
 
 .page-title {
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #2c3e50;
   margin: 0 0 0.5rem 0;
 }
 
 .page-subtitle {
-  color: #7f8c8d;
+  color: #666;
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
 
 .content-section {
   background: white;
-  border-radius: 8px;
+  border-radius: 0.375rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin: 2rem 0;
   padding: 2rem;
@@ -168,6 +168,7 @@ function goToDetailClassroomPage(cls) {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #f8f9fa;
@@ -176,7 +177,8 @@ function goToDetailClassroomPage(cls) {
 .section-header h3 {
   margin: 0;
   color: #2c3e50;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .classrooms-grid {
@@ -187,7 +189,7 @@ function goToDetailClassroomPage(cls) {
 
 .classroom-card {
   border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 0.375rem;
   overflow: hidden;
   transition: box-shadow 0.2s;
 }
@@ -198,18 +200,18 @@ function goToDetailClassroomPage(cls) {
 
 .card-header {
   background: #f8f9fa;
-  padding: 1.5rem;
+  padding: 1.2rem;
   border-bottom: 1px solid #e0e0e0;
 }
 
 .card-header h4 {
-  margin: 0;
+  margin: 0 0 0.25rem 0;
   color: #2c3e50;
   font-size: 1.2rem;
 }
 
 .card-body {
-  padding: 1.5rem;
+  padding: 1.2rem;
 }
 
 .card-actions {
@@ -242,7 +244,7 @@ function goToDetailClassroomPage(cls) {
   align-items: center;
   padding: 1rem;
   border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  border-radius: 0.375rem;
   margin-bottom: 0.5rem;
 }
 
@@ -256,7 +258,7 @@ function goToDetailClassroomPage(cls) {
   background: #e8f5e8;
   color: #2d5a2d;
   padding: 0.25rem 0.75rem;
-  border-radius: 20px;
+  border-radius: 0.375rem;
   font-size: 0.8rem;
   font-weight: 500;
 }
@@ -286,7 +288,7 @@ function goToDetailClassroomPage(cls) {
 .student-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 0.375rem;
   background: #007bff;
   color: white;
   display: flex;
@@ -321,12 +323,17 @@ function goToDetailClassroomPage(cls) {
   text-decoration: underline;
 }
 
-/* Buttons */
+h4 {
+  font-size: 1.2rem;
+  color: #888;
+}
+
+/* Buttons - Đồng bộ bo góc */
 .btn {
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  border-radius: 0.375rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
   text-decoration: none;
@@ -379,7 +386,7 @@ function goToDetailClassroomPage(cls) {
 
 .alert {
   padding: 1rem;
-  border-radius: 4px;
+  border-radius: 0.375rem;
   margin-bottom: 1rem;
 }
 
@@ -387,6 +394,30 @@ function goToDetailClassroomPage(cls) {
   background: #f8d7da;
   border: 1px solid #f5c6cb;
   color: #721c24;
+}
+
+/* Input controls - Đồng bộ bo góc */
+.form-control {
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+
+.search-input {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  min-width: 250px;
+}
+
+.input-group .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-group .btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 /* Responsive */
