@@ -15,6 +15,320 @@
       "description": "Development server"
     }
   ],
+  "security": [{ "bearerAuth": [] }],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Users": {
+        "type": "object",
+        "properties": {
+          "uid": { "type": "integer", "readOnly": true },
+          "u_avatar_id": { "type": "string" },
+          "u_email": { "type": "string", "format": "email" },
+          "u_first_name": { "type": "string", "maxLength": 100 },
+          "u_last_name": { "type": "string", "maxLength": 100 },
+          "u_password": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true
+          },
+          "u_role": {
+            "type": "string",
+            "enum": ["Student", "Teacher", "Admin"]
+          },
+          "u_status": { "type": "boolean" },
+          "u_created_at": { "type": "string", "format": "date-time" },
+          "u_updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Classrooms": {
+        "type": "object",
+        "properties": {
+          "cid": { "type": "integer" },
+          "uid": { "type": "integer" },
+          "c_name": { "type": "string" },
+          "c_code": { "type": "string" },
+          "c_status": { "type": "boolean" },
+          "c_created_at": { "type": "string", "format": "date-time" },
+          "c_updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Assignments": {
+        "type": "object",
+        "properties": {
+          "aid": { "type": "integer" },
+          "cid": { "type": "integer" },
+          "a_title": { "type": "string" },
+          "a_description": { "type": "string" },
+          "a_max_points": { "type": "number" },
+          "a_status": { "type": "boolean" },
+          "a_created_at": { "type": "string", "format": "date-time" },
+          "a_updated_at": { "type": "string", "format": "date-time" },
+          "a_deadline_at": { "type": "string", "format": "date-time" },
+          "a_allow_late_submission": { "type": "boolean" }
+        }
+      },
+      "Submissions": {
+        "type": "object",
+        "properties": {
+          "sid": { "type": "integer" },
+          "uid": { "type": "integer" },
+          "aid": { "type": "integer" },
+          "s_status": { "type": "string" },
+          "s_submitted_at": { "type": "string", "format": "date-time" },
+          "s_updated_at": { "type": "string", "format": "date-time" },
+          "s_grade": { "type": "number" },
+          "s_comment": { "type": "string" },
+          "s_graded_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Members": {
+        "type": "object",
+        "properties": {
+          "mid": { "type": "string" },
+          "uid": { "type": "integer" },
+          "cid": { "type": "integer" },
+          "m_status": {
+            "type": "string",
+            "enum": ["active", "removed", "suspended"]
+          },
+          "m_joined_at": { "type": "string", "format": "date-time" },
+          "m_removed_at": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          }
+        }
+      },
+      "Attachments": {
+        "type": "object",
+        "properties": {
+          "fid": { "type": "integer" },
+          "f_name": { "type": "string" },
+          "f_original_name": { "type": "string" },
+          "f_type": { "type": "string" },
+          "f_size": { "type": "integer" },
+          "f_created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaginationMetadata": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Current page number",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items per page",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of items",
+            "minimum": 0
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "minimum": 0
+          },
+          "hasNextPage": {
+            "type": "boolean",
+            "description": "Whether there is a next page"
+          },
+          "hasPrevPage": {
+            "type": "boolean",
+            "description": "Whether there is a previous page"
+          }
+        },
+        "required": ["page", "limit", "total", "totalPages"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["fail", "error"],
+            "description": "JSend status"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          }
+        },
+        "required": ["status", "message"]
+      }
+    },
+    "responses": {
+      "200Success": {
+        "description": "Success",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": { "type": "string", "example": "success" },
+                "data": { "type": ["object", "array", "null"] }
+              }
+            }
+          }
+        }
+      },
+      "200NoData": {
+        "description": "Success without data",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": { "type": "string", "example": "success" },
+                "message": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "400BadRequest": {
+        "description": "Invalid request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "fail",
+              "message": "Invalid request"
+            }
+          }
+        }
+      },
+      "401Unauthorized": {
+        "description": "Unauthorized access",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "fail",
+              "message": "Unauthorized access"
+            }
+          }
+        }
+      },
+      "403Forbidden": {
+        "description": "Forbidden - insufficient permissions",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "fail",
+              "message": "Insufficient permissions"
+            }
+          }
+        }
+      },
+      "404NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "fail",
+              "message": "Resource not found"
+            }
+          }
+        }
+      },
+      "405MethodNotAllow": {
+        "description": "Method not allow",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "fail",
+              "message": "Method not allow"
+            }
+          }
+        }
+      },
+      "500InternalServerError": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "status": "error",
+              "message": "Internal Server Error"
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "userIdParam": {
+        "name": "uid",
+        "in": "path",
+        "required": true,
+        "description": "User ID",
+        "schema": { "type": "integer" }
+      },
+      "classroomIdParam": {
+        "name": "cid",
+        "in": "path",
+        "required": true,
+        "description": "Classroom ID",
+        "schema": { "type": "integer" }
+      },
+      "assignmentIdParam": {
+        "name": "aid",
+        "in": "path",
+        "required": true,
+        "description": "Assignment ID",
+        "schema": { "type": "integer" }
+      },
+      "submissionIdParam": {
+        "name": "sid",
+        "in": "path",
+        "required": true,
+        "description": "Submission ID",
+        "schema": { "type": "integer" }
+      },
+      "memberIdParam": {
+        "name": "mid",
+        "in": "path",
+        "required": true,
+        "description": "Member ID",
+        "schema": { "type": "integer" }
+      },
+      "limitParam": {
+        "name": "limit",
+        "in": "query",
+        "schema": { "type": "integer", "default": 10 }
+      },
+      "pageParam": {
+        "name": "page",
+        "in": "query",
+        "schema": { "type": "integer", "default": 1 }
+      }
+    }
+  },
   "paths": {
     "/api/auth/register": {
       "post": {
@@ -74,7 +388,8 @@
           },
           "400": { "$ref": "#/components/responses/400BadRequest" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
+        },
+        "security": []
       }
     },
     "/api/auth/login": {
@@ -114,9 +429,7 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "user": {
-                          "$ref": "#/components/schemas/Users"
-                        }
+                        "token": { "type": "string" }
                       }
                     }
                   }
@@ -127,7 +440,8 @@
           "400": { "$ref": "#/components/responses/400BadRequest" },
           "401": { "$ref": "#/components/responses/401Unauthorized" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
+        },
+        "security": []
       }
     },
     "/api/users/{uid}": {
@@ -1728,319 +2042,6 @@
           "403": { "$ref": "#/components/responses/403Forbidden" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
-      }
-    }
-  },
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    },
-    "schemas": {
-      "Users": {
-        "type": "object",
-        "properties": {
-          "uid": { "type": "integer", "readOnly": true },
-          "u_avatar_id": { "type": "string" },
-          "u_email": { "type": "string", "format": "email" },
-          "u_first_name": { "type": "string", "maxLength": 100 },
-          "u_last_name": { "type": "string", "maxLength": 100 },
-          "u_password": {
-            "type": "string",
-            "format": "password",
-            "writeOnly": true
-          },
-          "u_role": {
-            "type": "string",
-            "enum": ["Student", "Teacher", "Admin"]
-          },
-          "u_status": { "type": "boolean" },
-          "u_created_at": { "type": "string", "format": "date-time" },
-          "u_updated_at": { "type": "string", "format": "date-time" }
-        }
-      },
-      "Classrooms": {
-        "type": "object",
-        "properties": {
-          "cid": { "type": "integer" },
-          "uid": { "type": "integer" },
-          "c_name": { "type": "string" },
-          "c_code": { "type": "string" },
-          "c_status": { "type": "boolean" },
-          "c_created_at": { "type": "string", "format": "date-time" },
-          "c_updated_at": { "type": "string", "format": "date-time" }
-        }
-      },
-      "Assignments": {
-        "type": "object",
-        "properties": {
-          "aid": { "type": "integer" },
-          "cid": { "type": "integer" },
-          "a_title": { "type": "string" },
-          "a_description": { "type": "string" },
-          "a_max_points": { "type": "number" },
-          "a_status": { "type": "boolean" },
-          "a_created_at": { "type": "string", "format": "date-time" },
-          "a_updated_at": { "type": "string", "format": "date-time" },
-          "a_deadline_at": { "type": "string", "format": "date-time" },
-          "a_allow_late_submission": { "type": "boolean" }
-        }
-      },
-      "Submissions": {
-        "type": "object",
-        "properties": {
-          "sid": { "type": "integer" },
-          "uid": { "type": "integer" },
-          "aid": { "type": "integer" },
-          "s_status": { "type": "string" },
-          "s_submitted_at": { "type": "string", "format": "date-time" },
-          "s_updated_at": { "type": "string", "format": "date-time" },
-          "s_grade": { "type": "number" },
-          "s_comment": { "type": "string" },
-          "s_graded_at": { "type": "string", "format": "date-time" }
-        }
-      },
-      "Members": {
-        "type": "object",
-        "properties": {
-          "mid": { "type": "string" },
-          "uid": { "type": "integer" },
-          "cid": { "type": "integer" },
-          "m_status": {
-            "type": "string",
-            "enum": ["active", "removed", "suspended"]
-          },
-          "m_joined_at": { "type": "string", "format": "date-time" },
-          "m_removed_at": {
-            "type": ["string", "null"],
-            "format": "date-time"
-          }
-        }
-      },
-      "Attachments": {
-        "type": "object",
-        "properties": {
-          "fid": { "type": "integer" },
-          "f_name": { "type": "string" },
-          "f_original_name": { "type": "string" },
-          "f_type": { "type": "string" },
-          "f_size": { "type": "integer" },
-          "f_created_at": { "type": "string", "format": "date-time" }
-        }
-      },
-      "PaginationMetadata": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "minimum": 1
-          },
-          "limit": {
-            "type": "integer",
-            "description": "Number of items per page",
-            "minimum": 1,
-            "maximum": 100
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total number of items",
-            "minimum": 0
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number of pages",
-            "minimum": 0
-          },
-          "hasNextPage": {
-            "type": "boolean",
-            "description": "Whether there is a next page"
-          },
-          "hasPrevPage": {
-            "type": "boolean",
-            "description": "Whether there is a previous page"
-          }
-        },
-        "required": ["page", "limit", "total", "totalPages"]
-      },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": ["fail", "error"],
-            "description": "JSend status"
-          },
-          "message": {
-            "type": "string",
-            "description": "Error message"
-          }
-        },
-        "required": ["status", "message"]
-      }
-    },
-    "responses": {
-      "200Success": {
-        "description": "Success",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "status": { "type": "string", "example": "success" },
-                "data": { "type": ["object", "array", "null"] }
-              }
-            }
-          }
-        }
-      },
-      "200NoData": {
-        "description": "Success without data",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "status": { "type": "string", "example": "success" },
-                "message": { "type": "string" }
-              }
-            }
-          }
-        }
-      },
-      "400BadRequest": {
-        "description": "Invalid request",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            },
-            "example": {
-              "status": "fail",
-              "message": "Invalid request"
-            }
-          }
-        }
-      },
-      "401Unauthorized": {
-        "description": "Unauthorized access",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            },
-            "example": {
-              "status": "fail",
-              "message": "Unauthorized access"
-            }
-          }
-        }
-      },
-      "403Forbidden": {
-        "description": "Forbidden - insufficient permissions",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            },
-            "example": {
-              "status": "fail",
-              "message": "Insufficient permissions"
-            }
-          }
-        }
-      },
-      "404NotFound": {
-        "description": "Resource not found",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            },
-            "example": {
-              "status": "fail",
-              "message": "Resource not found"
-            }
-          }
-        }
-      },
-      "405MethodNotAllow": {
-        "description": "Method not allow",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            },
-            "example": {
-              "status": "fail",
-              "message": "Method not allow"
-            }
-          }
-        }
-      },
-      "500InternalServerError": {
-        "description": "Internal server error",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            },
-            "example": {
-              "status": "error",
-              "message": "Internal Server Error"
-            }
-          }
-        }
-      }
-    },
-    "parameters": {
-      "userIdParam": {
-        "name": "uid",
-        "in": "path",
-        "required": true,
-        "description": "User ID",
-        "schema": { "type": "integer" }
-      },
-      "classroomIdParam": {
-        "name": "cid",
-        "in": "path",
-        "required": true,
-        "description": "Classroom ID",
-        "schema": { "type": "integer" }
-      },
-      "assignmentIdParam": {
-        "name": "aid",
-        "in": "path",
-        "required": true,
-        "description": "Assignment ID",
-        "schema": { "type": "integer" }
-      },
-      "submissionIdParam": {
-        "name": "sid",
-        "in": "path",
-        "required": true,
-        "description": "Submission ID",
-        "schema": { "type": "integer" }
-      },
-      "memberIdParam": {
-        "name": "mid",
-        "in": "path",
-        "required": true,
-        "description": "Member ID",
-        "schema": { "type": "integer" }
-      },
-      "limitParam": {
-        "name": "limit",
-        "in": "query",
-        "schema": { "type": "integer", "default": 10 }
-      },
-      "pageParam": {
-        "name": "page",
-        "in": "query",
-        "schema": { "type": "integer", "default": 1 }
       }
     }
   },
