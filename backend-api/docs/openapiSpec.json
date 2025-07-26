@@ -444,14 +444,12 @@
         "security": []
       }
     },
-    "/api/users/{uid}": {
+    "/api/users/me": {
       "get": {
-        "summary": "Get user profile",
-        "description": "Get current user profile information (requires JWT)",
-        "operationId": "getUser",
+        "summary": "Get my profile",
+        "description": "Get current my profile information (requires JWT)",
+        "operationId": "fetchMe",
         "tags": ["users"],
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "$ref": "#/components/parameters/userIdParam" }],
         "responses": {
           "200": {
             "description": "User profile information",
@@ -481,14 +479,15 @@
           "401": { "$ref": "#/components/responses/401Unauthorized" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
-      },
+      }
+    },
+    "/api/users/": {
       "put": {
-        "summary": "Update user profile",
-        "description": "Update user profile information",
+        "summary": "Update my profile",
+        "description": "Update my profile information",
         "operationId": "updateUser",
         "tags": ["users"],
         "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "$ref": "#/components/parameters/userIdParam" }],
         "requestBody": {
           "required": true,
           "content": {
@@ -545,12 +544,11 @@
         }
       },
       "delete": {
-        "summary": "Delete user account",
-        "description": "Delete user account",
+        "summary": "Delete my account",
+        "description": "Delete my account",
         "operationId": "deleteUser",
         "tags": ["users"],
         "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "$ref": "#/components/parameters/userIdParam" }],
         "responses": {
           "200": {
             "description": "Account deleted successfully",
@@ -563,6 +561,45 @@
         }
       }
     },
+    "/api/users/{uid}": {
+      "get": {
+        "summary": "Get user profile",
+        "description": "Get current user profile information (requires JWT)",
+        "operationId": "getUser",
+        "tags": ["users"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/userIdParam" }],
+        "responses": {
+          "200": {
+            "description": "User profile information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/Users"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401Unauthorized" },
+          "500": { "$ref": "#/components/responses/500InternalServerError" }
+        }
+      }
+    },
     "/api/teacher/classrooms": {
       "get": {
         "summary": "Get classrooms created by teacher",
@@ -571,13 +608,6 @@
         "tags": ["classrooms"],
         "security": [{ "bearerAuth": [] }],
         "parameters": [
-          {
-            "name": "uid",
-            "in": "query",
-            "required": true,
-            "description": "User ID of teacher",
-            "schema": { "type": "integer" }
-          },
           { "$ref": "#/components/parameters/limitParam" },
           { "$ref": "#/components/parameters/pageParam" }
         ],
@@ -629,7 +659,6 @@
                 "type": "object",
                 "required": ["c_name"],
                 "properties": {
-                  "uid": { "type": "integer" },
                   "c_name": { "type": "string" }
                 }
               }
@@ -858,13 +887,6 @@
         "tags": ["classrooms"],
         "security": [{ "bearerAuth": [] }],
         "parameters": [
-          {
-            "name": "uid",
-            "in": "query",
-            "required": true,
-            "description": "User ID",
-            "schema": { "type": "integer" }
-          },
           { "$ref": "#/components/parameters/limitParam" },
           { "$ref": "#/components/parameters/pageParam" }
         ],
@@ -962,10 +984,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["c_code", "uid"],
+                "required": ["c_code"],
                 "properties": {
-                  "c_code": { "type": "string" },
-                  "uid": { "type": "integer" }
+                  "c_code": { "type": "string" }
                 }
               }
             }
@@ -1319,71 +1340,6 @@
           "404": { "$ref": "#/components/responses/404NotFound" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
-      },
-      "post": {
-        "summary": "Submit assignment",
-        "description": "Student submits assignment",
-        "operationId": "submitAssignment",
-        "tags": ["submissions"],
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "$ref": "#/components/parameters/assignmentIdParam" }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "uid": { "type": "integer" },
-                  "attachments": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "binary",
-                      "writeOnly": true,
-                      "description": "Submission files"
-                    },
-                    "description": "Assignment files to upload",
-                    "maxItems": 10
-                  }
-                },
-                "required": ["attachments"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Assignment submitted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "description": "The response status",
-                      "enum": ["success"]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "submission": {
-                          "$ref": "#/components/schemas/Submissions"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": { "$ref": "#/components/responses/400BadRequest" },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "403": { "$ref": "#/components/responses/403Forbidden" },
-          "404": { "$ref": "#/components/responses/404NotFound" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
       }
     },
     "/api/teacher/assignments/{aid}/submissions": {
@@ -1529,25 +1485,78 @@
         }
       }
     },
-    "/api/student/submissions/": {
+    "/api/student/assignments/{aid}/submission": {
+      "post": {
+        "summary": "Submit assignment",
+        "description": "Student submits assignment",
+        "operationId": "submitAssignment",
+        "tags": ["submissions"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/assignmentIdParam" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "attachments": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary",
+                      "writeOnly": true,
+                      "description": "Submission files"
+                    },
+                    "description": "Assignment files to upload",
+                    "maxItems": 10
+                  }
+                },
+                "required": ["attachments"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Assignment submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The response status",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "submission": {
+                          "$ref": "#/components/schemas/Submissions"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/400BadRequest" },
+          "401": { "$ref": "#/components/responses/401Unauthorized" },
+          "403": { "$ref": "#/components/responses/403Forbidden" },
+          "404": { "$ref": "#/components/responses/404NotFound" },
+          "500": { "$ref": "#/components/responses/500InternalServerError" }
+        }
+      },
       "get": {
         "summary": "Get submissions details",
         "description": "Get detailed information about an submission",
         "operationId": "getSubmissionByStudent",
         "tags": ["submissions"],
         "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "query",
-            "schema": { "type": "integer" }
-          },
-          {
-            "name": "aid",
-            "in": "query",
-            "schema": { "type": "integer" }
-          }
-        ],
+        "parameters": [{ "$ref": "#/components/parameters/assignmentIdParam" }],
         "responses": {
           "200": {
             "description": "submission details",
@@ -1586,6 +1595,7 @@
         "operationId": "updateSubmissionByStudent",
         "tags": ["submissions"],
         "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/assignmentIdParam" }],
         "requestBody": {
           "required": true,
           "content": {
@@ -1593,8 +1603,6 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "uid": { "type": "integer" },
-                  "aid": { "type": "integer" },
                   "attachments": {
                     "type": "array",
                     "items": {
@@ -1607,7 +1615,7 @@
                     "maxItems": 10
                   }
                 },
-                "required": ["uid", "aid", "attachments"]
+                "required": ["attachments"]
               }
             }
           }

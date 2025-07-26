@@ -2,58 +2,58 @@
 import AttachmentList from '@/components/AttachmentList.vue';
 import CreateAndEditAssignment from '@/components/CreateAndEditAssignment.vue';
 import MainPagination from '@/components/MainPagination.vue';
-import assignmentsService from '@/services/assignments.service';
-import classroomsService from '@/services/classrooms.service';
+import { useAssignmentDetail, useSubmissions } from '@/composables/useAssignment';
+import { useClassroomMembers } from '@/composables/useClassroom';
 import { formatDate } from '@/utils/format';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
-
 const aid = Number(route.params?.aid);
 
-const assignment = ref({});
-const attachments = ref([]);
-const members = ref([]);
-const submissions = ref([]);
+// Detail assignments
+const {
+  data: detailData,
+  isLoading: isLoadingDetail,
+  error: errorDetail,
+  refetch: refetchDetail,
+} = useAssignmentDetail(aid);
+const assignment = computed(() => detailData.value?.assignment || {});
+const attachments = computed(() => assignment.value.attachments || []);
+const cid = computed(() => assignment.value?.cid);
 
-const totalSubmissionPage = ref(1);
-const currentSubmissionPage = ref(1);
+// Members
+const {
+  data: membersData,
+  isLoading: isLoadingMembers,
+  error: errorMembers,
+  refetch: refetchMembers,
+} = useClassroomMembers(cid);
+
+const members = computed(() => membersData.value?.users || []);
+
+// Submissions
+const currentSubmissionPage = computed(() => {
+  const page = Number(route.query?.page);
+  if (Number.isNaN(page) || page < 1) return 1;
+  return page;
+});
+
+const {
+  data: submissionsData,
+  isLoading: isLoadingSubmissions,
+  error: errorSubmissions,
+  refetch: refetchSubmissions,
+} = useSubmissions(aid, currentSubmissionPage.value);
+const submissions = computed(() => submissionsData.value?.submissions || []);
+
+const totalSubmissionPage = computed(() => submissionsData.value?.metadata.lastPage || 1);
 
 const showModal = ref(false);
 
-async function retrieveAssignment() {
-  try {
-    const data = await assignmentsService.getAssignment(aid);
-    assignment.value = data.assignment;
-    attachments.value = assignment.value.attachments;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-async function retrieveSubmissions(page) {
-  try {
-    const data = await assignmentsService.getSubmissions(aid, page);
-    submissions.value = data.submissions;
-    totalSubmissionPage.value = data.metadata.lastPage ?? 1;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-async function retrieveMembers() {
-  try {
-    const data = await classroomsService.getMembers(assignment.value.cid);
-    members.value = data.users;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 function changeCurrentPage(page) {
-  currentSubmissionPage.value = page;
+  router.push({ name: 'teacher.asignment.detail', query: { page } });
 }
 
 const submittedMembersWithSubmission = computed(() => {
@@ -91,23 +91,19 @@ const rightColumn = computed(() => {
   return notSubmittedMembers.value.slice(mid);
 });
 
-onMounted(async () => {
-  await retrieveAssignment();
-  await retrieveMembers();
-  await retrieveSubmissions(currentSubmissionPage.value);
-});
-
-watch(currentSubmissionPage, () => retrieveSubmissions(currentSubmissionPage.value), {
-  immediate: true,
-});
-
 async function openSubmissionDetailPage(id) {
   router.push(`/teacher/submissions/${id}`);
 }
 </script>
 
 <template>
-  <div class="container py-5">
+  <div v-if="isLoadingDetail" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else class="container py-5">
     <!-- Exercise information -->
     <div class="bg-white p-4 rounded shadow-sm mb-4">
       <div class="row">
@@ -160,102 +156,111 @@ async function openSubmissionDetailPage(id) {
 
     <CreateAndEditAssignment
       v-if="showModal"
-      @updated="retrieveAssignment(aid)"
+      @updated="refetchDetail"
       @close="showModal = false"
       :assignment="assignment"
       :task="'update'"
     />
 
     <!-- List of submissions -->
-    <div class="bg-white p-4 rounded shadow-sm my-4">
-      <h4 class="mb-3 text-dark">List of submissions</h4>
-      <table class="table table-bordered table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th>No.</th>
-            <th>Full name</th>
-            <th>Status</th>
-            <th>Submited Date</th>
-            <th>Mark</th>
-            <th>Attachments</th>
-            <th>Late</th>
-            <th>Detail</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(member, index) in submittedMembersWithSubmission" :key="member.uid">
-            <td>{{ index + 1 }}</td>
-            <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
-            <td>
-              <span class="text-success">{{ member.submission.s_status }}</span>
-            </td>
-            <td>{{ formatDate(member.submission.s_submitted_at) }}</td>
-            <td>{{ member.submission.s_grade }}</td>
-            <td>{{ member.submission.attachments.length }}</td>
-            <td>
-              {{
-                new Date(member.submission.s_submitted_at) > new Date(assignment.a_deadline_at)
-                  ? 'True'
-                  : 'False'
-              }}
-            </td>
-            <td>
-              <button
-                class="btn btn-sm btn-outline-secondary"
-                @click="openSubmissionDetailPage(member.submission.sid)"
-              >
-                Xem chi tiết
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
 
-      <div class="d-flex justify-content-center">
-        <MainPagination
-          v-if="submittedMembersWithSubmission.length > 0"
-          :total-pages="totalSubmissionPage"
-          :current-page="1"
-          @update:current-page="changeCurrentPage"
-        />
+    <div v-if="isLoadingMembers || isLoadingSubmissions" class="text-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
       </div>
     </div>
 
-    <div class="bg-white p-4 rounded shadow-sm my-4">
-      <h4 class="mb-3 text-dark">Unsubmitted list</h4>
-      <div class="row">
-        <div class="col-md-6">
-          <table class="table table-bordered table-hover align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>No.</th>
-                <th>Full name</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(member, index) in leftColumn" :key="member.uid">
-                <td>{{ index + 1 }}</td>
-                <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+    <div v-else>
+      <div class="bg-white p-4 rounded shadow-sm my-4">
+        <h4 class="mb-3 text-dark">List of submissions</h4>
+        <table class="table table-bordered table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>No.</th>
+              <th>Full name</th>
+              <th>Status</th>
+              <th>Submited Date</th>
+              <th>Mark</th>
+              <th>Attachments</th>
+              <th>Late</th>
+              <th>Detail</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(member, index) in submittedMembersWithSubmission" :key="member.uid">
+              <td>{{ index + 1 }}</td>
+              <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
+              <td>
+                <span class="text-success">{{ member.submission.s_status }}</span>
+              </td>
+              <td>{{ formatDate(member.submission.s_submitted_at) }}</td>
+              <td>{{ member.submission.s_grade }}</td>
+              <td>{{ member.submission.attachments.length }}</td>
+              <td>
+                {{
+                  new Date(member.submission.s_submitted_at) > new Date(assignment.a_deadline_at)
+                    ? 'True'
+                    : 'False'
+                }}
+              </td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  @click="openSubmissionDetailPage(member.submission.sid)"
+                >
+                  Xem chi tiết
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div class="col-md-6">
-          <table class="table table-bordered table-hover align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>No.</th>
-                <th>Full name</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(member, index) in rightColumn" :key="member.uid">
-                <td>{{ index + leftColumn.length + 1 }}</td>
-                <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="d-flex justify-content-center">
+          <MainPagination
+            v-if="submittedMembersWithSubmission.length > 0"
+            :total-pages="totalSubmissionPage"
+            :current-page="1"
+            @update:current-page="changeCurrentPage"
+          />
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded shadow-sm my-4">
+        <h4 class="mb-3 text-dark">Unsubmitted list</h4>
+        <div class="row">
+          <div class="col-md-6">
+            <table class="table table-bordered table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>No.</th>
+                  <th>Full name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(member, index) in leftColumn" :key="member.uid">
+                  <td>{{ index + 1 }}</td>
+                  <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="col-md-6">
+            <table class="table table-bordered table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>No.</th>
+                  <th>Full name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(member, index) in rightColumn" :key="member.uid">
+                  <td>{{ index + leftColumn.length + 1 }}</td>
+                  <td>{{ member.u_first_name }} {{ member.u_last_name }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

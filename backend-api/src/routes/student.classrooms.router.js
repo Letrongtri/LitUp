@@ -16,7 +16,6 @@ const router = express.Router();
  * query: ?uid=15&limit=10&page=2
  */
 const getJoinedClassroomData = z.object({
-  uid: z.coerce.number().nonnegative().optional(),
   limit: z.coerce.number().nonnegative().optional(),
   page: z.coerce.number().nonnegative().optional(),
 });
@@ -26,7 +25,6 @@ const joinClassroomData = z.object({
   input: z.object({
     cid: z.coerce.number().nonnegative(),
     c_code: z.string().length(6),
-    uid: z.coerce.number().nonnegative(),
   }),
 });
 

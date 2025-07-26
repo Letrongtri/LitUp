@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import classroomsService from '@/services/classrooms.service';
+import { useDeleteClassroom, useUpdateClassroom } from '@/composables/useClassroom';
 
 const route = useRoute();
 const router = useRouter();
@@ -19,15 +19,18 @@ const message = ref('');
 const updating = ref(false);
 const status = ref(props.classroom.c_status);
 
+const updateClassroomMutation = useUpdateClassroom();
+const deleteClassroomMutation = useDeleteClassroom();
+
 async function updateClassroom() {
   updating.value = true;
   error.value = '';
   message.value = '';
 
   try {
-    await classroomsService.updateClassroom(cid, {
-      c_name: className.value,
-      c_status: status.value,
+    await updateClassroomMutation.mutateAsync({
+      cid,
+      data: { c_name: className.value, c_status: status.value },
     });
     message.value = 'Class update successful!';
 
@@ -45,7 +48,7 @@ async function deleteClassroom() {
   message.value = '';
   if (confirm('Do you want to delete this classroom?')) {
     try {
-      await classroomsService.deleteClassroom(cid);
+      await deleteClassroomMutation.mutateAsync(cid);
       message.value = 'Class update successful!';
       router.push('/teacher/classrooms');
     } catch (err) {

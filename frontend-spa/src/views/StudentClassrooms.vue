@@ -1,16 +1,15 @@
 <script setup>
 import ClassroomStudentList from '@/components/ClassroomStudentList.vue';
 import '../assets/css/ClassroomStudent.css';
-import { computed, ref, watch } from 'vue';
-import classroomsService from '@/services/classrooms.service';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import MainPagination from '@/components/MainPagination.vue';
 import JoinClassroom from '@/components/JoinClassroom.vue';
+import { useClassroomsByStudent } from '@/composables/useClassroom';
 
 const route = useRoute();
 const router = useRouter();
 
-const totalPages = ref(1);
 const showModal = ref(false);
 
 const currentPage = computed(() => {
@@ -19,41 +18,34 @@ const currentPage = computed(() => {
   return page;
 });
 
-const classrooms = ref([]);
-const searchClass = ref('');
+const { data, isLoading, error, refetch } = useClassroomsByStudent(currentPage.value);
+const classrooms = computed(() => data.value?.classrooms || []);
+const totalPages = computed(() => data.value?.metadata.lastPage || 1);
 
-const searchableClassrooms = computed(() =>
-  classrooms.value.map((classroom) => classroom.c_name.toLowerCase()),
-);
+const searchClass = ref('');
 
 // Classroom filtered by searchClass
 const filteredClassrooms = computed(() => {
   if (!searchClass.value) return classrooms.value;
-  return classrooms.value.filter((contact, index) =>
-    searchableClassrooms.value[index].includes(searchClass.value),
+
+  return classrooms.value.filter((classroom) =>
+    classroom.c_name.toLowerCase().includes(searchClass.value.toLowerCase()),
   );
 });
-
-async function retrieveClassrooms(page) {
-  try {
-    const data = await classroomsService.getClassrooms(page);
-
-    totalPages.value = data.metadata.lastPage ?? 1;
-    classrooms.value = data.classrooms;
-  } catch (error) {
-    console.log(error);
-  }
-}
 
 function changeCurrentPage(page) {
   router.push({ name: 'student.classrooms', query: { page } });
 }
-
-watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: true });
 </script>
 
 <template>
-  <div class="page-container">
+  <div v-if="isLoading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else class="page-container">
     <!-- Header -->
     <div class="container">
       <div class="content-section">
@@ -69,7 +61,7 @@ watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: tru
       </div>
     </div>
 
-    <JoinClassroom v-if="showModal" @created="retrieveClassrooms(1)" @close="showModal = false" />
+    <JoinClassroom v-if="showModal" @created="refetch" @close="showModal = false" />
 
     <div class="container">
       <!-- Search bar -->

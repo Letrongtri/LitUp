@@ -1,6 +1,7 @@
 // Common views
 import AuthPage from '@/views/AuthPage.vue';
 import ProfileUser from '@/views/ProfileUser.vue';
+import Homepage from '@/views/Homepage.vue';
 
 // Layout
 import AuthLayout from '@/layouts/AuthLayout.vue';
@@ -32,16 +33,9 @@ import Forbidden from '@/views/Forbidden.vue';
 const routes = [
   {
     path: '/',
-    redirect: () => {
-      try {
-        const user = JSON.parse(localStorage.getItem('user')).user;
-        if (user.u_role === 'admin') return '/admin/dashboard';
-        else if (user.u_role === 'teacher') return '/teacher/classrooms';
-        else if (user.u_role === 'student') return '/student/classrooms';
-      } catch (e) {
-        return '/auth';
-      }
-    },
+    name: 'homepage',
+    component: Homepage,
+    meta: { layout: AuthLayout },
   },
   { path: '/auth', name: 'auth', component: AuthPage, meta: { layout: AuthLayout } },
   {

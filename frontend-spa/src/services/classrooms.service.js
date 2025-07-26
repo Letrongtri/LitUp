@@ -1,92 +1,65 @@
-import { efetch } from './service';
+import { useAuthStore } from '@/stores/auth';
+import http from './http';
 
 function classroomsService() {
-  const baseUrlTeacher = '/api/teacher/classrooms';
-  const baseUrlStudent = '/api/student/classrooms';
+  const baseUrlTeacher = '/teacher/classrooms';
+  const baseUrlStudent = '/student/classrooms';
 
   async function getClassrooms(page, limit = 10) {
-    const user = JSON.parse(localStorage.getItem('user')).user;
-    let url = `${baseUrlStudent}?uid=${user.uid}&page=${page}&limit=${limit}`;
-
-    const data = await efetch(url);
-
-    return data;
+    let url = `${baseUrlStudent}?page=${page}&limit=${limit}`;
+    return (await http.get(url)).data;
   }
 
   async function getClassroomsByTeacher(page, limit = 10) {
-    const user = JSON.parse(localStorage.getItem('user')).user;
-
-    let url = `${baseUrlTeacher}?uid=${user.uid}&page=${page}&limit=${limit}`;
-    const data = await efetch(url);
-
-    return data;
+    let url = `${baseUrlTeacher}?page=${page}&limit=${limit}`;
+    const res = await http.get(url);
+    return res.data;
   }
 
   async function getClassroom(id) {
-    const role = JSON.parse(localStorage.getItem('user')).user.u_role;
-
-    if (role === 'teacher') return await efetch(`${baseUrlTeacher}/${id}`);
-    else return await efetch(`${baseUrlStudent}/${id}`);
+    const authStore = useAuthStore();
+    if (authStore.user.u_role === 'teacher') {
+      const res = await http.get(`${baseUrlTeacher}/${id}`);
+      return res.data;
+    } else if (authStore.user.u_role === 'student') {
+      const res = await http.get(`${baseUrlStudent}/${id}`);
+      return res.data;
+    }
   }
 
   async function createClassroom(classroom) {
-    return efetch(baseUrlTeacher, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(classroom),
-    });
+    return http.post(baseUrlTeacher, classroom);
   }
 
   async function updateClassroom(id, classroom) {
-    return efetch(`${baseUrlTeacher}/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(classroom),
-    });
+    return http.put(`${baseUrlTeacher}/${id}`, classroom);
   }
 
   async function deleteClassroom(id) {
-    return efetch(`${baseUrlTeacher}/${id}`, {
-      method: 'DELETE',
-    });
+    return http.delete(`${baseUrlTeacher}/${id}`);
   }
 
   async function getClassroomAssignment(cid) {
-    const role = JSON.parse(localStorage.getItem('user')).user.u_role;
-
-    if (role === 'teacher') return await efetch(`${baseUrlTeacher}/${cid}/assignments`);
-    else return await efetch(`${baseUrlStudent}/${cid}/assignments`);
+    const authStore = useAuthStore();
+    if (authStore.user.u_role === 'teacher')
+      return (await http.get(`${baseUrlTeacher}/${cid}/assignments`)).data;
+    else return (await http.get(`${baseUrlStudent}/${cid}/assignments`)).data;
   }
 
   async function getMembers(cid) {
-    return efetch(`${baseUrlTeacher}/${cid}/members`);
+    return (await http.get(`${baseUrlTeacher}/${cid}/members`)).data;
   }
 
   async function removeMember(cid, mid) {
-    return efetch(`${baseUrlTeacher}/${cid}/members/${mid}`, {
-      method: 'DELETE',
-    });
+    return http.delete(`${baseUrlTeacher}/${cid}/members/${mid}`);
   }
 
   async function createAssignment(cid, formData) {
-    return efetch(`${baseUrlTeacher}/${cid}/assignments`, {
-      method: 'POST',
-      body: formData,
-    });
+    return http.post(`${baseUrlTeacher}/${cid}/assignments`, formData);
   }
 
   async function joinClassroom(cid, joinData) {
-    return efetch(`${baseUrlStudent}/${cid}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(joinData),
-    });
+    return http.post(`${baseUrlStudent}/${cid}`, joinData);
   }
 
   return {

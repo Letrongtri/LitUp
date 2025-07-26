@@ -1,44 +1,39 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import usersService from '@/services/users.service';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import EditProfile from '@/components/EditProfile.vue';
+import { useAuthStore } from '@/stores/auth';
+import { useDeleteUser } from '@/composables/useUser';
+import { DEFAULT_AVATAR } from '@/constants';
 
-const route = useRoute();
 const router = useRouter();
-
-const myAccount = ref(false);
+const authStore = useAuthStore();
 
 const user = ref({});
 const error = ref('');
 const showModal = ref(false);
 
-async function retrieveUser() {
-  try {
-    const uid = Number(route.params?.uid);
-    const profile = await usersService.getUserById(uid);
-    user.value = profile.user;
-  } catch (err) {
-    error.value = 'Lỗi khi tải hồ sơ: ' + err.message;
-  }
-  if (user.value && JSON.parse(localStorage.getItem('user')).user.uid === user.value.uid) {
-    myAccount.value = true;
-  }
-}
+const deleteUserMultation = useDeleteUser();
 
 onMounted(async () => {
-  await retrieveUser();
+  user.value = authStore.user;
 });
+
+async function retrieveUser() {
+  try {
+    await authStore.fetchMe();
+    user.value = authStore.user;
+  } catch (err) {
+    error.value = err.message;
+  }
+}
 
 async function deleteProfile() {
   if (confirm('Do you want to delete account?')) {
     try {
-      const user = JSON.parse(localStorage.getItem('user')).user;
-      
-      await usersService.deleteUser(user.uid);
-      localStorage.removeItem('user');
-      
-      router.push('/');
+      await deleteUserMultation.mutateAsync();
+      authStore.clearToken();
+      router.push('/auth');
       alert('Your account has been deleted!');
     } catch (err) {
       error.value = err.message;
@@ -54,7 +49,7 @@ async function deleteProfile() {
         <!-- Avatar + Name -->
         <div class="text-center mb-4">
           <img
-            :src="user.avatar_url"
+            :src="user.avatar_url || DEFAULT_AVATAR"
             class="rounded-circle mb-3"
             width="100"
             height="100"
@@ -74,7 +69,7 @@ async function deleteProfile() {
           </li>
         </ul>
         <!-- Action button -->
-        <div v-if="myAccount" class="d-flex gap-2 justify-content-center">
+        <div class="d-flex gap-2 justify-content-center">
           <button class="btn btn-warning" @click="showModal = true">Edit</button>
           <button class="btn btn-danger" @click="deleteProfile">Delete</button>
         </div>

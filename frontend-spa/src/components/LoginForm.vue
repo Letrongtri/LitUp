@@ -1,9 +1,12 @@
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import authService from '@/services/auth.service';
+import { useAuthStore } from '@/stores/auth';
+import { useLogin } from '@/composables/useAuth';
 
 const router = useRouter();
+const authStore = useAuthStore();
+const loginMutation = useLogin();
 
 const loginForm = ref({
   u_email: '',
@@ -14,13 +17,20 @@ const emit = defineEmits(['change-mode', 'set-success', 'set-error']);
 
 async function handleLogin() {
   try {
-    const result = await authService.login(loginForm.value);
+    const result = await loginMutation.mutateAsync(loginForm.value);
 
-    localStorage.setItem('user', JSON.stringify(result));
+    // Lưu token vào store
+    authStore.setToken(result.data.token);
+    await authStore.fetchMe();
 
     emit('set-error', '');
     emit('set-success', 'Log in successful!');
-    router.push('/');
+
+    const role = authStore.user?.u_role;
+    if (role === 'admin') router.replace('/admin/dashboard');
+    else if (role === 'teacher') router.replace('/teacher/classrooms');
+    else if (role === 'student') router.replace('/student/classrooms');
+    else router.replace('/');
   } catch (err) {
     emit('set-error', err.message || 'Log in failed!');
   }

@@ -1,11 +1,15 @@
 const classroomsService = require("../services/classrooms.service");
-const usersService = require("../services/users.service");
 const ApiError = require("../api-error");
 const JSend = require("../jsend");
 
 async function createClassroom(req, res, next) {
   try {
+    if (req.user.u_role !== "teacher") {
+      return next(new ApiError(403, "Invalid credentials"));
+    }
+
     const classroomData = {
+      uid: req.user.uid,
       ...req.body,
     };
 
@@ -33,13 +37,8 @@ async function createClassroom(req, res, next) {
 
 async function getJoinedClassrooms(req, res, next) {
   try {
-    const { uid } = req.query;
     let limit = Number(req.query.limit);
     let page = Number(req.query.page);
-
-    if (!uid) {
-      return next(new ApiError(400, "uid is required"));
-    }
 
     if (isNaN(page) || page < 1) page = 1;
     if (isNaN(limit) || limit < 1) limit = 10;
@@ -55,7 +54,11 @@ async function getJoinedClassrooms(req, res, next) {
       },
     };
 
-    result = await classroomsService.getClassroomsByUser(uid, limit, page);
+    result = await classroomsService.getClassroomsByUser(
+      req.user.uid,
+      limit,
+      page
+    );
 
     return res.json(JSend.success(result));
   } catch (err) {
@@ -84,7 +87,10 @@ async function getClassroomDetailByStudent(req, res, next) {
   const { cid } = req.params;
 
   try {
-    const classroom = await classroomsService.getClassroomDetailByStudent(cid);
+    const classroom = await classroomsService.getClassroomDetailByStudent(
+      req.user.uid,
+      cid
+    );
     if (!classroom) {
       return next(new ApiError(404, "Classroom not found"));
     }
@@ -146,15 +152,15 @@ async function deleteClassroom(req, res, next) {
 async function joinClassroom(req, res, next) {
   try {
     const { cid } = req.params;
-    const { c_code, uid } = req.body;
+    const { c_code } = req.body;
 
-    if (!c_code || !uid) {
-      return next(new ApiError(400, "Missing code or id"));
+    if (!c_code) {
+      return next(new ApiError(400, "Missing code"));
     }
 
     const result = await classroomsService.joinClassroomByCode(
       cid,
-      uid,
+      req.user.uid,
       c_code
     );
     if (!result) {
@@ -206,24 +212,13 @@ async function removeMember(req, res, next) {
 
 const getTeacherClassrooms = async (req, res, next) => {
   try {
-    const { uid } = req.query;
-
     let page = Number(req.query.page);
     let limit = Number(req.query.limit);
 
     if (isNaN(page) || page < 1) page = 1;
     if (isNaN(limit) || limit < 1) limit = 10;
 
-    const user = await usersService.getUserById(uid);
-
-    if (!user) {
-      return res.status(404).json({
-        status: "fail",
-        message: "User not found",
-      });
-    }
-
-    if (user.u_role !== "teacher") {
+    if (req.user.u_role !== "teacher") {
       return res.status(403).json({
         status: "fail",
         message: "Only teachers can access this resource",
@@ -231,7 +226,7 @@ const getTeacherClassrooms = async (req, res, next) => {
     }
 
     const classrooms = await classroomsService.getClassroomsByTeacher(
-      uid,
+      req.user.uid,
       limit,
       page
     );

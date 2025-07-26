@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-// import { useRouter } from 'vue-router';
-import classroomsService from '@/services/classrooms.service';
+import { useCreateClassroom } from '@/composables/useClassroom';
 
 const emit = defineEmits(['created', 'close']);
 const className = ref('');
@@ -9,7 +8,7 @@ const message = ref('');
 const error = ref('');
 const creating = ref(false);
 
-// const router = useRouter();
+const createClassroomMutation = useCreateClassroom();
 
 async function handleCreateClassroom() {
   if (!className.value.trim()) return;
@@ -19,12 +18,7 @@ async function handleCreateClassroom() {
   message.value = '';
 
   try {
-    const uid = JSON.parse(localStorage.getItem('user')).user.uid;
-    if (!uid) throw new Error('UID not found');
-
-    const classroom = { uid, c_name: className.value.trim() };
-
-    await classroomsService.createClassroom(classroom);
+    await createClassroomMutation.mutateAsync({ c_name: className.value.trim() });
     message.value = 'Create a successful class!';
     className.value = '';
 

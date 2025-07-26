@@ -1,9 +1,12 @@
 <script setup>
 import { ref, watchEffect } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import assignmentsService from '@/services/assignments.service';
 import { formatDateToDateTimeLocal } from '@/utils/format';
-import classroomsService from '@/services/classrooms.service';
+import {
+  useCreateAssignment,
+  useDeleteAssignment,
+  useUpdateAssignment,
+} from '@/composables/useAssignment';
 
 const route = useRoute();
 const router = useRouter();
@@ -39,14 +42,18 @@ watchEffect(() => {
   }
 });
 
+const updateAssignmentMutation = useUpdateAssignment();
+const createAssignmentMutation = useCreateAssignment();
+const deleteAssignmentMutation = useDeleteAssignment();
+
 async function handleAssignment() {
   handling.value = true;
   error.value = '';
   message.value = '';
 
   try {
-    const date = new Date();
-    const deadlineTimestamp = date.toISOString(deadline.value);
+    const date = new Date(deadline.value);
+    const deadlineTimestamp = date.toISOString();
 
     const formData = new FormData();
     formData.append('a_title', title.value);
@@ -61,10 +68,10 @@ async function handleAssignment() {
     });
 
     if (props.task === 'update') {
-      await assignmentsService.updateAssignment(aid, formData);
+      await updateAssignmentMutation.mutateAsync({ aid, payload: formData });
       message.value = 'Update successfully!';
     } else if (props.task === 'create') {
-      await classroomsService.createAssignment(cid, formData);
+      await createAssignmentMutation.mutateAsync({ cid, payload: formData });
       message.value = 'Add successfully!';
     }
 
@@ -84,7 +91,7 @@ async function deleteAssignment() {
 
   if (confirm('Do you want to delete this assignment?')) {
     try {
-      await assignmentsService.deleteAssignment(props.assignment.aid);
+      await deleteAssignmentMutation.mutateAsync(props.assignment.aid);
       message.value = 'Class update successful!';
       router.push(`/teacher/classrooms/${props.assignment.cid}`);
     } catch (err) {

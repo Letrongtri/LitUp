@@ -20,14 +20,13 @@ const { assignmentSchema } = require("../schemas/assignment.schemas");
 const router = express.Router();
 
 const getCreatedClassroomsData = z.object({
-  uid: z.coerce.number().nonnegative().optional(),
   limit: z.coerce.number().nonnegative().optional(),
   page: z.coerce.number().nonnegative().optional(),
 });
 
 /** Teacher create a new classroom */
 const createClassroomData = z.object({
-  input: classroomSchema.pick({ c_name: true, uid: true }).strict(),
+  input: classroomSchema.pick({ c_name: true }).strict(),
 });
 
 /** Get classroom id */

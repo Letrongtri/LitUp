@@ -69,7 +69,17 @@ async function getClassroomById(cid) {
     .first();
 }
 
-async function getClassroomDetailByStudent(cid) {
+async function getClassroomDetailByStudent(uid, cid) {
+  const isMember = await knex("members")
+    .where("cid", cid)
+    .andWhere("uid", uid)
+    .select("mid")
+    .first();
+
+  if (!isMember) {
+    return null;
+  }
+
   const data = await knex("classrooms as c")
     .join("users as u", "c.uid", "u.uid")
     .where("c.cid", cid)
@@ -229,7 +239,9 @@ async function getMemberByClassId(cid) {
       ? await attachmentRepository().where("fid", user.u_avatar_id).first()
       : null;
 
-    user.avatar_url = avatar ? `public/uploads/${avatar}` : DEFAULT_AVATAR;
+    user.avatar_url = avatar
+      ? `public/uploads/${avatar.f_name}`
+      : DEFAULT_AVATAR;
   }
 
   return users;

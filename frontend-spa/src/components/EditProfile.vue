@@ -1,13 +1,15 @@
 <script setup>
 import { ref } from 'vue';
-import usersService from '@/services/users.service';
-import authService from '@/services/auth.service';
 import { eventBus } from '@/eventBus';
+import { useUpdateUser } from '@/composables/useUser';
+import { useAuthStore } from '@/stores/auth';
 
 const emit = defineEmits(['updated', 'close']);
 const props = defineProps({
   user: Object,
 });
+const updateUserMutation = useUpdateUser();
+const authStore = useAuthStore();
 
 const editForm = ref({
   u_first_name: props.user.u_first_name,
@@ -19,7 +21,6 @@ const editForm = ref({
 });
 
 const confirmPassword = ref('');
-const oldPassword = ref('');
 
 const message = ref('');
 const error = ref('');
@@ -36,30 +37,25 @@ async function editProfile() {
         error.value = 'Confirmation password does not match!';
         return;
       }
-
-      await authService.login({
-        u_email: editForm.value.u_email,
-        u_password: editForm.value.u_password,
-      });
     }
-
-    const user = JSON.parse(localStorage.getItem('user')).user;
 
     const formData = new FormData();
     formData.append('u_first_name', editForm.value.u_first_name);
     formData.append('u_last_name', editForm.value.u_last_name);
-    formData.append('u_email_name', editForm.value.u_email_name);
-    formData.append('u_status_name', editForm.value.u_status_name);
-    formData.append('u_password_name', editForm.value.u_password_name);
-    formData.append('u_avatar_file', editForm.value.u_avatar_file[0]);
+    formData.append('u_email', editForm.value.u_email);
+    formData.append('u_status', editForm.value.u_status);
+    if (editForm.value.u_password) {
+      formData.append('u_password', editForm.value.u_password);
+    }
+    if (editForm.value.u_avatar_file.length > 0) {
+      formData.append('u_avatar_file', editForm.value.u_avatar_file[0]);
+    }
 
-    const updatedProfile = await usersService.updateUser(user.uid, formData);
-    console.log(updatedProfile);
+    const updatedProfile = await updateUserMutation.mutateAsync(formData);
 
     message.value = 'Edit successfully!';
 
-    localStorage.removeItem('user');
-    localStorage.setItem('user', JSON.stringify(updatedProfile));
+    await authStore.fetchMe();
     eventBus.emit('profile-updated');
 
     emit('updated');
@@ -119,16 +115,6 @@ function handleFileChange(e) {
         />
       </div>
       <div class="mb-3">
-        <label for="oldPassword" class="form-label fw-semibold">Old password: </label>
-        <input
-          id="oldPassword"
-          v-model="oldPassword"
-          type="password"
-          class="form-control mb-3"
-          placeholder="Password"
-        />
-      </div>
-      <div class="mb-3">
         <label for="password" class="form-label fw-semibold">Password: </label>
         <input
           id="password"
@@ -162,9 +148,7 @@ function handleFileChange(e) {
         <button type="button" @click="emit('close')" class="btn btn-secondary px-4 py-2 me-3">
           Cancel
         </button>
-        <button type="submit" :disabled="updating" class="btn btn-warning px-4 py-2">
-          Edit
-        </button>
+        <button type="submit" :disabled="updating" class="btn btn-warning px-4 py-2">Edit</button>
       </div>
     </form>
   </div>

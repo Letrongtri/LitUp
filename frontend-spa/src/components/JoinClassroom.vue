@@ -1,36 +1,26 @@
 <script setup>
-import { ref, watch } from 'vue';
-// import { useRouter } from 'vue-router';
-import classroomsService from '@/services/classrooms.service';
+import { ref } from 'vue';
+import { useJoinClassroom } from '@/composables/useClassroom';
 
 const emit = defineEmits(['created', 'close']);
-const className = ref('');
 const classId = ref('');
 const classCode = ref('');
-const teacherName = ref('');
 
 const message = ref('');
 const error = ref('');
 const creating = ref(false);
 
-// const router = useRouter();
-
+const joinClassroomMutation = useJoinClassroom();
 async function handleJoinClassroom() {
-  //   if (!className.value || !cla) return;
-
   creating.value = true;
   error.value = '';
   message.value = '';
 
   try {
-    const uid = JSON.parse(localStorage.getItem('user')).user.uid;
-    if (!uid) throw new Error('UID not found');
+    const joinData = { c_code: classCode.value };
 
-    const joinData = { uid, c_code: classCode.value };
-
-    await classroomsService.joinClassroom(classId.value, joinData);
+    await joinClassroomMutation.mutateAsync({ cid: classId.value, data: joinData });
     message.value = 'Join successfully!';
-    className.value = '';
     classId.value = '';
     classCode.value = '';
 
@@ -42,22 +32,6 @@ async function handleJoinClassroom() {
     creating.value = false;
   }
 }
-
-async function getClassInfo(cid) {
-  if (classId.value) {
-    try {
-      const classroom = await classroomsService.getClassroom(cid);
-      className.value = classroom.classroom.c_name;
-      teacherName.value = classroom.classroom.teacher_name;
-    } catch (error) {
-      error.value = error.message;
-      className.value = '';
-      teacherName.value = '';
-    }
-  }
-}
-
-watch(classId, () => getClassInfo(classId.value));
 </script>
 
 <template>
@@ -71,16 +45,6 @@ watch(classId, () => getClassInfo(classId.value));
       <div class="mb-3">
         <label for="classId" class="form-label fw-semibold">Class ID:* </label>
         <input id="classId" type="number" v-model="classId" class="form-control" required />
-      </div>
-
-      <div class="mb-3">
-        <label for="className" class="form-label fw-semibold">Class name: </label>
-        <input id="className" type="text" v-model="className" class="form-control" disabled />
-      </div>
-
-      <div class="mb-3">
-        <label for="teacherName" class="form-label fw-semibold">Teacher: </label>
-        <input id="teacherName" type="text" v-model="teacherName" class="form-control" disabled />
       </div>
 
       <div class="mb-3">

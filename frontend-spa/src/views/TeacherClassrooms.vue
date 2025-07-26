@@ -1,19 +1,13 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import classroomsService from '@/services/classrooms.service';
 import MainPagination from '@/components/MainPagination.vue';
 import CreateClassroom from '@/components/CreateClassroom.vue';
 import { formatDate } from '@/utils/format';
-
-const classrooms = ref([]);
-const error = ref('');
-const showModal = ref(false);
+import { useClassroomsByTeacher } from '@/composables/useClassroom';
 
 const router = useRouter();
 const route = useRoute();
-
-const totalPages = ref(1);
 
 const currentPage = computed(() => {
   const page = Number(route.query?.page);
@@ -21,36 +15,27 @@ const currentPage = computed(() => {
   return page;
 });
 
-const searchClass = ref('');
+const { data, isLoading, error, refetch } = useClassroomsByTeacher(currentPage.value);
 
-const searchableClassrooms = computed(() =>
-  classrooms.value.map((classroom) => classroom.c_name.toLowerCase()),
-);
+const classrooms = computed(() => data.value?.classrooms || []);
+const totalPages = computed(() => data.value?.metadata?.lastPage || 1);
+
+const showModal = ref(false);
+
+const searchClass = ref('');
 
 // Classroom filtered by searchClass
 const filteredClassrooms = computed(() => {
   if (!searchClass.value) return classrooms.value;
-  return classrooms.value.filter((contact, index) =>
-    searchableClassrooms.value[index].includes(searchClass.value),
+
+  return classrooms.value.filter((classroom) =>
+    classroom.c_name.toLowerCase().includes(searchClass.value.toLowerCase()),
   );
 });
-
-async function retrieveClassrooms(page) {
-  try {
-    const data = await classroomsService.getClassroomsByTeacher(page);
-
-    totalPages.value = data.metadata.lastPage ?? 1;
-    classrooms.value = data.classrooms;
-  } catch (error) {
-    console.log(error);
-  }
-}
 
 function changeCurrentPage(page) {
   router.push({ name: 'student.classrooms', query: { page } });
 }
-
-watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: true });
 
 function goToDetailClassroomPage(cls) {
   router.push({ name: 'teacher.class.detail', params: { cid: cls.cid } });
@@ -74,14 +59,20 @@ function goToDetailClassroomPage(cls) {
       </div>
     </div>
 
-    <CreateClassroom v-if="showModal" @created="retrieveClassrooms(1)" @close="showModal = false" />
+    <CreateClassroom v-if="showModal" @created="refetch" @close="showModal = false" />
 
     <div class="container">
       <!-- Error Alert -->
       <div v-if="error" class="alert alert-danger mb-4"><strong>Error:</strong> {{ error }}</div>
 
+      <div v-if="isLoading" class="text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
       <!-- Classrooms List -->
-      <div class="content-section">
+      <div v-else class="content-section">
         <div class="section-header d-flex justify-content-between">
           <h3>List of classroom</h3>
           <div class="input-group w-auto">
