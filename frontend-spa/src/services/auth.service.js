@@ -1,35 +1,25 @@
-import { efetch } from './service';
+import http from './http';
+// import { efetch } from './service';
 
 function authService() {
-  const baseUrl = '/api/auth';
+  const baseUrl = '/auth';
 
-  async function login(loginForm) {
-    let url = `${baseUrl}/login`;
-
-    return efetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(loginForm),
-    });
+  async function login(payload) {
+    return await http.post(`${baseUrl}/login`, payload);
   }
 
-  async function register(registerForm) {
-    let url = `${baseUrl}/register`;
+  async function register(payload) {
+    return await http.post(`${baseUrl}/register`, payload);
+  }
 
-    return efetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(registerForm),
-    });
+  async function fetchMe() {
+    return await http.get('/users/me');
   }
 
   return {
     login,
     register,
+    fetchMe,
   };
 }
 

@@ -6,6 +6,7 @@ async function createSubmission(req, res, next) {
   try {
     const submissionData = {
       aid: req.params.aid,
+      uid: req.user.uid,
       s_status: "submitted",
       s_submitted_at: new Date().toISOString(),
       ...req.body,
@@ -72,12 +73,13 @@ async function getSubmissionById(req, res, next) {
 }
 
 async function getSubmission(req, res, next) {
-  const { uid, aid } = req.query;
-
   try {
-    const submission = await submissionService.getSubmission(uid, aid);
+    const submission = await submissionService.getSubmission(
+      req.user.uid,
+      req.params.aid
+    );
     if (!submission) {
-      return next(new ApiError(404, "Submission not found"));
+      return next(new ApiError(200, "Submission not found"));
     }
     return res.json(JSend.success({ submission }));
   } catch (error) {
@@ -90,12 +92,10 @@ async function getSubmission(req, res, next) {
 }
 
 async function updateSubmission(req, res, next) {
-  const { uid, aid } = req.body;
-
   try {
     const updated = await submissionService.updateSubmission(
-      uid,
-      aid,
+      req.user.uid,
+      req.params.aid,
       req.files
     );
 

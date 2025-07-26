@@ -1,14 +1,19 @@
 <script setup>
 import { eventBus } from '@/eventBus';
+import { useAuthStore } from '@/stores/auth';
+import { useQueryClient } from '@tanstack/vue-query';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const user = ref(JSON.parse(localStorage.getItem('user'))?.user || {});
+const authStore = useAuthStore();
+const queryClient = useQueryClient();
+
+const user = ref(authStore.user);
 
 function handleLogout() {
   if (confirm('Do you want to log out?')) {
-    localStorage.removeItem('user');
+    authStore.logout();
     router.push('/auth');
   }
 }
@@ -23,7 +28,7 @@ function goToHomePage() {
 
 // Listen for profile update event
 function reloadUser() {
-  user.value = JSON.parse(localStorage.getItem('user'))?.user || {};
+  user.value = authStore.user;
 }
 
 onMounted(() => {

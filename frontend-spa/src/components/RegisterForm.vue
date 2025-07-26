@@ -1,9 +1,9 @@
-<!-- src/components/RegisterForm.vue -->
 <script setup>
 import { ref, defineEmits } from 'vue';
-import authService from '@/services/auth.service';
+import { useRegister } from '@/composables/useAuth';
 
 const emit = defineEmits(['change-mode', 'set-success', 'set-error']);
+const registerMutation = useRegister();
 
 const registerForm = ref({
   u_first_name: '',
@@ -22,7 +22,7 @@ async function handleRegister() {
   }
 
   try {
-    await authService.register(registerForm.value);
+    await registerMutation.mutateAsync(registerForm.value);
 
     emit('set-error', '');
     emit('set-success', 'Registration successful! You can log in.');

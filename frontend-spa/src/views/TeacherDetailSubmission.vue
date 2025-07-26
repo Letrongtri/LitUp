@@ -1,43 +1,28 @@
 <script setup>
-import submissionsService from '@/services/submissions.service';
+import { useGradeSubmission, useSubmissionDetailByTeacher } from '@/composables/useSubmission';
 import { formatDate } from '@/utils/format';
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
 
 const sid = Number(route.params?.sid);
-const submission = ref({});
-const selectedIndex = ref(-1);
-const grade = ref(0);
-const comment = ref('');
-const error = ref('');
-const message = ref('');
+const { data, isLoading, error, refetch } = useSubmissionDetailByTeacher(sid);
+const submission = computed(() => data.value?.submission || {});
+const grade = ref(submission.value?.s_grade || '');
+const comment = ref(submission.value?.s_comment || '');
 
-async function retrieveSubmission() {
-  try {
-    const data = await submissionsService.getSubmissionByTeacher(sid);
-    submission.value = data.submission;
-  } catch (error) {
-    console.log(error);
-  }
-}
+const selectedIndex = ref(-1);
+const gradeError = ref('');
+const message = ref('');
 
 const selectedFile = computed(() => {
   if (selectedIndex.value < 0) return null;
   return submission.value.attachments[selectedIndex.value];
 });
 
-onMounted(async () => {
-  await retrieveSubmission();
-  grade.value = submission.value.s_grade
-    ? (submission.value.s_grade * 100) / submission.value.a_max_points
-    : 0;
-  comment.value = submission.value.s_comment ?? '';
-});
-
 function getFileViewerUrl(fileName) {
-  const baseUrl = 'http://localhost:3000/public/uploads/' + fileName;
+  const baseUrl = 'public/uploads/' + fileName;
   const ext = fileName.split('.').pop().toLowerCase();
 
   if (['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt'].includes(ext)) {
@@ -48,8 +33,9 @@ function getFileViewerUrl(fileName) {
   return `https://docs.google.com/gview?url=${encodeURIComponent(baseUrl)}&embedded=true`;
 }
 
+const gradeSubmissionMutation = useGradeSubmission();
 async function gradeSubmission() {
-  error.value = '';
+  gradeError.value = '';
   message.value = '';
 
   try {
@@ -58,16 +44,27 @@ async function gradeSubmission() {
       s_comment: comment.value,
     };
 
-    await submissionsService.gradeSubmission(sid, data);
+    await gradeSubmissionMutation.mutateAsync({ sid, data });
     message.value = 'Grade successfully!';
   } catch (err) {
-    error.value = err.message;
+    gradeError.value = err.message;
   }
 }
+
+watch(submission, (newVal) => {
+  grade.value = newVal?.s_grade || '';
+  comment.value = newVal?.s_comment || '';
+});
 </script>
 
 <template>
-  <div class="page-container bg-light py-4">
+  <div v-if="isLoading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else class="page-container bg-light py-4">
     <div class="container">
       <div class="bg-white p-4 rounded shadow-sm border" style="height: 100vh">
         <div class="row">
@@ -92,7 +89,9 @@ async function gradeSubmission() {
             <ul class="list-unstyled small">
               <li><strong>Full name:</strong> {{ submission.u_name }}</li>
               <li><strong>Status:</strong> {{ submission.s_status }}</li>
-              <li><strong>Date of submission:</strong> {{ formatDate(submission.s_submitted_at) }}</li>
+              <li>
+                <strong>Date of submission:</strong> {{ formatDate(submission.s_submitted_at) }}
+              </li>
             </ul>
 
             <hr />
@@ -117,7 +116,7 @@ async function gradeSubmission() {
 
             <h6 class="fw-semibold">Grade submission</h6>
 
-            <div v-if="error" class="alert alert-danger">{{ error }}</div>
+            <div v-if="gradeError" class="alert alert-danger">{{ gradeError }}</div>
             <div v-if="message" class="alert alert-success">{{ message }}</div>
 
             <form @submit.prevent="gradeSubmission">
@@ -129,9 +128,7 @@ async function gradeSubmission() {
 
               <div class="mb-3">
                 <label class="form-label fw-semibold m-0 me-1">Equivalent: </label>
-                <span>
-                  {{ ((grade) * submission.a_max_points) / (100) }} /{{ 10 }}
-                </span>
+                <span> {{ (grade * submission.a_max_points) / 100 }} /{{ 10 }} </span>
               </div>
 
               <div class="mb-3">

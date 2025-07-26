@@ -1,5 +1,6 @@
 const knex = require("../database/knex");
 const { saveFile, deleteFileByPath } = require("./attachments.service");
+const bcrypt = require("bcrypt");
 
 function userRepository() {
   return knex("users");
@@ -53,6 +54,12 @@ async function updateUser(uid, updateData, file) {
     if (!updatedUser) return null;
 
     const userData = readUserData(updateData);
+
+    if (userData.u_password) {
+      const hashedPassword = await bcrypt.hash(userData.u_password, 10);
+      userData.u_password = hashedPassword;
+    }
+
     updatedUser.avatar_url = "/public/images/blank-profile-picture.png";
 
     if (file) {

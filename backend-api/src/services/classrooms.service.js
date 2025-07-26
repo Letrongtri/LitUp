@@ -69,7 +69,17 @@ async function getClassroomById(cid) {
     .first();
 }
 
-async function getClassroomDetailByStudent(cid) {
+async function getClassroomDetailByStudent(uid, cid) {
+  const isMember = await knex("members")
+    .where("cid", cid)
+    .andWhere("uid", uid)
+    .select("mid")
+    .first();
+
+  if (!isMember) {
+    return null;
+  }
+
   const data = await knex("classrooms as c")
     .join("users as u", "c.uid", "u.uid")
     .where("c.cid", cid)
@@ -172,12 +182,7 @@ async function getClassroomsByUser(uid, limit, page) {
     .join("users as u", "u.uid", "c.uid")
     .where("m.uid", uid)
     .andWhere("m.m_status", true)
-    .select(
-      knex.raw("COUNT(c.cid) OVER() AS record_count"),
-      knex.raw("CONCAT(u_first_name, ' ', u_last_name) as teacher_name"),
-      "c.*"
-    )
-    .orderBy("c.cid")
+    .select("c.*")
     .limit(limit)
     .offset((page - 1) * limit);
 
@@ -234,7 +239,9 @@ async function getMemberByClassId(cid) {
       ? await attachmentRepository().where("fid", user.u_avatar_id).first()
       : null;
 
-    user.avatar_url = avatar ? `public/uploads/${avatar}` : DEFAULT_AVATAR;
+    user.avatar_url = avatar
+      ? `public/uploads/${avatar.f_name}`
+      : DEFAULT_AVATAR;
   }
 
   return users;

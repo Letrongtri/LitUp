@@ -2,58 +2,58 @@
 import AttachmentList from '@/components/AttachmentList.vue';
 import CreateAndEditAssignment from '@/components/CreateAndEditAssignment.vue';
 import MainPagination from '@/components/MainPagination.vue';
-import assignmentsService from '@/services/assignments.service';
-import classroomsService from '@/services/classrooms.service';
+import { useAssignmentDetail, useSubmissions } from '@/composables/useAssignment';
+import { useClassroomMembers } from '@/composables/useClassroom';
 import { formatDate } from '@/utils/format';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
-
 const aid = Number(route.params?.aid);
 
-const assignment = ref({});
-const attachments = ref([]);
-const members = ref([]);
-const submissions = ref([]);
+// Detail assignments
+const {
+  data: detailData,
+  isLoading: isLoadingDetail,
+  error: errorDetail,
+  refetch: refetchDetail,
+} = useAssignmentDetail(aid);
+const assignment = computed(() => detailData.value?.assignment || {});
+const attachments = computed(() => assignment.value.attachments || []);
+const cid = computed(() => assignment.value?.cid);
 
-const totalSubmissionPage = ref(1);
-const currentSubmissionPage = ref(1);
+// Members
+const {
+  data: membersData,
+  isLoading: isLoadingMembers,
+  error: errorMembers,
+  refetch: refetchMembers,
+} = useClassroomMembers(cid);
+
+const members = computed(() => membersData.value?.users || []);
+
+// Submissions
+const currentSubmissionPage = computed(() => {
+  const page = Number(route.query?.page);
+  if (Number.isNaN(page) || page < 1) return 1;
+  return page;
+});
+
+const {
+  data: submissionsData,
+  isLoading: isLoadingSubmissions,
+  error: errorSubmissions,
+  refetch: refetchSubmissions,
+} = useSubmissions(aid, currentSubmissionPage.value);
+const submissions = computed(() => submissionsData.value?.submissions || []);
+
+const totalSubmissionPage = computed(() => submissionsData.value?.metadata.lastPage || 1);
 
 const showModal = ref(false);
 
-async function retrieveAssignment() {
-  try {
-    const data = await assignmentsService.getAssignment(aid);
-    assignment.value = data.assignment;
-    attachments.value = assignment.value.attachments;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-async function retrieveSubmissions(page) {
-  try {
-    const data = await assignmentsService.getSubmissions(aid, page);
-    submissions.value = data.submissions;
-    totalSubmissionPage.value = data.metadata.lastPage ?? 1;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-async function retrieveMembers() {
-  try {
-    const data = await classroomsService.getMembers(assignment.value.cid);
-    members.value = data.users;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 function changeCurrentPage(page) {
-  currentSubmissionPage.value = page;
+  router.push({ name: 'teacher.asignment.detail', query: { page } });
 }
 
 const submittedMembersWithSubmission = computed(() => {
@@ -91,82 +91,85 @@ const rightColumn = computed(() => {
   return notSubmittedMembers.value.slice(mid);
 });
 
-onMounted(async () => {
-  await retrieveAssignment();
-  await retrieveMembers();
-  await retrieveSubmissions(currentSubmissionPage.value);
-});
-
-watch(currentSubmissionPage, () => retrieveSubmissions(currentSubmissionPage.value), {
-  immediate: true,
-});
-
 async function openSubmissionDetailPage(id) {
   router.push(`/teacher/submissions/${id}`);
 }
 </script>
 <template>
-  <div class="page-container bg-light">
-    <!-- Assignment Header - giống như class header -->
-    <div class="class-header bg-white border-bottom shadow-sm">
-      <div class="container py-4 px-3 d-flex align-items-center justify-content-between">
-        <h2 class="fw-bold text-primary mb-1">{{ assignment.a_title }}</h2>
-        <button class="btn btn-primary" @click="showModal = true">
-          <i class="fa fa-cog d-inline-block me-1" aria-hidden="true"></i>
-          Setting
-        </button>
+  <div v-if="isLoadingDetail" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else class="container py-5">
+    <!-- Exercise information -->
+    <div class="bg-white p-4 rounded shadow-sm mb-4">
+      <div class="row">
+        <div class="class-header bg-white border-bottom shadow-sm">
+          <div class="container py-4 px-3 d-flex align-items-center justify-content-between">
+            <h2 class="fw-bold text-primary mb-1">{{ assignment.a_title }}</h2>
+            <button class="btn btn-primary" @click="showModal = true">
+              <i class="fa fa-cog d-inline-block me-1" aria-hidden="true"></i>
+              Setting
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col-4">
+          <p><strong>Created at: </strong> {{ formatDate(assignment.a_created_at) }}</p>
+        </div>
+        <div class="col-4">
+          <p><strong>Deadline at: </strong> {{ formatDate(assignment.a_deadline_at) }}</p>
+        </div>
+        <div class="col-4">
+          <p><strong>Max points: </strong> {{ assignment.a_max_points }}</p>
+        </div>
+        <div class="col-4">
+          <p><strong>Allow late submission: </strong> {{ assignment.a_allow_late_submission }}</p>
+        </div>
+        <div class="col-4">
+          <p>
+            <strong>Status: </strong>
+            <span class="text-success" v-if="assignment.a_status">Active</span>
+            <span class="text-danger" v-else>Inactive</span>
+          </p>
+        </div>
+        <div class="col-4">
+          <p><strong>Total submissions: </strong> {{ submittedMembersWithSubmission.length }}</p>
+        </div>
+        <div class="col-4">
+          <p><strong>Not yet submitted: </strong> {{ notSubmittedMembers.length }}</p>
+        </div>
+        <div class="col-4">
+          <p><strong>Average scores: </strong> {{ avgGrade }}</p>
+        </div>
+      </div>
+      <div class="row">
+        <p><strong>Description: </strong> {{ assignment.a_description }}</p>
+        <p><strong>Attachments: </strong>{{ attachments.length }}</p>
+        <AttachmentList v-if="attachments" :attachments="attachments" />
       </div>
     </div>
 
     <CreateAndEditAssignment
       v-if="showModal"
-      @updated="retrieveAssignment(aid)"
+      @updated="refetchDetail"
       @close="showModal = false"
       :assignment="assignment"
       :task="'update'"
     />
 
-    <div class="container py-5">
-      <!-- Exercise information -->
-      <div class="bg-white p-4 rounded shadow-sm mb-4">
-        <div class="row mt-4">
-          <div class="col-4">
-            <p><strong>Created at: </strong> {{ formatDate(assignment.a_created_at) }}</p>
-          </div>
-          <div class="col-4">
-            <p><strong>Deadline at: </strong> {{ formatDate(assignment.a_deadline_at) }}</p>
-          </div>
-          <div class="col-4">
-            <p><strong>Max points: </strong> {{ assignment.a_max_points }}</p>
-          </div>
-          <div class="col-4">
-            <p><strong>Allow late submission: </strong> {{ assignment.a_allow_late_submission }}</p>
-          </div>
-          <div class="col-4">
-            <p>
-              <strong>Status: </strong>
-              <span class="text-success" v-if="assignment.a_status">Active</span>
-              <span class="text-danger" v-else>Inactive</span>
-            </p>
-          </div>
-          <div class="col-4">
-            <p><strong>Total submissions: </strong> {{ submittedMembersWithSubmission.length }}</p>
-          </div>
-          <div class="col-4">
-            <p><strong>Not yet submitted: </strong> {{ notSubmittedMembers.length }}</p>
-          </div>
-          <div class="col-4">
-            <p><strong>Average scores: </strong> {{ avgGrade }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <p><strong>Description: </strong> {{ assignment.a_description }}</p>
-          <p><strong>Attachments: </strong>{{ attachments.length }}</p>
-          <AttachmentList v-if="attachments" :attachments="attachments" />
-        </div>
-      </div>
+    <!-- List of submissions -->
 
-      <!-- List of submissions -->
+    <div v-if="isLoadingMembers || isLoadingSubmissions" class="text-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div v-else>
       <div class="bg-white p-4 rounded shadow-sm my-4">
         <h4 class="mb-3 text-dark">List of submissions</h4>
         <table class="table table-bordered table-hover align-middle">
@@ -204,7 +207,7 @@ async function openSubmissionDetailPage(id) {
                   class="btn btn-sm btn-outline-secondary"
                   @click="openSubmissionDetailPage(member.submission.sid)"
                 >
-                  View Detail
+                  Xem chi tiết
                 </button>
               </td>
             </tr>
@@ -262,8 +265,6 @@ async function openSubmissionDetailPage(id) {
     </div>
   </div>
 </template>
-
-
 
 <style scoped>
 .page-container {

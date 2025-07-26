@@ -1,26 +1,18 @@
-import { efetch } from './service';
+import http from './http';
 
 function usersService() {
-  const baseUrl = '/api/users';
+  const baseUrl = '/users';
 
   async function getUserById(id) {
-    let url = `${baseUrl}/${id}`;
-    const data = await efetch(url);
-
-    return data;
+    return await http.get(`${baseUrl}/${id}`);
   }
 
-  async function updateUser(id, formData) {
-    return efetch(`${baseUrl}/${id}`, {
-      method: 'PUT',
-      body: formData,
-    });
+  async function updateUser(data) {
+    return await http.put(`/users`, data); // có thể là JSON hoặc FormData
   }
 
   async function deleteUser(id) {
-    return efetch(`${baseUrl}/${id}`, {
-      method: 'DELETE',
-    });
+    return await http.delete(`/users`);
   }
 
   return {

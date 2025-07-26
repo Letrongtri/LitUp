@@ -1,44 +1,37 @@
 <script setup>
-import classroomsService from '@/services/classrooms.service';
 import { useRoute } from 'vue-router';
-
-import { onMounted, ref } from 'vue';
+import { computed } from 'vue';
 import AssignmentList from '@/components/AssignmentList.vue';
+import { useClassroomAssignments, useClassroomDetail } from '@/composables/useClassroom';
 
 const route = useRoute();
 const cid = Number(route.params?.cid);
-let classroom = ref({});
-let assignments = ref([]);
 
-async function retrieveClassroom(cid) {
-  try {
-    const data = await classroomsService.getClassroom(cid);
-    classroom.value = data.classroom;
-  } catch (error) {
-    console.log(error);
-  }
-}
+const {
+  data: detailData,
+  isLoading: isLoadingDetail,
+  error: errorDetail,
+  refetch: refetchDetail,
+} = useClassroomDetail(cid);
+let classroom = computed(() => detailData.value?.classroom || {});
 
-async function retrieveAsignments(cid) {
-  try {
-    const data = await classroomsService.getClassroomAssignment(cid);
-    assignments.value = data;
-    console.log(data);
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-onMounted(async () => {
-  await retrieveClassroom(cid);
-  console.log(classroom.value);
-
-  await retrieveAsignments(cid);
-});
+const {
+  data: assignmentData,
+  isLoading: isLoadingAssignments,
+  error: errorAssignments,
+  refetch: refetchAssignments,
+} = useClassroomAssignments(cid);
+let assignments = computed(() => assignmentData.value || []);
 </script>
 
 <template>
-  <div class="page-container bg-light">
+  <div v-if="isLoadingDetail" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else class="page-container bg-light">
     <div class="class-header bg-white border-bottom shadow-sm">
       <div class="container py-4 px-3">
         <h2 class="fw-bold text-primary mb-1">{{ classroom.c_name }}</h2>
@@ -49,40 +42,13 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="container py-4">
-      <!-- <div
-        v-if="assignments.length > 0"
-        class="assignment-section bg-white shadow-sm rounded border table-hover"
-      >
-        <div
-          v-for="assignment in assignments"
-          :key="assignment.aid"
-          class="assignment-item border-bottom p-4 d-flex flex-column flex-md-row justify-content-between align-items-start gap-3"
-        >
-          <div class="flex-grow-1">
-            <h5 class="fw-semibold text-dark mb-3">{{ assignment.a_title }}</h5>
-            <p class="mb-2">
-              <strong>Description: </strong>
-              {{ assignment.a_description }}
-            </p>
-            <div class="row">
-              <div class="col-md-6">
-                <p class="mb-2">
-                  <strong>Deadline:</strong> {{ formatDate(assignment.a_deadline_at) }}
-                </p>
-                <p class="mb-2"><strong>Status:</strong> Hết hạn</p>
-              </div>
-              <div class="col-md-6">
-                <p class="mb-2"><strong>Max point: </strong> {{ assignment.a_max_points }}</p>
-                <p class="mb-2">
-                  <strong>Attachments:</strong> {{ assignment.attachments.length }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
+    <div v-if="isLoadingAssignments" class="text-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
 
+    <div v-else class="container py-4">
       <AssignmentList v-if="assignments.length > 0" :assignments="assignments" :role="'student'" />
       <p class="text-muted text-center py-3 mb-0" v-else>No exercises yet</p>
     </div>
@@ -107,7 +73,7 @@ onMounted(async () => {
 .tab-item {
   padding: 0.5rem 1rem;
   cursor: pointer;
-  border-radius: 0.375rem; 
+  border-radius: 0.375rem;
   color: #444;
   transition: background 0.2s;
 }
@@ -122,7 +88,7 @@ onMounted(async () => {
 }
 
 .assignment-section {
-  border-radius: 0.375rem !important; 
+  border-radius: 0.375rem !important;
 }
 
 h2 {

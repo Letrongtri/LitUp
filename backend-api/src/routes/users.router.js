@@ -52,12 +52,21 @@ module.exports.setup = (app) => {
   app.use("/api/users", router);
 
   router
-    .route("/:uid")
-    .get(validateRequest(getUserID), usersController.getUser)
+    .route("/me")
+    .get(usersController.fetchMe)
+    .all(allowedMethods(["GET"]));
+
+  router
+    .route("/")
     .put(
       [avatarUpload, validateRequest(updateUserData)],
       usersController.updateUser
     )
     .delete(usersController.deleteUser)
-    .all(allowedMethods(["GET", "PUT", "DELETE"]));
+    .all(allowedMethods(["PUT", "DELETE"]));
+
+  router
+    .route("/:uid")
+    .get(validateRequest(getUserID), usersController.getUser)
+    .all(allowedMethods(["GET"]));
 };

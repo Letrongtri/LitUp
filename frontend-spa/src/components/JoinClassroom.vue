@@ -1,31 +1,26 @@
 <script setup>
-import { ref, watch } from 'vue';
-import classroomsService from '@/services/classrooms.service';
+import { ref } from 'vue';
+import { useJoinClassroom } from '@/composables/useClassroom';
 
 const emit = defineEmits(['created', 'close']);
-const className = ref('');
 const classId = ref('');
 const classCode = ref('');
-const teacherName = ref('');
 
 const message = ref('');
 const error = ref('');
 const creating = ref(false);
 
+const joinClassroomMutation = useJoinClassroom();
 async function handleJoinClassroom() {
   creating.value = true;
   error.value = '';
   message.value = '';
   
   try {
-    const uid = JSON.parse(localStorage.getItem('user')).user.uid;
-    if (!uid) throw new Error('UID not found');
-    
-    const joinData = { uid, c_code: classCode.value };
-    
-    await classroomsService.joinClassroom(classId.value, joinData);
+    const joinData = { c_code: classCode.value };
+
+    await joinClassroomMutation.mutateAsync({ cid: classId.value, data: joinData });
     message.value = 'Join successfully!';
-    className.value = '';
     classId.value = '';
     classCode.value = '';
     
@@ -62,64 +57,44 @@ watch(classId, () => getClassInfo(classId.value));
 </script>
 
 <template>
-  <!-- Modal Backdrop -->
-  <div class="modal-backdrop" @click="handleBackdropClick">
-    <!-- Modal Container -->
-    <div class="modal-container">
-      <div class="form-box bg-white shadow rounded p-4 p-md-5">
-        <!-- Close Button -->
-        <button 
-          type="button" 
-          class="btn-close"
-          @click="emit('close')"
-          aria-label="Close"
-        >
-          <i class="fas fa-times"></i>
-        </button>
+  <div class="form-box bg-white shadow rounded p-4 p-md-5">
+    <h2 class="mb-4 text-primary fw-bold">Join Classroom</h2>
 
-        <h2 class="mb-4 text-primary fw-bold">Join Classroom</h2>
-        
-        <div v-if="error" class="alert alert-danger">{{ error }}</div>
-        <div v-if="message" class="alert alert-success">{{ message }}</div>
-        
-        <form @submit.prevent="handleJoinClassroom">
-          <div class="mb-3">
-            <label for="classId" class="form-label fw-semibold">Class ID:* </label>
-            <input id="classId" type="number" v-model="classId" class="form-control" required />
-          </div>
-          
-          <div class="mb-3">
-            <label for="className" class="form-label fw-semibold">Class name: </label>
-            <input id="className" type="text" v-model="className" class="form-control" disabled />
-          </div>
-          
-          <div class="mb-3">
-            <label for="teacherName" class="form-label fw-semibold">Teacher: </label>
-            <input id="teacherName" type="text" v-model="teacherName" class="form-control" disabled />
-          </div>
-          
-          <div class="mb-3">
-            <label for="classCode" class="form-label fw-semibold">Class code:* </label>
-            <input
-              id="classCode"
-              type="text"
-              v-model="classCode"
-              class="form-control"
-              placeholder="Ex: ABC123"
-              required
-            />
-          </div>
-          
-          <div class="d-flex align-items-center justify-content-end">
-            <button type="button" @click="emit('close')" class="btn btn-secondary px-4 py-2 me-3">
-              Cancel
-            </button>
-            <button type="submit" :disabled="creating" class="btn btn-primary px-4 py-2">
-              <span v-if="creating" class="spinner-border spinner-border-sm me-2"></span>
-              Join
-            </button>
-          </div>
-        </form>
+    <div v-if="error" class="alert alert-danger">{{ error }}</div>
+    <div v-if="message" class="alert alert-success">{{ message }}</div>
+
+    <form @submit.prevent="handleJoinClassroom">
+      <div class="mb-3">
+        <label for="classId" class="form-label fw-semibold">Class ID:* </label>
+        <input id="classId" type="number" v-model="classId" class="form-control" required />
+      </div>
+
+      <div class="mb-3">
+        <label for="className" class="form-label fw-semibold">Class name: </label>
+        <input id="className" type="text" v-model="className" class="form-control" disabled />
+      </div>
+
+      <div class="mb-3">
+        <label for="teacherName" class="form-label fw-semibold">Teacher: </label>
+        <input id="teacherName" type="text" v-model="teacherName" class="form-control" disabled />
+      </div>
+
+      <div class="mb-3">
+        <label for="classCode" class="form-label fw-semibold">Class code:* </label>
+        <input
+          id="classCode"
+          type="text"
+          v-model="classCode"
+          class="form-control"
+          placeholder="Ex: ABC123"
+          required
+        />
+      </div>
+      <div class="d-flex align-items-center justify-content-end">
+        <button type="button" @click="emit('close')" class="btn btn-secondary px-4 py-2 me-3">
+          Cancel
+        </button>
+        <button type="submit" :disabled="creating" class="btn btn-primary px-4 py-2">Join</button>
       </div>
     </div>
   </div>

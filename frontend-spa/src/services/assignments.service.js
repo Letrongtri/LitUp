@@ -1,51 +1,51 @@
-import { efetch } from './service';
+import { useAuthStore } from '@/stores/auth';
+import http from './http';
 
 function assignmentsService() {
-  const baseUrlTeacher = '/api/teacher/assignments';
-  const baseUrlStudent = '/api/student/assignments';
+  const baseUrlTeacher = '/teacher/assignments';
+  const baseUrlStudent = '/student/assignments';
 
   async function getAssignments(page, limit = 10) {
-    const user = JSON.parse(localStorage.getItem('user'));
+    let url = `${baseUrlStudent}?page=${page}&limit=${limit}`;
+    const res = await http.get(url);
 
-    let url = `${baseUrlStudent}?uid=${user.user.uid}&page=${page}&limit=${limit}`;
-    const data = await efetch(url);
-
-    return data;
+    return res.data;
   }
 
   async function getAssignment(id) {
-    const role = JSON.parse(localStorage.getItem('user')).user.u_role;
-
-    if (role === 'teacher') return await efetch(`${baseUrlTeacher}/${id}`);
-    else return await efetch(`${baseUrlStudent}/${id}`);
+    const authStore = useAuthStore();
+    let res = null;
+    if (authStore.user.u_role === 'teacher') {
+      res = await http.get(`${baseUrlTeacher}/${id}`);
+    } else {
+      res = await http.get(`${baseUrlStudent}/${id}`);
+    }
+    return res.data;
   }
 
   async function updateAssignment(id, formData) {
-    for (const [key, val] of formData.entries()) {
-      console.log(key, val);
-    }
-
-    return efetch(`${baseUrlTeacher}/${id}`, {
-      method: 'PUT',
-      body: formData,
-    });
+    return await http.put(`${baseUrlTeacher}/${id}`, formData);
   }
 
   async function deleteAssignment(id) {
-    return efetch(`${baseUrlTeacher}/${id}`, {
-      method: 'DELETE',
-    });
+    return await http.delete(`${baseUrlTeacher}/${id}`);
   }
 
   async function getSubmissions(id, page, limit = 10) {
-    return efetch(`${baseUrlTeacher}/${id}/submissions?limit=${limit}&page=${page}`);
+    const res = await http.get(`${baseUrlTeacher}/${id}/submissions?limit=${limit}&page=${page}`);
+    return res.data;
   }
 
   async function submitAssignment(aid, formData) {
-    return efetch(`${baseUrlStudent}/${aid}`, {
-      method: 'POST',
-      body: formData,
-    });
+    return await http.post(`${baseUrlStudent}/${aid}/submission`, formData);
+  }
+
+  async function getAssignmentSubmissionByStudent(aid) {
+    return (await http.get(`${baseUrlStudent}/${aid}/submission`)).data;
+  }
+
+  async function updateSubmission(aid, formData) {
+    return await http.put(`${baseUrlStudent}/${aid}/submission`, formData);
   }
 
   return {
@@ -55,6 +55,8 @@ function assignmentsService() {
     deleteAssignment,
     getSubmissions,
     submitAssignment,
+    getAssignmentSubmissionByStudent,
+    updateSubmission,
   };
 }
 

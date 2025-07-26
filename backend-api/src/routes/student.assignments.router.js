@@ -25,8 +25,16 @@ const getAssignmentId = z.object({
 
 /** Student create a new submission */
 const createSubmissionData = z.object({
-  input: submissionSchema
-    .pick({ aid: true, uid: true, attachments: true })
+  input: submissionSchema.pick({ aid: true, attachments: true }).strict(),
+});
+
+/** Get updated submission data */
+const updateSubmissionData = z.object({
+  input: z
+    .object({
+      aid: z.coerce.number().nonnegative(),
+      attachments: z.any(),
+    })
     .strict(),
 });
 
@@ -36,9 +44,18 @@ module.exports.setup = (app) => {
   router
     .route("/:aid")
     .get(validateRequest(getAssignmentId), assignmentsController.getAssignment)
+    .all(allowedMethods(["GET"]));
+
+  router
+    .route("/:aid/submission")
+    .get(validateRequest(getAssignmentId), submissionsController.getSubmission)
     .post(
       [filesUpload, validateRequest(createSubmissionData)],
       submissionsController.createSubmission
     )
-    .all(allowedMethods(["GET", "POST"]));
+    .put(
+      [filesUpload, validateRequest(updateSubmissionData)],
+      submissionsController.updateSubmission
+    )
+    .all(allowedMethods(["GET", "PUT"]));
 };

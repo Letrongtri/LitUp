@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import classroomsService from '@/services/classrooms.service';
+import { useCreateClassroom } from '@/composables/useClassroom';
 
 const emit = defineEmits(['created', 'close']);
 const className = ref('');
@@ -8,23 +8,20 @@ const message = ref('');
 const error = ref('');
 const creating = ref(false);
 
+const createClassroomMutation = useCreateClassroom();
+
 async function handleCreateClassroom() {
   if (!className.value.trim()) return;
-  
+
   creating.value = true;
   error.value = '';
   message.value = '';
-  
+
   try {
-    const uid = JSON.parse(localStorage.getItem('user')).user.uid;
-    if (!uid) throw new Error('UID not found');
-    
-    const classroom = { uid, c_name: className.value.trim() };
-    
-    await classroomsService.createClassroom(classroom);
+    await createClassroomMutation.mutateAsync({ c_name: className.value.trim() });
     message.value = 'Create a successful class!';
     className.value = '';
-    
+
     emit('created');
     emit('close');
   } catch (err) {
@@ -48,20 +45,15 @@ function handleBackdropClick(event) {
     <div class="modal-container">
       <div class="form-box bg-white shadow rounded p-4 p-md-5">
         <!-- Close Button -->
-        <button 
-          type="button" 
-          class="btn-close"
-          @click="emit('close')"
-          aria-label="Close"
-        >
+        <button type="button" class="btn-close" @click="emit('close')" aria-label="Close">
           <i class="fas fa-times"></i>
         </button>
 
         <h2 class="mb-4 text-primary fw-bold">Create a new class</h2>
-        
+
         <div v-if="error" class="alert alert-danger">{{ error }}</div>
         <div v-if="message" class="alert alert-success">{{ message }}</div>
-        
+
         <form @submit.prevent="handleCreateClassroom">
           <div class="mb-3">
             <label for="className" class="form-label fw-semibold">Class name:* </label>
@@ -74,7 +66,7 @@ function handleBackdropClick(event) {
               required
             />
           </div>
-          
+
           <div class="d-flex align-items-center justify-content-end">
             <button type="button" @click="emit('close')" class="btn btn-secondary px-4 py-2 me-3">
               Cancel
@@ -91,7 +83,6 @@ function handleBackdropClick(event) {
 </template>
 
 <style scoped>
-
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -106,7 +97,6 @@ function handleBackdropClick(event) {
   padding: 20px;
 }
 
-
 .modal-container {
   position: relative;
   max-width: 600px;
@@ -115,7 +105,6 @@ function handleBackdropClick(event) {
   overflow-y: auto;
 }
 
-
 .form-box {
   max-width: 600px;
   margin: 0 auto;
@@ -123,7 +112,6 @@ function handleBackdropClick(event) {
   position: relative;
   animation: modalSlideIn 0.3s ease-out;
 }
-
 
 .btn-close {
   position: absolute;
@@ -155,7 +143,9 @@ input.form-control {
   border-radius: 10px;
   border: 1px solid #dee2e6;
   padding: 12px 15px;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
 input.form-control:focus {
@@ -221,12 +211,10 @@ button.btn {
   color: #495057;
 }
 
-
 .spinner-border-sm {
   width: 1rem;
   height: 1rem;
 }
-
 
 @keyframes modalSlideIn {
   from {
@@ -239,22 +227,20 @@ button.btn {
   }
 }
 
-
 @media (max-width: 768px) {
   .modal-backdrop {
     padding: 10px;
   }
-  
+
   .form-box {
     padding: 20px !important;
   }
-  
+
   .btn-close {
     top: 10px;
     right: 10px;
   }
 }
-
 
 .modal-container::-webkit-scrollbar {
   width: 6px;

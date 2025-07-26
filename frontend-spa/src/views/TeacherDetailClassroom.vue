@@ -1,78 +1,74 @@
 <script setup>
-import AssignmentStudentList from '@/components/AssignmentList.vue';
-
-import classroomsService from '@/services/classrooms.service';
 import { useRoute } from 'vue-router';
-
-import { computed, onMounted, ref } from 'vue';
-import EditClassroom from '@/components/EditClassroom.vue';
+import { computed, ref } from 'vue';
 import { formatDate } from '@/utils/format';
+import AssignmentStudentList from '@/components/AssignmentList.vue';
+import EditClassroom from '@/components/EditClassroom.vue';
 import CreateAndEditAssignment from '@/components/CreateAndEditAssignment.vue';
+import {
+  useClassroomAssignments,
+  useClassroomDetail,
+  useClassroomMembers,
+  useRemoveMember,
+} from '@/composables/useClassroom';
 
 const route = useRoute();
 const cid = Number(route.params?.cid);
-const classroom = ref({});
-const assignments = ref([]);
-const members = ref([]);
+
+const {
+  data: detailData,
+  isLoading: isLoadingDetail,
+  error: errorDetail,
+  refetch: refetchDetail,
+} = useClassroomDetail(cid);
+const classroom = computed(() => detailData.value?.classroom || {});
+
+const {
+  data: assignmentsData,
+  isLoading: isLoadingAssignments,
+  error: errorAssignments,
+  refetch: refetchAssignments,
+} = useClassroomAssignments(cid);
+const assignments = computed(() => assignmentsData.value ?? []);
+
+const {
+  data: membersData,
+  isLoading: isLoadingMembers,
+  error: errorMembers,
+  refetch: refetchMembers,
+} = useClassroomMembers(cid);
+const members = computed(() => membersData.value?.users || []);
+
 const showModalEditClassroom = ref(false);
 const showModalAddAssignment = ref(false);
 const tab = ref('information');
 
 const selectedMemberIdx = ref(-1);
-// const selectedMember = ref({});
 const selectedMember = computed(() => {
   if (selectedMemberIdx.value < 0) return null;
   return members.value[selectedMemberIdx.value];
 });
 
-async function retrieveClassroom() {
-  try {
-    const data = await classroomsService.getClassroom(cid);
-    classroom.value = data.classroom;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-async function retrieveAssignments() {
-  try {
-    const data = await classroomsService.getClassroomAssignment(cid);
-    assignments.value = data;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-async function retrieveMembers() {
-  try {
-    const data = await classroomsService.getMembers(cid);
-    members.value = data.users;
-    console.log(data);
-  } catch (error) {
-    console.log(error);
-  }
-}
-
+const membersMutation = useRemoveMember();
 async function removeMember(mid) {
   if (confirm('Do you want to remove this user from your class?')) {
     try {
-      await classroomsService.removeMember(cid, mid);
-      retrieveMembers();
+      await membersMutation.mutateAsync({ cid, mid });
     } catch (error) {
       console.log(error);
     }
   }
 }
-
-onMounted(() => {
-  retrieveClassroom();
-  retrieveAssignments();
-  retrieveMembers();
-});
 </script>
 
 <template>
-  <div class="page-container bg-light">
+  <div v-if="isLoadingDetail" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else class="page-container bg-light">
     <!-- Class Banner -->
     <div class="class-header bg-white border-bottom shadow-sm">
       <div class="container py-4 px-3 d-flex align-items-center justify-content-between">
@@ -102,7 +98,7 @@ onMounted(() => {
 
     <EditClassroom
       v-if="showModalEditClassroom"
-      @updated="retrieveClassroom(cid)"
+      @updated="refetchDetail"
       @close="showModalEditClassroom = false"
       :classroom="classroom"
     />
@@ -127,12 +123,20 @@ onMounted(() => {
           </div>
         </div>
 
-        <CreateAndEditAssignment
-          v-if="showModalAddAssignment"
-          @updated="retrieveAssignments()"
-          @close="showModalAddAssignment = false"
-          :task="'create'"
-        />
+        <div v-if="isLoadingAssignments" class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+        <div v-else>
+          <CreateAndEditAssignment
+            v-if="showModalAddAssignment"
+            @updated="refetchAssignments"
+            @close="showModalAddAssignment = false"
+            :task="'create'"
+          />
+        </div>
 
         <div class="row g-3">
           <div class="card rounded shadow p-3 border">
@@ -158,7 +162,12 @@ onMounted(() => {
     <!-- Member tab -->
     <div v-if="tab === 'members'">
       <div class="container py-4">
-        <div class="row g-3 mb-3">
+        <div v-if="isLoadingMembers" class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        <div v-else class="row g-3 mb-3">
           <!-- Member table -->
           <div class="col-md-8">
             <div class="card rounded shadow p-3">
@@ -226,7 +235,7 @@ onMounted(() => {
 <style scoped>
 .content-section {
   background: white;
-  border-radius: 0.375rem; 
+  border-radius: 0.375rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin: 2rem 0;
   padding: 2rem;
@@ -249,7 +258,7 @@ onMounted(() => {
 .tab-item {
   padding: 0.5rem 1rem;
   cursor: pointer;
-  border-radius: 0.375rem; 
+  border-radius: 0.375rem;
   color: #444;
   transition: background 0.2s;
 }
@@ -264,7 +273,7 @@ onMounted(() => {
 }
 
 .card {
-  border-radius: 0.375rem !important; 
+  border-radius: 0.375rem !important;
   background-color: #fff;
 }
 
@@ -273,11 +282,11 @@ onMounted(() => {
 }
 
 .btn {
-  border-radius: 0.375rem; 
+  border-radius: 0.375rem;
 }
 
 .img-thumbnail {
-  border-radius: 0.375rem; 
+  border-radius: 0.375rem;
 }
 
 .table {

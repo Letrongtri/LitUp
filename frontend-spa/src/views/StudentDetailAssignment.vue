@@ -1,42 +1,45 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import assignmentsService from '@/services/assignments.service';
 import { formatDate } from '@/utils/format';
 import AttachmentList from '@/components/AttachmentList.vue';
-import submissionsService from '@/services/submissions.service';
+import { useAssignmentDetail } from '@/composables/useAssignment';
+import {
+  useDeleteSubmission,
+  useSubmissionDetailByStudent,
+  useSubmitAssignment,
+  useUpdateSubmission,
+} from '@/composables/useSubmission';
 
 const route = useRoute();
-const assignment = ref({});
-const submission = ref(null);
-
-const submitAttachments = ref([]);
 
 const message = ref('');
 const error = ref('');
 const handling = ref(false);
 
 const aid = Number(route.params.aid);
-const uid = JSON.parse(localStorage.getItem('user')).user.uid;
 
-async function retrieveAssignment() {
-  try {
-    const result = await assignmentsService.getAssignment(aid);
-    assignment.value = result.assignment;
-  } catch (err) {
-    error.value = 'Unable to download exercise: ' + err.message;
-  }
-}
+const submitAttachments = ref([]);
 
-async function retrieveSubmission() {
-  try {
-    const result = await submissionsService.getSubmissionByStudent(uid, aid);
-    submission.value = result.submission;
-  } catch (err) {
-    // submission.value = {};
-    console.log(err);
-  }
-}
+const {
+  data: detailData,
+  isLoading: isLoadingDetail,
+  error: errorDetail,
+  refetch: refetchDetail,
+} = useAssignmentDetail(aid);
+const assignment = computed(() => detailData.value?.assignment || {});
+
+const {
+  data: submissionData,
+  isLoading: isLoadingSubmission,
+  error: errorSubmission,
+  refetch: refetchSubmission,
+} = useSubmissionDetailByStudent(aid);
+const submission = computed(() => submissionData.value?.submission || {});
+
+const submitAssignmentMutation = useSubmitAssignment();
+const updateSubmissionMutation = useUpdateSubmission();
+const deleteSubmissionMutation = useDeleteSubmission();
 
 async function createSubmission() {
   handling.value = true;
@@ -45,16 +48,12 @@ async function createSubmission() {
 
   try {
     const formData = new FormData();
-    formData.append('uid', uid);
-
     Array.from(submitAttachments.value).forEach((file) => {
       formData.append('attachments', file);
     });
 
-    await assignmentsService.submitAssignment(aid, formData);
+    await submitAssignmentMutation.mutateAsync({ aid, data: formData });
     message.value = 'Submit successfully!';
-
-    await retrieveSubmission();
   } catch (err) {
     error.value = 'Submit failed: ' + err.message;
   } finally {
@@ -69,17 +68,12 @@ async function updateSubmission() {
 
   try {
     const formData = new FormData();
-    formData.append('uid', uid);
-    formData.append('aid', aid);
-
     Array.from(submitAttachments.value).forEach((file) => {
       formData.append('attachments', file);
     });
 
-    await submissionsService.updateSubmission(formData);
+    await updateSubmissionMutation.mutateAsync({ aid, data: formData });
     message.value = 'Update successfully!';
-
-    await retrieveSubmission();
   } catch (err) {
     error.value = 'Update failed: ' + err.message;
   } finally {
@@ -94,10 +88,8 @@ async function deleteSubmission(sid) {
   console.log(sid);
 
   try {
-    await submissionsService.deleteSubmission(sid);
+    await deleteSubmissionMutation.mutateAsync(sid);
     message.value = 'Delete successfully!';
-
-    await retrieveSubmission();
   } catch (err) {
     error.value = 'Delete failed: ' + err.message;
   } finally {
@@ -105,19 +97,19 @@ async function deleteSubmission(sid) {
   }
 }
 
-onMounted(async () => {
-  await retrieveAssignment();
-  await retrieveSubmission();
-  console.log(submission.value);
-});
-
 function handleFileChange(e) {
   submitAttachments.value = Array.from(e.target.files);
 }
 </script>
 
 <template>
-  <div class="page-container bg-light py-5">
+  <div v-if="isLoadingDetail" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else class="page-container bg-light py-5">
     <div class="class-header bg-white border-bottom shadow-sm">
       <div class="container py-4 px-3">
         <h2 class="fw-bold text-primary mb-1">{{ assignment.a_title }}</h2>
@@ -156,7 +148,7 @@ function handleFileChange(e) {
             </div>
           </div>
 
-          <div v-if="submission" class="card p-3">
+          <div v-if="submission.sid" class="card p-3">
             <h5 class="card-title">Your submission</h5>
 
             <div class="mb-3">
@@ -204,13 +196,19 @@ function handleFileChange(e) {
               <form @submit.prevent="createSubmission" enctype="multipart/form-data">
                 <div class="mb-4">
                   <label class="form-label fw-semibold">Upload your attachments:</label>
-                  <input type="file" multiple class="form-control" @change="handleFileChange" />
+                  <input
+                    type="file"
+                    multiple
+                    class="form-control"
+                    @change="handleFileChange"
+                    required
+                  />
                 </div>
 
                 <div class="d-flex align-items-center justify-content-end">
                   <button
                     type="button"
-                    v-if="submission"
+                    v-if="submission.sid"
                     @click="updateSubmission"
                     :disabled="handling"
                     class="btn btn-warning px-4 py-2 me-3"
@@ -219,7 +217,7 @@ function handleFileChange(e) {
                   </button>
                   <button
                     type="button"
-                    v-if="submission"
+                    v-if="submission.sid"
                     @click="deleteSubmission(submission.sid)"
                     :disabled="handling"
                     class="btn btn-danger px-4 py-2"
@@ -345,5 +343,4 @@ label,
 button {
   font-size: 1rem;
 }
-
 </style>

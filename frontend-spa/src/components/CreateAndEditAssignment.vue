@@ -1,9 +1,12 @@
 <script setup>
 import { ref, watchEffect } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import assignmentsService from '@/services/assignments.service';
 import { formatDateToDateTimeLocal } from '@/utils/format';
-import classroomsService from '@/services/classrooms.service';
+import {
+  useCreateAssignment,
+  useDeleteAssignment,
+  useUpdateAssignment,
+} from '@/composables/useAssignment';
 
 const route = useRoute();
 const router = useRouter();
@@ -40,14 +43,18 @@ watchEffect(() => {
   }
 });
 
+const updateAssignmentMutation = useUpdateAssignment();
+const createAssignmentMutation = useCreateAssignment();
+const deleteAssignmentMutation = useDeleteAssignment();
+
 async function handleAssignment() {
   handling.value = true;
   error.value = '';
   message.value = '';
 
   try {
-    const date = new Date();
-    const deadlineTimestamp = date.toISOString(deadline.value);
+    const date = new Date(deadline.value);
+    const deadlineTimestamp = date.toISOString();
 
     const formData = new FormData();
     formData.append('a_title', title.value);
@@ -62,10 +69,10 @@ async function handleAssignment() {
     });
 
     if (props.task === 'update') {
-      await assignmentsService.updateAssignment(aid, formData);
+      await updateAssignmentMutation.mutateAsync({ aid, payload: formData });
       message.value = 'Update successfully!';
     } else if (props.task === 'create') {
-      await classroomsService.createAssignment(cid, formData);
+      await createAssignmentMutation.mutateAsync({ cid, payload: formData });
       message.value = 'Add successfully!';
     }
 
@@ -88,8 +95,8 @@ async function deleteAssignment() {
   if (confirm('Do you want to delete this assignment?')) {
     deleting.value = true;
     try {
-      await assignmentsService.deleteAssignment(props.assignment.aid);
-      message.value = 'Assignment deleted successfully!';
+      await deleteAssignmentMutation.mutateAsync(props.assignment.aid);
+      message.value = 'Class update successful!';
       router.push(`/teacher/classrooms/${props.assignment.cid}`);
     } catch (err) {
       error.value = 'Delete failed: ' + err.message;
@@ -117,16 +124,13 @@ function handleBackdropClick(event) {
     <div class="modal-container">
       <div class="form-box bg-white shadow rounded p-4 p-md-5">
         <!-- Close Button -->
-        <button 
-          type="button" 
-          class="btn-close"
-          @click="emit('close')"
-          aria-label="Close"
-        >
+        <button type="button" class="btn-close" @click="emit('close')" aria-label="Close">
           <i class="fas fa-times"></i>
         </button>
 
-        <h2 class="mb-4 text-primary fw-bold">{{ task === 'create' ? 'Add' : 'Edit' }} Assignment</h2>
+        <h2 class="mb-4 text-primary fw-bold">
+          {{ task === 'create' ? 'Add' : 'Edit' }} Assignment
+        </h2>
 
         <div v-if="error" class="alert alert-danger">{{ error }}</div>
         <div v-if="message" class="alert alert-success">{{ message }}</div>
@@ -220,7 +224,6 @@ function handleBackdropClick(event) {
 </template>
 
 <style scoped>
-
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -235,7 +238,6 @@ function handleBackdropClick(event) {
   padding: 20px;
 }
 
-
 .modal-container {
   position: relative;
   max-width: 700px;
@@ -244,7 +246,6 @@ function handleBackdropClick(event) {
   overflow-y: auto;
 }
 
-
 .form-box {
   max-width: 700px;
   margin: 0 auto;
@@ -252,7 +253,6 @@ function handleBackdropClick(event) {
   position: relative;
   animation: modalSlideIn 0.3s ease-out;
 }
-
 
 .btn-close {
   position: absolute;
@@ -279,14 +279,15 @@ function handleBackdropClick(event) {
   color: #495057;
 }
 
-
 input.form-control,
 textarea.form-control,
 select.form-control {
   border-radius: 10px;
   border: 1px solid #dee2e6;
   padding: 12px 15px;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
 input.form-control:focus,
@@ -296,12 +297,10 @@ textarea.form-control:focus {
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
-
 textarea.form-control {
   resize: vertical;
   min-height: 100px;
 }
-
 
 .switch-container {
   display: flex;
@@ -309,7 +308,6 @@ textarea.form-control {
   align-items: center;
   flex-wrap: wrap;
 }
-
 
 .form-switch {
   padding-left: 2.5em;
@@ -323,7 +321,11 @@ textarea.form-control {
   background-color: #dee2e6;
   border: 1px solid #adb5bd;
   border-radius: 2em;
-  transition: background-color 0.15s ease-in-out, background-position 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    background-color 0.15s ease-in-out,
+    background-position 0.15s ease-in-out,
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
 .form-check-input:checked {
@@ -334,7 +336,6 @@ textarea.form-control {
 .form-check-label {
   font-weight: 500;
 }
-
 
 .file-list {
   padding: 10px;
@@ -358,7 +359,6 @@ textarea.form-control {
   font-size: 0.85rem;
   border: 1px solid #bbdefb;
 }
-
 
 button.btn {
   font-weight: 600;
@@ -409,11 +409,9 @@ button.btn {
   opacity: 0.65;
 }
 
-
 .gap-2 {
   gap: 0.5rem;
 }
-
 
 .alert {
   border-radius: 8px;
@@ -431,24 +429,20 @@ button.btn {
   color: #0a3622;
 }
 
-
 .form-label {
   margin-bottom: 0.5rem;
   color: #495057;
 }
-
 
 .row .col-md-6 {
   padding-right: 0.75rem;
   padding-left: 0.75rem;
 }
 
-
 .spinner-border-sm {
   width: 1rem;
   height: 1rem;
 }
-
 
 @keyframes modalSlideIn {
   from {
@@ -461,43 +455,41 @@ button.btn {
   }
 }
 
-
 @media (max-width: 768px) {
   .modal-backdrop {
     padding: 10px;
   }
-  
+
   .form-box {
     padding: 20px !important;
   }
-  
+
   .btn-close {
     top: 10px;
     right: 10px;
   }
-  
+
   .row .col-md-6 {
     padding-right: 0.5rem;
     padding-left: 0.5rem;
     margin-bottom: 1rem;
   }
-  
+
   .switch-container {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .gap-2 {
     flex-wrap: wrap;
     justify-content: center;
   }
-  
+
   .btn {
     min-width: 100px;
   }
 }
-
 
 .modal-container::-webkit-scrollbar {
   width: 6px;

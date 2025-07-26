@@ -26,26 +26,34 @@ const {
 // swagger ui - openAPI
 const swaggerDocument = require("../docs/openapiSpec.json");
 
+// authorization
+const authenticateToken = require("./middlewares/auth.middleware");
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// rate limiter
+app.use("/api", apiLimiter);
+
 app.get("/", (req, res) => {
   return res.json(JSend.success());
 });
 
+// public routes
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/public", express.static("public"));
 
-// rate limiter
-app.use("/api", apiLimiter);
+authRouter.setup(app);
+
+// route need authenticate
+app.use(authenticateToken);
 
 adminRouter.setup(app);
 studentAssignmentsRouter.setup(app);
 teacherAssignmentsRouter.setup(app);
-authRouter.setup(app);
 studentClassroomsRouter.setup(app);
 teacherClassroomsRouter.setup(app);
 studentSubmissionsRouter.setup(app);

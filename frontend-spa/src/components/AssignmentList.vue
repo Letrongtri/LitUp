@@ -1,7 +1,6 @@
 <script setup>
 import router from '@/router';
 import { formatDate } from '@/utils/format';
-// import AttachmentList from '@/components/AttachmentList.vue';
 
 const props = defineProps({
   assignments: { type: Array },
@@ -12,7 +11,6 @@ function goToAssignmentDetail(id) {
   if (props.role === 'student') router.push(`/student/assignments/${id}`);
   else if (props.role === 'teacher') router.push(`/teacher/assignments/${id}`);
 }
-console.log(props.assignments);
 </script>
 
 <template>
