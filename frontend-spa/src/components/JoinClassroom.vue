@@ -33,27 +33,11 @@ async function handleJoinClassroom() {
   }
 }
 
-async function getClassInfo(cid) {
-  if (classId.value) {
-    try {
-      const classroom = await classroomsService.getClassroom(cid);
-      className.value = classroom.classroom.c_name;
-      teacherName.value = classroom.classroom.teacher_name;
-    } catch (error) {
-      error.value = error.message;
-      className.value = '';
-      teacherName.value = '';
-    }
-  }
-}
-
 function handleBackdropClick(event) {
   if (event.target === event.currentTarget) {
     emit('close');
   }
 }
-
-watch(classId, () => getClassInfo(classId.value));
 </script>
 
 <template>

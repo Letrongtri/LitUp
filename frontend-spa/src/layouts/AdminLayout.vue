@@ -11,8 +11,6 @@ provide('tab', tab);
 
 function goToDashboardPage() {
   if (route.name === 'admin.dashboard') return;
-  //
-  tab.value = 'overview';
   router.push('/admin/dashboard');
 }
 
@@ -116,13 +114,13 @@ function goToSubmissionsManagementPage() {
 .page-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #007bff; 
+  color: #007bff;
   margin-bottom: 0.5rem;
 }
 
 .page-subtitle {
   font-size: 1.2rem;
-  color: #343a40; 
+  color: #343a40;
 }
 
 .tabs-nav {

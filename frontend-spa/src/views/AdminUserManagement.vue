@@ -1,16 +1,15 @@
 <script setup>
 import MainPagination from '@/components/MainPagination.vue';
-import adminService from '@/services/admin.service';
+import { useUpdateUserByAdmin, useUsersByAdmin } from '@/composables/useAdmin';
 import { formatDate } from '@/utils/format';
-import { computed, inject, onMounted, ref, watch } from 'vue';
+import { computed, inject, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-const users = ref([]);
 const route = useRoute();
 const router = useRouter();
 const tab = inject('tab');
+tab.value = 'users';
 
-const totalPages = ref(1);
 const currentPage = computed(() => {
   const page = Number(route.query?.page);
   if (Number.isNaN(page) || page < 1) return 1;
@@ -21,6 +20,11 @@ const currentLimit = computed(() => {
   if (Number.isNaN(limit) || limit < 1) return 10;
   return limit;
 });
+
+const { data, isLoading, error, refetch } = useUsersByAdmin(currentPage, currentLimit);
+
+const users = computed(() => data.value?.users || []);
+const totalPages = computed(() => data.value?.metadata.lastPage || 1);
 
 const searchText = ref('');
 const searchableUsers = computed(() =>
@@ -43,21 +47,11 @@ const filteredUsers = computed(() => {
   );
 });
 
-async function retrieveUsers(page) {
-  try {
-    const data = await adminService.getUsersByAdmin(page, currentLimit.value);
-    users.value = data.users;
-    totalPages.value = data.metadata.lastPage ?? 1;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
+const updateUserMutation = useUpdateUserByAdmin();
 async function deactivateAccount(uid) {
   if (confirm('Do you want to deactivate this account?')) {
     try {
-      await adminService.editAccount(uid, { u_status: false });
-      selectedUser.value.u_status = false;
+      await updateUserMutation.mutateAsync({ uid, data: { u_status: false } });
     } catch (error) {
       console.log(error);
     }
@@ -67,8 +61,7 @@ async function deactivateAccount(uid) {
 async function activateAccount(uid) {
   if (confirm('Do you want to activate this account?')) {
     try {
-      await adminService.editAccount(uid, { u_status: true });
-      selectedUser.value.u_status = true;
+      await updateUserMutation.mutateAsync({ uid, data: { u_status: true } });
     } catch (error) {
       console.log(error);
     }
@@ -77,17 +70,18 @@ async function activateAccount(uid) {
 
 function changeCurrentPage(page) {
   router.push({ name: 'admin.users', query: { page, limit: currentLimit.value } });
+  refetch();
 }
-
-onMounted(() => {
-  tab.value = 'users';
-});
-
-watch(currentPage, () => retrieveUsers(currentPage.value), { immediate: true });
 </script>
 
 <template>
-  <div class="page-container">
+  <div v-if="isLoading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else class="page-container">
     <div class="container">
       <div class="content-section">
         <div class="section-header">

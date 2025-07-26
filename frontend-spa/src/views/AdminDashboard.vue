@@ -1,6 +1,5 @@
 <script setup>
-import adminService from '@/services/admin.service';
-import { inject, onMounted, ref } from 'vue';
+import { computed, inject, onMounted } from 'vue';
 import { Bar, Doughnut, Line } from 'vue-chartjs';
 
 import {
@@ -14,7 +13,9 @@ import {
   CategoryScale,
   LinearScale,
   PointElement,
+  Filler,
 } from 'chart.js';
+import { useStatistics } from '@/composables/useAdmin';
 
 ChartJS.register(
   Title,
@@ -26,52 +27,53 @@ ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
+  Filler,
 );
 
-const statistics = ref({});
 const tab = inject('tab');
+tab.value = 'overview';
 
-async function retrieveStatistics() {
-  try {
-    const data = await adminService.getStatistics();
-    statistics.value = data.stats;
+const { data, isLoading, error, refetch } = useStatistics();
+const statistics = computed(() => {
+  const rawStats = data.value?.stats;
 
-    if (statistics.value.userRolesData) {
-      statistics.value.userRolesData.datasets[0].backgroundColor = [
-        '#FF6384', // Admin
-        '#36A2EB', // Teacher
-        '#FFCE56', // Student
-      ];
-    }
+  if (!rawStats) return {};
 
-    if (statistics.value.submissionsData) {
-      statistics.value.submissionsData.datasets[0].backgroundColor = '#42A5F5';
-      statistics.value.submissionsData.datasets[0].borderRadius = 6;
-    }
+  // Clone dữ liệu ra để không mutate object readonly
+  const stats = JSON.parse(JSON.stringify(rawStats));
 
-    if (statistics.value.trendData) {
-      const colors = ['#66BB6A', '#FFA726'];
-      statistics.value.trendData.datasets.forEach((dataset, i) => {
-        dataset.borderColor = colors[i];
-        dataset.backgroundColor = `${colors[i]}33`; // add transparency
-        dataset.fill = true;
-        dataset.tension = 0.3;
-        dataset.pointRadius = 4;
-      });
-    }
-  } catch (error) {
-    console.log(error);
+  if (stats.userRolesData) {
+    stats.userRolesData.datasets[0].backgroundColor = ['#FF6384', '#36A2EB', '#FFCE56'];
   }
-}
 
-onMounted(async () => {
-  tab.value = 'overview';
-  await retrieveStatistics();
+  if (stats.submissionsData) {
+    stats.submissionsData.datasets[0].backgroundColor = '#42A5F5';
+    stats.submissionsData.datasets[0].borderRadius = 6;
+  }
+
+  if (stats.trendData) {
+    const colors = ['#66BB6A', '#FFA726'];
+    stats.trendData.datasets.forEach((dataset, i) => {
+      dataset.borderColor = colors[i];
+      dataset.backgroundColor = `${colors[i]}33`;
+      dataset.fill = true;
+      dataset.tension = 0.3;
+      dataset.pointRadius = 4;
+    });
+  }
+
+  return stats;
 });
 </script>
 
 <template>
-  <div class="container">
+  <div v-if="isLoading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else class="container">
     <!-- Overview -->
     <div class="overview-grid">
       <div class="overview-card">
@@ -96,7 +98,6 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Placeholder for the chart (if needed later) -->
     <div class="content-section">
       <h3 class="section-title">Detailed statistics</h3>
       <div class="charts-grid">
