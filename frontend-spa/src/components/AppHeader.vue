@@ -1,13 +1,11 @@
 <script setup>
 import { eventBus } from '@/eventBus';
 import { useAuthStore } from '@/stores/auth';
-import { useQueryClient } from '@tanstack/vue-query';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const authStore = useAuthStore();
-const queryClient = useQueryClient();
 
 const user = ref(authStore.user);
 

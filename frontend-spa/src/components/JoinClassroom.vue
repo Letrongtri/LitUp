@@ -15,7 +15,7 @@ async function handleJoinClassroom() {
   creating.value = true;
   error.value = '';
   message.value = '';
-  
+
   try {
     const joinData = { c_code: classCode.value };
 
@@ -23,7 +23,7 @@ async function handleJoinClassroom() {
     message.value = 'Join successfully!';
     classId.value = '';
     classCode.value = '';
-    
+
     emit('created');
     emit('close');
   } catch (err) {
@@ -70,16 +70,6 @@ watch(classId, () => getClassInfo(classId.value));
       </div>
 
       <div class="mb-3">
-        <label for="className" class="form-label fw-semibold">Class name: </label>
-        <input id="className" type="text" v-model="className" class="form-control" disabled />
-      </div>
-
-      <div class="mb-3">
-        <label for="teacherName" class="form-label fw-semibold">Teacher: </label>
-        <input id="teacherName" type="text" v-model="teacherName" class="form-control" disabled />
-      </div>
-
-      <div class="mb-3">
         <label for="classCode" class="form-label fw-semibold">Class code:* </label>
         <input
           id="classCode"
@@ -96,12 +86,11 @@ watch(classId, () => getClassInfo(classId.value));
         </button>
         <button type="submit" :disabled="creating" class="btn btn-primary px-4 py-2">Join</button>
       </div>
-    </div>
+    </form>
   </div>
 </template>
 
 <style scoped>
-
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -116,7 +105,6 @@ watch(classId, () => getClassInfo(classId.value));
   padding: 20px;
 }
 
-
 .modal-container {
   position: relative;
   max-width: 600px;
@@ -125,7 +113,6 @@ watch(classId, () => getClassInfo(classId.value));
   overflow-y: auto;
 }
 
-
 .form-box {
   max-width: 600px;
   margin: 0 auto;
@@ -133,7 +120,6 @@ watch(classId, () => getClassInfo(classId.value));
   position: relative;
   animation: modalSlideIn 0.3s ease-out;
 }
-
 
 .btn-close {
   position: absolute;
@@ -159,12 +145,13 @@ watch(classId, () => getClassInfo(classId.value));
   color: #495057;
 }
 
-
 input.form-control {
   border-radius: 10px;
   border: 1px solid #dee2e6;
   padding: 12px 15px;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
 input.form-control:focus {
@@ -172,7 +159,6 @@ input.form-control:focus {
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
-
 
 button.btn {
   font-weight: 600;
@@ -201,7 +187,6 @@ button.btn {
   border-color: #565e64;
 }
 
-
 .alert {
   border-radius: 8px;
   font-size: 0.95rem;
@@ -218,7 +203,6 @@ button.btn {
   color: #0a3622;
 }
 
-
 @keyframes modalSlideIn {
   from {
     opacity: 0;
@@ -230,16 +214,15 @@ button.btn {
   }
 }
 
-
 @media (max-width: 768px) {
   .modal-backdrop {
     padding: 10px;
   }
-  
+
   .form-box {
     padding: 20px !important;
   }
-  
+
   .btn-close {
     top: 10px;
     right: 10px;
