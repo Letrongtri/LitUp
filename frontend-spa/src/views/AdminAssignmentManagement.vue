@@ -1,16 +1,15 @@
 <script setup>
 import MainPagination from '@/components/MainPagination.vue';
-import adminService from '@/services/admin.service';
+import { useAssignmentsByAdmin, useUpdateAssignmentByAdmin } from '@/composables/useAdmin';
 import { formatDate } from '@/utils/format';
-import { computed, inject, onMounted, ref, watch } from 'vue';
+import { computed, inject, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-const assignments = ref([]);
 const route = useRoute();
 const router = useRouter();
 const tab = inject('tab');
+tab.value = 'assignments';
 
-const totalPages = ref(1);
 const currentPage = computed(() => {
   const page = Number(route.query?.page);
   if (Number.isNaN(page) || page < 1) return 1;
@@ -21,6 +20,10 @@ const currentLimit = computed(() => {
   if (Number.isNaN(limit) || limit < 1) return 10;
   return limit;
 });
+
+const { data, isLoading, error, refetch } = useAssignmentsByAdmin(currentPage, currentLimit);
+const assignments = computed(() => data.value?.assignments || []);
+const totalPages = computed(() => data.value?.metadata.lastPage);
 
 const searchText = ref('');
 const searchableAssignments = computed(() =>
@@ -43,21 +46,12 @@ const filteredAssignments = computed(() => {
   );
 });
 
-async function retrieveAssignments(page) {
-  try {
-    const data = await adminService.getAssignmentsByAdmin(page, currentLimit.value);
-    assignments.value = data.assignments;
-    totalPages.value = data.metadata.lastPage ?? 1;
-  } catch (error) {
-    console.log(error);
-  }
-}
+const updateAssignmentMutation = useUpdateAssignmentByAdmin();
 
 async function deactivateAssignment(aid) {
   if (confirm('Do you want to deactivate this assignment?')) {
     try {
-      await adminService.editAssignment(aid, { a_status: false });
-      selectedAssignment.value.a_status = false;
+      await updateAssignmentMutation.mutateAsync({ aid, data: { a_status: false } });
     } catch (error) {
       console.log(error);
     }
@@ -67,8 +61,7 @@ async function deactivateAssignment(aid) {
 async function activateAssignment(aid) {
   if (confirm('Do you want to activate this assignment?')) {
     try {
-      await adminService.editAssignment(aid, { a_status: true });
-      selectedAssignment.value.a_status = true;
+      await updateAssignmentMutation.mutateAsync({ aid, data: { a_status: true } });
     } catch (error) {
       console.log(error);
     }
@@ -93,12 +86,6 @@ function dowloadFile(attachment) {
   link.click();
   document.body.removeChild(link);
 }
-
-onMounted(() => {
-  tab.value = 'assignments';
-});
-
-watch(currentPage, () => retrieveAssignments(currentPage.value), { immediate: true });
 </script>
 
 <template>
@@ -118,7 +105,13 @@ watch(currentPage, () => retrieveAssignments(currentPage.value), { immediate: tr
           </div>
         </div>
 
-        <div class="row">
+        <div v-if="isLoading" class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+        <div v-else class="row">
           <div class="col-md-8">
             <table class="user-table table table-bordered table-hover align-middle">
               <thead class="table-light">

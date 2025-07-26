@@ -15,7 +15,7 @@ const currentPage = computed(() => {
   return page;
 });
 
-const { data, isLoading, error, refetch } = useClassroomsByTeacher(currentPage.value);
+const { data, isLoading, error, refetch } = useClassroomsByTeacher(currentPage);
 
 const classrooms = computed(() => data.value?.classrooms || []);
 const totalPages = computed(() => data.value?.metadata?.lastPage || 1);
@@ -52,7 +52,9 @@ function goToDetailClassroomPage(cls) {
             <h2 class="fw-bold text-primary mb-2">Your classroom</h2>
             <p class="page-subtitle mb-0">Classroom and assignment management</p>
           </div>
-          <div class="col-lg-3 col-sm-12 d-flex justify-content-end align-items-center mt-3 mt-lg-0">
+          <div
+            class="col-lg-3 col-sm-12 d-flex justify-content-end align-items-center mt-3 mt-lg-0"
+          >
             <button class="btn btn-primary" @click="showModal = true">
               <i class="fa fa-plus me-2" aria-hidden="true"></i>
               Create Classroom
@@ -227,10 +229,6 @@ function goToDetailClassroomPage(cls) {
   margin: 0 0 1rem 0;
   color: #2c3e50;
   font-size: 1.2rem;
-}
-
-.assignments-list {
-  space-y: 1rem;
 }
 
 .assignment-item {
@@ -419,7 +417,7 @@ h4 {
   .class-header h2 {
     font-size: 1.8rem;
   }
-  
+
   .section-header {
     flex-direction: column;
     align-items: flex-start;

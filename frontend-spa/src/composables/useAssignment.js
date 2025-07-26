@@ -1,6 +1,7 @@
 import assignmentsService from '@/services/assignments.service';
 import classroomsService from '@/services/classrooms.service';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { computed, unref } from 'vue';
 
 export function useAssignmentDetail(id) {
   return useQuery({
@@ -13,10 +14,10 @@ export function useAssignmentDetail(id) {
 
 export function useSubmissions(id, page, limit = 10) {
   return useQuery({
-    queryKey: ['assignment.submissions', id, page],
-    queryFn: () => assignmentsService.getSubmissions(id, page, limit),
+    queryKey: computed(() => ['assignment.submissions', unref(id), unref(page)]),
+    queryFn: () => assignmentsService.getSubmissions(unref(id), unref(page), limit),
     keepPreviousData: true,
-    enabled: !!id,
+    enabled: !!unref(id),
   });
 }
 
