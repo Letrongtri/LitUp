@@ -75,13 +75,7 @@ function changeCurrentPage(page) {
 </script>
 
 <template>
-  <div v-if="isLoading" class="text-center">
-    <div class="spinner-border" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-  </div>
-
-  <div v-else class="page-container">
+  <div class="page-container">
     <div class="container">
       <div class="content-section">
         <div class="section-header">
@@ -97,7 +91,13 @@ function changeCurrentPage(page) {
           </div>
         </div>
 
-        <div class="row">
+        <div v-if="isLoading" class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+        <div v-else class="row">
           <div class="col-md-8">
             <!-- User table -->
             <table class="user-table table table-bordered table-hover align-middle">

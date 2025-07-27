@@ -1,16 +1,15 @@
 <script setup>
 import MainPagination from '@/components/MainPagination.vue';
-import adminService from '@/services/admin.service';
+import { useClassroomsByAdmin, useUpdateClassroomByAdmin } from '@/composables/useAdmin';
 import { formatDate } from '@/utils/format';
-import { computed, inject, onMounted, ref, watch } from 'vue';
+import { computed, inject, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-const classrooms = ref([]);
 const route = useRoute();
 const router = useRouter();
 const tab = inject('tab');
+tab.value = 'classrooms';
 
-const totalPages = ref(1);
 const currentPage = computed(() => {
   const page = Number(route.query?.page);
   if (Number.isNaN(page) || page < 1) return 1;
@@ -21,6 +20,10 @@ const currentLimit = computed(() => {
   if (Number.isNaN(limit) || limit < 1) return 10;
   return limit;
 });
+
+const { data, isLoading, error, refetch } = useClassroomsByAdmin(currentPage, currentLimit);
+const classrooms = computed(() => data.value?.classrooms || []);
+const totalPages = computed(() => data.value?.metadata.lastPage || 1);
 
 const searchText = ref('');
 const searchableClassrooms = computed(() =>
@@ -43,21 +46,11 @@ const filteredClassrooms = computed(() => {
   );
 });
 
-async function retrieveClassrooms(page) {
-  try {
-    const data = await adminService.getClassroomsByAdmin(page, currentLimit.value);
-    classrooms.value = data.classrooms;
-    totalPages.value = data.metadata.lastPage ?? 1;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
+const updateClassroomMutation = useUpdateClassroomByAdmin();
 async function deactivateClassroom(cid) {
   if (confirm('Do you want to deactivate this classroom?')) {
     try {
-      await adminService.editClassroom(cid, { c_status: false });
-      selectedClassroom.value.c_status = false;
+      await updateClassroomMutation.mutateAsync({ cid, data: { c_status: false } });
     } catch (error) {
       console.log(error);
     }
@@ -67,8 +60,7 @@ async function deactivateClassroom(cid) {
 async function activateClassroom(cid) {
   if (confirm('Do you want to activate this classroom?')) {
     try {
-      await adminService.editClassroom(cid, { c_status: true });
-      selectedClassroom.value.c_status = true;
+      await updateClassroomMutation.mutateAsync({ cid, data: { c_status: true } });
     } catch (error) {
       console.log(error);
     }
@@ -78,12 +70,6 @@ async function activateClassroom(cid) {
 function changeCurrentPage(page) {
   router.push({ name: 'admin.classrooms', query: { page, limit: currentLimit.value } });
 }
-
-onMounted(() => {
-  tab.value = 'classrooms';
-});
-
-watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: true });
 </script>
 
 <template>
@@ -103,7 +89,13 @@ watch(currentPage, () => retrieveClassrooms(currentPage.value), { immediate: tru
           </div>
         </div>
 
-        <div class="row">
+        <div v-if="isLoading" class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+        <div v-else class="row">
           <div class="col-md-8">
             <!-- User table -->
             <table class="user-table table table-bordered table-hover align-middle">

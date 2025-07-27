@@ -1,16 +1,15 @@
 <script setup>
 import MainPagination from '@/components/MainPagination.vue';
-import adminService from '@/services/admin.service';
+import { useSubmissionsByAdmin } from '@/composables/useAdmin';
 import { formatDate } from '@/utils/format';
-import { computed, inject, onMounted, ref, watch } from 'vue';
+import { computed, inject, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-const submissions = ref([]);
 const route = useRoute();
 const router = useRouter();
 const tab = inject('tab');
+tab.value = 'submissions';
 
-const totalPages = ref(1);
 const currentPage = computed(() => {
   const page = Number(route.query?.page);
   if (Number.isNaN(page) || page < 1) return 1;
@@ -21,6 +20,10 @@ const currentLimit = computed(() => {
   if (Number.isNaN(limit) || limit < 1) return 10;
   return limit;
 });
+
+const { data, isLoading, error, refetch } = useSubmissionsByAdmin(currentPage, currentLimit);
+const submissions = computed(() => data.value?.submissions || []);
+const totalPages = computed(() => data.value?.metadata.lastPage || 1);
 
 const searchText = ref('');
 const searchableSubmissions = computed(() =>
@@ -43,16 +46,6 @@ const filteredSubmissions = computed(() => {
   );
 });
 
-async function retrieveSubmissions(page) {
-  try {
-    const data = await adminService.getSubmissionsByAdmin(page, currentLimit.value);
-    submissions.value = data.submissions;
-    totalPages.value = data.metadata.lastPage ?? 1;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 function changeCurrentPage(page) {
   router.push({ name: 'admin.submissions', query: { page, limit: currentLimit.value } });
 }
@@ -71,12 +64,6 @@ function dowloadFile(attachment) {
   link.click();
   document.body.removeChild(link);
 }
-
-onMounted(() => {
-  tab.value = 'submissions';
-});
-
-watch(currentPage, () => retrieveSubmissions(currentPage.value), { immediate: true });
 </script>
 
 <template>
@@ -96,7 +83,13 @@ watch(currentPage, () => retrieveSubmissions(currentPage.value), { immediate: tr
           </div>
         </div>
 
-        <div class="row">
+        <div v-if="isLoading" class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+        <div v-else class="row">
           <div class="col-md-8">
             <table class="user-table table table-bordered table-hover align-middle">
               <thead class="table-light">

@@ -4,16 +4,16 @@ import { computed, unref } from 'vue';
 
 export function useClassroomsByTeacher(page) {
   return useQuery({
-    queryKey: ['teacher.classrooms', page],
-    queryFn: () => classroomsService.getClassroomsByTeacher(page),
+    queryKey: computed(() => ['teacher.classrooms', unref(page)]),
+    queryFn: () => classroomsService.getClassroomsByTeacher(unref(page)),
     keepPreviousData: true,
   });
 }
 
 export function useClassroomsByStudent(page) {
   return useQuery({
-    queryKey: ['student.classrooms', page],
-    queryFn: () => classroomsService.getClassrooms(page),
+    queryKey: computed(() => ['student.classrooms', unref(page)]),
+    queryFn: () => classroomsService.getClassrooms(unref(page)),
     keepPreviousData: true,
   });
 }
