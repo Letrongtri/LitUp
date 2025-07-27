@@ -18,7 +18,7 @@ const currentPage = computed(() => {
   return page;
 });
 
-const { data, isLoading, error, refetch } = useClassroomsByStudent(currentPage.value);
+const { data, isLoading, refetch } = useClassroomsByStudent(currentPage.value);
 const classrooms = computed(() => data.value?.classrooms || []);
 const totalPages = computed(() => data.value?.metadata.lastPage || 1);
 
@@ -27,7 +27,7 @@ const searchClass = ref('');
 // Classroom filtered by searchClass
 const filteredClassrooms = computed(() => {
   if (!searchClass.value) return classrooms.value;
-
+  
   return classrooms.value.filter((classroom) =>
     classroom.c_name.toLowerCase().includes(searchClass.value.toLowerCase()),
   );
@@ -80,7 +80,7 @@ function changeCurrentPage(page) {
               placeholder="Find class"
               v-model="searchClass"
             />
-            <button class="btn btn-success" @click="submit">
+            <button class="btn btn-success">
               <i class="fas fa-search"></i>
             </button>
           </div>
@@ -89,6 +89,7 @@ function changeCurrentPage(page) {
         <ClassroomStudentList
           v-if="filteredClassrooms.length > 0"
           :classrooms="filteredClassrooms"
+          class="custom-classroom-list"
         />
 
         <h4 v-else>You have not attended any classes yet.</h4>
