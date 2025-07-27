@@ -9,7 +9,9 @@ const route = useRoute();
 const sid = Number(route.params?.sid);
 const { data, isLoading, error, refetch } = useSubmissionDetailByTeacher(sid);
 const submission = computed(() => data.value?.submission || {});
-const grade = ref(submission.value?.s_grade || '');
+const grade = ref(
+  submission.value ? (submission.value.s_grade * 100) / submission.value.a_max_points : '',
+);
 const comment = ref(submission.value?.s_comment || '');
 
 const selectedIndex = ref(-1);
@@ -22,7 +24,7 @@ const selectedFile = computed(() => {
 });
 
 function getFileViewerUrl(fileName) {
-  const baseUrl = 'public/uploads/' + fileName;
+  const baseUrl = 'http://localhost/public/uploads/' + fileName;
   const ext = fileName.split('.').pop().toLowerCase();
 
   if (['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt'].includes(ext)) {
@@ -128,7 +130,9 @@ watch(submission, (newVal) => {
 
               <div class="mb-3">
                 <label class="form-label fw-semibold m-0 me-1">Equivalent: </label>
-                <span> {{ (grade * submission.a_max_points) / 100 }} /{{ 10 }} </span>
+                <span>
+                  {{ (grade * submission.a_max_points) / 100 }} /{{ submission.a_max_points }}
+                </span>
               </div>
 
               <div class="mb-3">

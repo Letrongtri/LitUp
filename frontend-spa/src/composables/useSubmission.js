@@ -59,7 +59,7 @@ export function useDeleteSubmission() {
   return useMutation({
     mutationFn: (sid) => submissionsService.deleteSubmission(sid),
     onSuccess: () => {
-      queryClient.invalidateQueries(['student.submission.detail']);
+      queryClient.invalidateQueries(['assignment.detail']);
     },
   });
 }

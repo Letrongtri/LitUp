@@ -32,7 +32,7 @@ async function deleteProfile() {
   if (confirm('Do you want to delete account?')) {
     try {
       await deleteUserMultation.mutateAsync();
-      authStore.clearToken();
+      authStore.logout();
       router.push('/auth');
       alert('Your account has been deleted!');
     } catch (err) {

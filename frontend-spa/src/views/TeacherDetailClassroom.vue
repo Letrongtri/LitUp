@@ -203,7 +203,7 @@ async function removeMember(mid) {
               <div class="p-1 w-100 d-flex align-items-center justify-content-center">
                 <img
                   class="img-fluid img-thumbnail"
-                  :src="selectedMember.avatar_url"
+                  :src="'http://localhost/' + selectedMember.avatar_url"
                   alt="avatar"
                 />
               </div>

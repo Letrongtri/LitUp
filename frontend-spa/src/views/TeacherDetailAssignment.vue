@@ -58,7 +58,7 @@ function changeCurrentPage(page) {
 
 const submittedMembersWithSubmission = computed(() => {
   return submissions.value.map((sub) => {
-    const user = members.value.find((m) => m.user_id === sub.user_id);
+    const user = members.value.find((m) => m.uid === sub.uid);
     return {
       ...user,
       submission: sub,
