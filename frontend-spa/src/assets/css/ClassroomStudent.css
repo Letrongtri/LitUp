@@ -61,37 +61,11 @@
   min-width: 250px;
 }
 
-/* Updated grid layout for better card sizing */
 .classrooms-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 400px));
-  gap: 1.5rem;
-  justify-content: start;
-}
-
-/* Alternative: Fixed width approach */
-/* 
-.classrooms-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 380px);
-  gap: 1.5rem;
-  justify-content: start;
-}
-*/
-
-/* Alternative: Flexbox approach for more control */
-/*
-.classrooms-grid {
-  display: flex;
-  flex-wrap: wrap;
+  grid-template-columns: repeat(3, minmax(300px, 1fr));
   gap: 1.5rem;
 }
-
-.classroom-card {
-  width: 380px;
-  flex-shrink: 0;
-}
-*/
 
 .classroom-card {
   border: 1px solid #e0e0e0;
@@ -191,18 +165,4 @@ h4 {
   .card-actions {
     flex-direction: column;
   }
-
-  /* Mobile responsive for cards */
-  .classrooms-grid {
-    grid-template-columns: 1fr;
-    justify-content: center;
-  }
-
-  /* If using flexbox approach */
-  /*
-  .classroom-card {
-    width: 100%;
-    max-width: 400px;
-  }
-  */
 }

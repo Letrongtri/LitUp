@@ -27,7 +27,7 @@ const searchClass = ref('');
 // Classroom filtered by searchClass
 const filteredClassrooms = computed(() => {
   if (!searchClass.value) return classrooms.value;
-  
+
   return classrooms.value.filter((classroom) =>
     classroom.c_name.toLowerCase().includes(searchClass.value.toLowerCase()),
   );
@@ -94,7 +94,10 @@ function changeCurrentPage(page) {
 
         <h4 v-else>You have not attended any classes yet.</h4>
 
-        <div class="mt-5 d-flex flex-wrap justify-content-center align-items-center">
+        <div
+          v-if="filteredClassrooms.length > 0"
+          class="mt-5 d-flex flex-wrap justify-content-center align-items-center"
+        >
           <MainPagination
             :total-pages="totalPages"
             :current-page="currentPage"
