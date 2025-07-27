@@ -41,36 +41,48 @@ function handleBackdropClick(event) {
 </script>
 
 <template>
-  <div class="form-box bg-white shadow rounded p-4 p-md-5">
-    <h2 class="mb-4 text-primary fw-bold">Join Classroom</h2>
-
-    <div v-if="error" class="alert alert-danger">{{ error }}</div>
-    <div v-if="message" class="alert alert-success">{{ message }}</div>
-
-    <form @submit.prevent="handleJoinClassroom">
-      <div class="mb-3">
-        <label for="classId" class="form-label fw-semibold">Class ID:* </label>
-        <input id="classId" type="number" v-model="classId" class="form-control" required />
-      </div>
-
-      <div class="mb-3">
-        <label for="classCode" class="form-label fw-semibold">Class code:* </label>
-        <input
-          id="classCode"
-          type="text"
-          v-model="classCode"
-          class="form-control"
-          placeholder="Ex: ABC123"
-          required
-        />
-      </div>
-      <div class="d-flex align-items-center justify-content-end">
-        <button type="button" @click="emit('close')" class="btn btn-secondary px-4 py-2 me-3">
-          Cancel
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop" @click="handleBackdropClick">
+    <div class="modal-container">
+      <div class="form-box bg-white shadow rounded p-4 p-md-5">
+        <!-- Close Button -->
+        <button type="button" class="btn-close" @click="emit('close')" aria-label="Close">
+          ×
         </button>
-        <button type="submit" :disabled="creating" class="btn btn-primary px-4 py-2">Join</button>
+        
+        <h2 class="mb-4 text-primary fw-bold">Join Classroom</h2>
+
+        <div v-if="error" class="alert alert-danger">{{ error }}</div>
+        <div v-if="message" class="alert alert-success">{{ message }}</div>
+
+        <form @submit.prevent="handleJoinClassroom">
+          <div class="mb-3">
+            <label for="classId" class="form-label fw-semibold">Class ID:* </label>
+            <input id="classId" type="number" v-model="classId" class="form-control" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="classCode" class="form-label fw-semibold">Class code:* </label>
+            <input
+              id="classCode"
+              type="text"
+              v-model="classCode"
+              class="form-control"
+              placeholder="Ex: ABC123"
+              required
+            />
+          </div>
+          <div class="d-flex align-items-center justify-content-end">
+            <button type="button" @click="emit('close')" class="btn btn-secondary px-4 py-2 me-3">
+              Cancel
+            </button>
+            <button type="submit" :disabled="creating" class="btn btn-primary px-4 py-2">
+              {{ creating ? 'Joining...' : 'Join' }}
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -111,7 +123,7 @@ function handleBackdropClick(event) {
   right: 15px;
   background: none;
   border: none;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: #6c757d;
   cursor: pointer;
   padding: 8px;
@@ -122,6 +134,7 @@ function handleBackdropClick(event) {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  font-weight: bold;
 }
 
 .btn-close:hover {
@@ -156,9 +169,14 @@ button.btn {
   border-color: #0d6efd;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: #0b5ed7;
   border-color: #0a58ca;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-secondary {
