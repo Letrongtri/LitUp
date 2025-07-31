@@ -15,23 +15,6 @@ async function fetchMe(req, res, next) {
   }
 }
 
-async function getUser(req, res, next) {
-  const { uid } = req.params;
-
-  try {
-    const user = await usersService.getUserById(uid);
-
-    if (!user) {
-      return next(new ApiError(404, "User not found"));
-    }
-
-    return res.json(JSend.success({ user }));
-  } catch (error) {
-    console.log(error);
-    return next(new ApiError(500, "Internal Server Error"));
-  }
-}
-
 async function updateUser(req, res, next) {
   try {
     const user = await usersService.updateUser(
@@ -64,7 +47,6 @@ async function deleteUser(req, res, next) {
 
 module.exports = {
   fetchMe,
-  getUser,
   updateUser,
   deleteUser,
 };

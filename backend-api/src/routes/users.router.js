@@ -39,34 +39,16 @@ const updateUserData = z.object({
   ),
 });
 
-/** User id */
-const getUserID = z.object({
-  input: z
-    .object({
-      uid: z.coerce.number().nonnegative(),
-    })
-    .strict(),
-});
-
 module.exports.setup = (app) => {
   app.use("/api/users", router);
 
   router
-    .route("/me")
-    .get(usersController.fetchMe)
-    .all(allowedMethods(["GET"]));
-
-  router
     .route("/")
+    .get(usersController.fetchMe)
     .put(
       [avatarUpload, validateRequest(updateUserData)],
       usersController.updateUser
     )
     .delete(usersController.deleteUser)
-    .all(allowedMethods(["PUT", "DELETE"]));
-
-  router
-    .route("/:uid")
-    .get(validateRequest(getUserID), usersController.getUser)
-    .all(allowedMethods(["GET"]));
+    .all(allowedMethods(["GET", "PUT", "DELETE"]));
 };

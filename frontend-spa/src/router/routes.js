@@ -39,7 +39,7 @@ const routes = [
   },
   { path: '/auth', name: 'auth', component: AuthPage, meta: { layout: AuthLayout } },
   {
-    path: '/users/:uid',
+    path: '/users',
     name: 'profile',
     component: ProfileUser,
     meta: { layout: DefaultLayout },

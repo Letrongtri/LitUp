@@ -444,7 +444,7 @@
         "security": []
       }
     },
-    "/api/users/me": {
+    "/api/users/": {
       "get": {
         "summary": "Get my profile",
         "description": "Get current my profile information (requires JWT)",
@@ -479,15 +479,12 @@
           "401": { "$ref": "#/components/responses/401Unauthorized" },
           "500": { "$ref": "#/components/responses/500InternalServerError" }
         }
-      }
-    },
-    "/api/users/": {
+      },
       "put": {
         "summary": "Update my profile",
         "description": "Update my profile information",
         "operationId": "updateUser",
         "tags": ["users"],
-        "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -548,7 +545,6 @@
         "description": "Delete my account",
         "operationId": "deleteUser",
         "tags": ["users"],
-        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Account deleted successfully",
@@ -561,52 +557,12 @@
         }
       }
     },
-    "/api/users/{uid}": {
-      "get": {
-        "summary": "Get user profile",
-        "description": "Get current user profile information (requires JWT)",
-        "operationId": "getUser",
-        "tags": ["users"],
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "$ref": "#/components/parameters/userIdParam" }],
-        "responses": {
-          "200": {
-            "description": "User profile information",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "description": "The response status",
-                      "enum": ["success"]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "user": {
-                          "$ref": "#/components/schemas/Users"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/401Unauthorized" },
-          "500": { "$ref": "#/components/responses/500InternalServerError" }
-        }
-      }
-    },
     "/api/teacher/classrooms": {
       "get": {
         "summary": "Get classrooms created by teacher",
         "description": "Return list of classrooms where the user is teacher",
         "operationId": "getTeacherClassrooms",
         "tags": ["classrooms"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "$ref": "#/components/parameters/limitParam" },
           { "$ref": "#/components/parameters/pageParam" }
@@ -650,7 +606,6 @@
         "description": "Teacher create a new classroom",
         "operationId": "createClassroom",
         "tags": ["classrooms"],
-        "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -704,7 +659,6 @@
         "description": "Detail of classroom",
         "operationId": "getClassroom",
         "tags": ["classrooms"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
         "responses": {
           "200": {
@@ -743,7 +697,6 @@
         "description": "Update classroom information",
         "operationId": "updateClassroom",
         "tags": ["classrooms"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
         "requestBody": {
           "required": true,
@@ -798,7 +751,6 @@
         "description": "Delete a classroom",
         "operationId": "deleteClassroom",
         "tags": ["classrooms"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
         "responses": {
           "200": {
@@ -818,7 +770,6 @@
         "description": "Members of classroom",
         "operationId": "getMemberInClass",
         "tags": ["classrooms"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
         "responses": {
           "200": {
@@ -862,7 +813,6 @@
         "description": "Teacher delete a classroom member",
         "operationId": "removeMember",
         "tags": ["classrooms"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "$ref": "#/components/parameters/classroomIdParam" },
           { "$ref": "#/components/parameters/memberIdParam" }
@@ -885,7 +835,6 @@
         "description": "Get list of classroom student has joined",
         "operationId": "getClassrooms",
         "tags": ["classrooms"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "$ref": "#/components/parameters/limitParam" },
           { "$ref": "#/components/parameters/pageParam" }
@@ -927,7 +876,6 @@
         "description": "Detail of classroom",
         "operationId": "getClassroomDetailByStudent",
         "tags": ["classrooms"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
         "responses": {
           "200": {
@@ -976,7 +924,6 @@
         "description": "Student joins classroom",
         "operationId": "joinClassroom",
         "tags": ["classrooms"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
         "requestBody": {
           "required": true,
@@ -1031,7 +978,6 @@
         "description": "Create a new assignment in classroom",
         "operationId": "createAssignment",
         "tags": ["assignments"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
         "requestBody": {
           "required": true,
@@ -1101,7 +1047,6 @@
         "description": "Get list of assignments in a classroom",
         "operationId": "getAssignments",
         "tags": ["assignments"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
         "responses": {
           "200": {
@@ -1141,7 +1086,6 @@
         "description": "Get detailed information about an assignment",
         "operationId": "getAssignment",
         "tags": ["assignments"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/assignmentIdParam" }],
         "responses": {
           "200": {
@@ -1180,7 +1124,6 @@
         "description": "Update assignment info",
         "operationId": "updateAssignment",
         "tags": ["assignments"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/assignmentIdParam" }],
         "requestBody": {
           "required": true,
@@ -1247,7 +1190,6 @@
         "description": "Delete an assignment",
         "operationId": "deleteAssignment",
         "tags": ["assignments"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/assignmentIdParam" }],
         "responses": {
           "200": {
@@ -1267,7 +1209,6 @@
         "description": "Get list of assignments in a classroom",
         "operationId": "getAssignments",
         "tags": ["assignments"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/classroomIdParam" }],
         "responses": {
           "200": {
@@ -1307,7 +1248,6 @@
         "description": "Get detailed information about an assignment",
         "operationId": "getAssignment",
         "tags": ["assignments"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/assignmentIdParam" }],
         "responses": {
           "200": {
@@ -1348,7 +1288,6 @@
         "description": "View submissions",
         "operationId": "getSubmissions",
         "tags": ["submissions"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "$ref": "#/components/parameters/assignmentIdParam" },
           { "$ref": "#/components/parameters/limitParam" },
@@ -1395,7 +1334,6 @@
         "description": "Get detailed information about an submission",
         "operationId": "getSubmission",
         "tags": ["submissions"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/submissionIdParam" }],
         "responses": {
           "200": {
@@ -1434,7 +1372,6 @@
         "description": "Teacher grade student's submissions",
         "operationId": "gradeSubmission",
         "tags": ["submissions"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/submissionIdParam" }],
         "requestBody": {
           "required": true,
@@ -1491,7 +1428,6 @@
         "description": "Student submits assignment",
         "operationId": "submitAssignment",
         "tags": ["submissions"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/assignmentIdParam" }],
         "requestBody": {
           "required": true,
@@ -1555,7 +1491,6 @@
         "description": "Get detailed information about an submission",
         "operationId": "getSubmissionByStudent",
         "tags": ["submissions"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/assignmentIdParam" }],
         "responses": {
           "200": {
@@ -1594,7 +1529,6 @@
         "description": "Update submission info",
         "operationId": "updateSubmissionByStudent",
         "tags": ["submissions"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/assignmentIdParam" }],
         "requestBody": {
           "required": true,
@@ -1660,7 +1594,6 @@
         "description": "Delete an submission",
         "operationId": "deleteSubmissionByStudent",
         "tags": ["submissions"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/submissionIdParam" }],
         "responses": {
           "200": {
@@ -1680,7 +1613,6 @@
         "description": "Get overall statistics",
         "operationId": "getOverview",
         "tags": ["admin"],
-        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Admin view statistics",
@@ -1712,7 +1644,6 @@
         "description": "Get list of all users",
         "operationId": "getAllUsers",
         "tags": ["admin"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "$ref": "#/components/parameters/limitParam" },
           { "$ref": "#/components/parameters/pageParam" }
@@ -1755,7 +1686,6 @@
         "description": "Admin can lock or unlock user accounts",
         "operationId": "toggleUserStatus",
         "tags": ["admin"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/userIdParam" }],
         "requestBody": {
           "required": true,
@@ -1812,7 +1742,6 @@
         "description": "Get list of all classrooms for admin management",
         "operationId": "getAllClassrooms",
         "tags": ["admin"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "$ref": "#/components/parameters/limitParam" },
           { "$ref": "#/components/parameters/pageParam" }
@@ -1911,7 +1840,6 @@
         "description": "Get list of all assignments for admin management",
         "operationId": "getAllAssignments",
         "tags": ["admin"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "$ref": "#/components/parameters/limitParam" },
           { "$ref": "#/components/parameters/pageParam" }
@@ -1956,7 +1884,6 @@
         "description": "Admin can lock or unlock assignments",
         "operationId": "toggleAssignmentStatus",
         "tags": ["admin"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [{ "$ref": "#/components/parameters/assignmentIdParam" }],
         "requestBody": {
           "required": true,
@@ -2013,7 +1940,6 @@
         "description": "Get list of all submissions for admin management",
         "operationId": "getAllSubmissions",
         "tags": ["admin"],
-        "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "$ref": "#/components/parameters/limitParam" },
           { "$ref": "#/components/parameters/pageParam" }

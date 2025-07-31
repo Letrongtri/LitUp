@@ -1,4 +1,4 @@
-import authService from '@/services/auth.service';
+import usersService from '@/services/users.service';
 import { defineStore } from 'pinia';
 
 export const useAuthStore = defineStore('auth', {
@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async fetchMe() {
-      const user = await authService.fetchMe();
+      const user = await usersService.fetchMe();
       this.user = user.data.user;
       return user;
     },

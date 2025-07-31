@@ -36,7 +36,13 @@ let assignments = computed(() => assignmentData.value || []);
       <div class="container py-4 px-3">
         <h2 class="fw-bold text-primary mb-1">{{ classroom.c_name }}</h2>
         <div class="d-flex align-items-center gap-2 text-muted mt-3">
-          <img :src="classroom.teacher_avatar_url" class="rounded-circle" width="35" height="35" />
+          <img
+            :src="classroom.teacher_avatar_url"
+            class="rounded-circle"
+            width="35"
+            height="35"
+            style="object-fit: cover"
+          />
           <p class="m-0 ms-2">{{ classroom.teacher_name }}</p>
         </div>
       </div>

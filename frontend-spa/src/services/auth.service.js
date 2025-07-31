@@ -12,14 +12,9 @@ function authService() {
     return await http.post(`${baseUrl}/register`, payload);
   }
 
-  async function fetchMe() {
-    return await http.get('/users/me');
-  }
-
   return {
     login,
     register,
-    fetchMe,
   };
 }
 
