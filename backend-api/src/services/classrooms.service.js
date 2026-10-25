@@ -64,7 +64,7 @@ async function getClassroomById(cid) {
     .where("c.cid", cid)
     .select(
       "c.*",
-      knex.raw("concat(u_first_name, ' ', u_last_name) as teacher_name")
+      knex.raw("concat(u_first_name, ' ', u_last_name) as teacher_name"),
     )
     .first();
 }
@@ -88,7 +88,7 @@ async function getClassroomDetailByStudent(uid, cid) {
       "c_name",
       "c_created_at",
       knex.raw("concat(u_first_name, ' ', u_last_name) as teacher_name"),
-      "u_avatar_id"
+      "u_avatar_id",
     )
     .first();
 
@@ -100,9 +100,7 @@ async function getClassroomDetailByStudent(uid, cid) {
 
   return {
     ...data,
-    teacher_avatar_url: avatar
-      ? `/public/uploads/${avatar.f_name}`
-      : DEFAULT_AVATAR,
+    teacher_avatar_url: avatar ? `/uploads/${avatar.f_name}` : DEFAULT_AVATAR,
   };
 }
 
@@ -229,7 +227,7 @@ async function getMemberByClassId(cid) {
       "u.u_email",
       "u.u_avatar_id",
       "m.mid",
-      "m.m_joined_at"
+      "m.m_joined_at",
     );
 
   const DEFAULT_AVATAR = "/public/images/blank-profile-picture.png";

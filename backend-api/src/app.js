@@ -29,6 +29,9 @@ const swaggerDocument = require("../docs/openapiSpec.json");
 // authorization
 const authenticateToken = require("./middlewares/auth.middleware");
 
+// cleanup upload error
+const cleanupUploadOnError = require("./middlewares/cleanupUploadError.middleware");
+
 const app = express();
 
 app.use(cors());
@@ -45,6 +48,7 @@ app.get("/", (req, res) => {
 // public routes
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/public", express.static("public"));
+app.use("/uploads", express.static("uploads"));
 
 authRouter.setup(app);
 
@@ -62,6 +66,8 @@ usersRouter.setup(app);
 
 // Handle 404 error for unknow URL paths
 app.use(resourceNotFound);
+
+app.use(cleanupUploadOnError);
 // Define the centralized error handling middleware, after all routes
 // and middleware have been defined
 app.use(handleError);

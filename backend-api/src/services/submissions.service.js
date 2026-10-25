@@ -3,7 +3,7 @@ const knex = require("../database/knex");
 const {
   saveFile,
   getAttachments,
-  deleteFileByPath,
+  deleteFiles,
 } = require("./attachments.service");
 const Paginator = require("./paginator");
 
@@ -104,6 +104,7 @@ async function createSubmission(newSubmission, files) {
     return { sid, ...submissionData, attachments };
   } catch (error) {
     await trx.rollback();
+    await deleteFiles(files);
     throw error;
   }
 }
@@ -124,7 +125,7 @@ async function getSubmissions(aid, query) {
       "s_updated_at",
       "s_grade",
       "s_comment",
-      "s_graded_at"
+      "s_graded_at",
     )
     .orderBy("sid", "asc")
     .limit(paginator.limit)
@@ -282,10 +283,6 @@ async function updateSubmission(uid, aid, files) {
 
     await attachmentRepository().transacting(trx).whereIn("fid", fidList).del();
 
-    oldFiles.forEach((f) => {
-      deleteFileByPath(`/public/uploads/${f.f_name}`);
-    });
-
     // add new files
     let attachments = [];
     for (const file of files) {
@@ -303,9 +300,13 @@ async function updateSubmission(uid, aid, files) {
       .update("s_updated_at", updatedSubmission.s_updated_at);
 
     await trx.commit();
+
+    deleteFiles(oldFiles.map((f) => `/uploads/${f.f_name}`));
+
     return { ...updatedSubmission, attachments };
   } catch (error) {
     await trx.rollback();
+    await deleteFiles(files);
     throw error;
   }
 }
@@ -350,13 +351,10 @@ async function deleteSubmission(sid) {
 
     await attachmentRepository().transacting(trx).whereIn("fid", fidList).del();
 
-    fName.forEach((f) => {
-      deleteFileByPath(`/public/uploads/${f}`);
-    });
-
     await submissionRepository().transacting(trx).where("sid", sid).del();
 
     await trx.commit();
+    deleteFiles(fName.map((f) => `/uploads/${f}`));
     return { deletedSubmission };
   } catch (error) {
     await trx.rollback();
@@ -391,7 +389,7 @@ async function gradeSubmission(sid, data) {
       await trx.rollback();
       throw new ApiError(
         400,
-        "Grade must be lower than max points of this assignment"
+        "Grade must be lower than max points of this assignment",
       );
     }
 

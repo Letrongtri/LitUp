@@ -1,8 +1,8 @@
 const knex = require("../database/knex");
 const {
   saveFile,
-  deleteFileByPath,
   getAttachments,
+  deleteFiles,
 } = require("./attachments.service");
 
 function assignmentRepository() {
@@ -62,6 +62,9 @@ async function createAssignment(newAssignment, files) {
     return { aid, ...assignmentData, attachments };
   } catch (error) {
     await trx.rollback();
+
+    // Delete files if an error occurs
+    await deleteFiles(files);
     throw error;
   }
 }
@@ -76,7 +79,7 @@ async function getAssignments(cid) {
       "a_max_points",
       "a_deadline_at",
       "a_allow_late_submission",
-      "a_status"
+      "a_status",
     )
     .orderBy("aid", "asc");
 
@@ -142,6 +145,7 @@ async function getAssignment(aid) {
 
 async function updateAssignment(aid, updateData, files) {
   const trx = await knex.transaction();
+  const filesToDeleteFromDisk = []; // Stage list in memory
 
   try {
     const updatedAssignment = await assignmentRepository()
@@ -152,6 +156,7 @@ async function updateAssignment(aid, updateData, files) {
 
     if (!updatedAssignment) {
       await trx.rollback();
+      await deleteFiles(files);
       return null;
     }
 
@@ -186,7 +191,7 @@ async function updateAssignment(aid, updateData, files) {
           .del();
 
         oldFiles.forEach((f) => {
-          deleteFileByPath(`/public/uploads/${f.f_name}`);
+          filesToDeleteFromDisk.push(`./uploads/${f.f_name}`);
         });
       }
 
@@ -212,9 +217,13 @@ async function updateAssignment(aid, updateData, files) {
     }
 
     await trx.commit();
+
+    await deleteFiles(filesToDeleteFromDisk);
+
     return { ...assignmentData, attachments };
   } catch (error) {
     await trx.rollback();
+    await deleteFiles(files);
     throw error;
   }
 }
@@ -242,7 +251,7 @@ async function deleteAssignment(aid) {
     if (submission) {
       await trx.rollback();
       throw new Error(
-        "Cannot delete assignment: There are existing submissions."
+        "Cannot delete assignment: There are existing submissions.",
       );
     }
 
@@ -259,6 +268,7 @@ async function deleteAssignment(aid) {
         .select("f_name");
 
       const fName = fList.map((f) => f.f_name);
+      const filesToDeleteFromDisk = [];
 
       await assignmentAttachmentRepository()
         .transacting(trx)
@@ -271,13 +281,15 @@ async function deleteAssignment(aid) {
         .del();
 
       fName.forEach((f) => {
-        deleteFileByPath(`/public/uploads/${f}`);
+        filesToDeleteFromDisk.push(`./uploads/${f}`);
       });
     }
 
     await assignmentRepository().transacting(trx).where("aid", aid).del();
 
     await trx.commit();
+
+    await deleteFiles(filesToDeleteFromDisk);
     return { deletedAssignment };
   } catch (error) {
     await trx.rollback();

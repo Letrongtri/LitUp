@@ -141,7 +141,7 @@ async function getAllUsers(limit, page) {
       : null;
 
     user.avatar_url = avatar
-      ? `/public/uploads/${avatar.f_name}`
+      ? `/uploads/${avatar.f_name}`
       : DEFAULT_AVATAR;
   }
 

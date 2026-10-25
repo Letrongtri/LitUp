@@ -57,7 +57,7 @@ function dowloadFile(attachment) {
   }
 
   const link = document.createElement('a');
-  link.href = `/public/uploads/${attachment.f_name}`;
+  link.href = `/uploads/${attachment.f_name}`;
   link.download = attachment.f_original_name;
   link.target = '_blank';
   document.body.appendChild(link);

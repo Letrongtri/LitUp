@@ -24,7 +24,7 @@ const selectedFile = computed(() => {
 });
 
 function getFileViewerUrl(fileName) {
-  const baseUrl = 'http://localhost/public/uploads/' + fileName;
+  const baseUrl = 'http://localhost/uploads/' + fileName;
   const ext = fileName.split('.').pop().toLowerCase();
 
   if (['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt'].includes(ext)) {

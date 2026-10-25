@@ -1,5 +1,5 @@
 const knex = require("../database/knex");
-const { saveFile, deleteFileByPath } = require("./attachments.service");
+const { saveFile, deleteFiles } = require("./attachments.service");
 const bcrypt = require("bcrypt");
 
 function userRepository() {
@@ -37,7 +37,7 @@ async function getUserById(uid) {
 
   return {
     ...user,
-    avatar_url: avatar ? `/public/uploads/${avatar.f_name}` : DEFAULT_AVATAR,
+    avatar_url: avatar ? `/uploads/${avatar.f_name}` : DEFAULT_AVATAR,
   };
 }
 
@@ -51,7 +51,11 @@ async function updateUser(uid, updateData, file) {
       .select("*")
       .first();
 
-    if (!updatedUser) return null;
+    if (!updatedUser) {
+      await trx.rollback();
+      if (file) await deleteFiles([file]);
+      return null;
+    }
 
     const userData = readUserData(updateData);
 
@@ -60,26 +64,29 @@ async function updateUser(uid, updateData, file) {
       userData.u_password = hashedPassword;
     }
 
-    updatedUser.avatar_url = "/public/images/blank-profile-picture.png";
+    let avatar_url = "/public/images/blank-profile-picture.png";
+    let old_avatar = null;
 
-    if (file) {
-      const avatar = await saveFile(file, trx);
-      userData.u_avatar_id = avatar.fid;
-      updatedUser.avatar_url = `/public/uploads/${avatar.f_name}`;
-    }
-
-    // Nếu có avatar cũ → xóa
     if (updatedUser.u_avatar_id) {
-      const oldAvatar = await attachmentRepository()
+      old_avatar = await attachmentRepository()
         .transacting(trx)
         .where("fid", updatedUser.u_avatar_id)
         .first();
 
-      if (oldAvatar?.f_name) {
-        deleteFileByPath(`public/uploads/${oldAvatar.f_name}`);
+      if (old_avatar.f_name) {
+        avatar_url = `/uploads/${old_avatar.f_name}`;
+      }
+    }
+
+    if (file) {
+      const avatar = await saveFile(file, trx);
+      userData.u_avatar_id = avatar.fid;
+      avatar_url = `/uploads/${avatar.f_name}`;
+
+      if (old_avatar?.f_name) {
         await attachmentRepository()
           .transacting(trx)
-          .where("fid", updatedUser.u_avatar_id)
+          .where("fid", old_avatar.fid)
           .delete();
       }
     }
@@ -94,9 +101,19 @@ async function updateUser(uid, updateData, file) {
     }
 
     await trx.commit();
-    return { ...updatedUser, ...userData };
+
+    if (old_avatar?.f_name) {
+      await deleteFiles([`/uploads/${old_avatar.f_name}`]);
+    }
+
+    return {
+      ...updatedUser,
+      ...userData,
+      avatar_url,
+    };
   } catch (error) {
     await trx.rollback();
+    if (file) await deleteFiles([file]);
     throw error;
   }
 }
@@ -115,14 +132,14 @@ async function deleteUser(uid) {
     await userRepository().transacting(trx).where("uid", uid).del();
 
     // Nếu có avatar cũ → xóa
+    let oldAvatar = null;
     if (deletedUser.u_avatar_id) {
-      const oldAvatar = await attachmentRepository()
+      oldAvatar = await attachmentRepository()
         .transacting(trx)
         .where("fid", deletedUser.u_avatar_id)
         .first();
 
       if (oldAvatar?.f_name) {
-        deleteFileByPath(`/public/uploads/${oldAvatar.f_name}`);
         await attachmentRepository()
           .transacting(trx)
           .where("fid", deletedUser.u_avatar_id)
@@ -131,6 +148,10 @@ async function deleteUser(uid) {
     }
 
     await trx.commit();
+
+    if (oldAvatar?.f_name) {
+      await deleteFiles([`uploads/${oldAvatar.f_name}`]);
+    }
     return deletedUser;
   } catch (error) {
     await trx.rollback();

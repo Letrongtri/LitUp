@@ -81,7 +81,7 @@ async function loginUser(payload) {
 
   return {
     ...user,
-    avatar_url: avatar ? `/public/uploads/${avatar.f_name}` : DEFAULT_AVATAR,
+    avatar_url: avatar ? `/uploads/${avatar.f_name}` : DEFAULT_AVATAR,
   };
 }
 

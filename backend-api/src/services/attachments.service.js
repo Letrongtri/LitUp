@@ -1,4 +1,5 @@
-const { unlink } = require("node:fs");
+const { unlink } = require("node:fs/promises");
+const path = require("node:path");
 const knex = require("../database/knex");
 
 function attachmentRepository() {
@@ -25,14 +26,30 @@ async function saveFile(file, trx = null) {
   return { fid: result.fid, ...fileData };
 }
 
-function deleteFileByPath(filePath) {
-  unlink(`.${filePath}`, () => {});
-}
-
 function getAttachments(fids) {
   return attachmentRepository()
     .whereIn("fid", fids)
     .select("fid", "f_name", "f_original_name", "f_type", "f_size");
 }
 
-module.exports = { saveFile, deleteFileByPath, getAttachments };
+async function deleteFiles(filePaths = []) {
+  if (!filePaths || !filePaths.length) return;
+
+  await Promise.allSettled(
+    filePaths.map((fp) => {
+      const target = typeof fp === "string" ? fp : fp.path;
+      const normalizedPath = path.isAbsolute(target)
+        ? target
+        : path.resolve(".", target);
+
+      return unlink(normalizedPath).catch((err) => {
+        // If file not found, ignore and continue
+        if (err.code !== "ENOENT") {
+          console.error("Error deleting file:", err);
+        }
+      });
+    }),
+  );
+}
+
+module.exports = { saveFile, getAttachments, deleteFiles };
